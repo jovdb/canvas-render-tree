@@ -1,17 +1,20 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
+/* eslint-disable prefer-spread */
+/* eslint-disable prefer-rest-params */
 export interface ILogger {
   log(s: string): void;
 }
 
 // Wrap strings with quotes
-function logArgs(args: ArrayLike<unknown>) {
+function logArgs(args: unknown[]) {
   return `${[...args]
     .map((v) => {
       const type = typeof v;
-      return type === 'string' || type === 'object'
+      return type === "string" || type === "object"
         ? JSON.stringify(v)
         : `${v}`;
     })
-    .join(', ')}`;
+    .join(", ")}`;
 }
 
 export class CanvasContext implements Partial<CanvasRenderingContext2D> {
@@ -19,18 +22,18 @@ export class CanvasContext implements Partial<CanvasRenderingContext2D> {
   private logger: ILogger | undefined;
   private name: string;
 
-  constructor(ctx: CanvasRenderingContext2D, logger?: ILogger, name = 'ctx') {
+  constructor(ctx: CanvasRenderingContext2D, logger?: ILogger, name = "ctx") {
     this.ctx = ctx;
     this.logger = logger;
     this.name = name;
-    this.logger?.log(`const ${this.name} = new CanvasrenderingContext2D`);
+    this.logger?.log(`const ${this.name} = new CanvasRenderingContext2D`);
   }
 
   drawImage(): void {
     this.logger?.log(
       `${this.name}.drawImage(image, ${logArgs([...arguments].slice(1))})`
     );
-    this.ctx.drawImage.apply(this.ctx, arguments);
+    this.ctx.drawImage.apply(this.ctx, arguments as any);
   }
 
   reset() {
@@ -49,32 +52,32 @@ export class CanvasContext implements Partial<CanvasRenderingContext2D> {
   }
 
   fillRect() {
-    this.logger?.log(`${this.name}.fillRect(${logArgs(arguments)})`);
-    this.ctx.fillRect.apply(this.ctx, arguments);
+    this.logger?.log(`${this.name}.fillRect(${logArgs(arguments as any)})`);
+    this.ctx.fillRect.apply(this.ctx, arguments as any);
   }
 
   clearRect() {
-    this.logger?.log(`${this.name}.clearRect(${logArgs(arguments)})`);
-    this.ctx.clearRect.apply(this.ctx, arguments);
+    this.logger?.log(`${this.name}.clearRect(${logArgs(arguments as any)})`);
+    this.ctx.clearRect.apply(this.ctx, arguments as any);
   }
 
   strokeRect() {
-    this.logger?.log(`${this.name}.strokeRect(${logArgs(arguments)})`);
-    this.ctx.strokeRect.apply(this.ctx, arguments);
+    this.logger?.log(`${this.name}.strokeRect(${logArgs(arguments as any)})`);
+    this.ctx.strokeRect.apply(this.ctx, arguments as any);
   }
 
   fillText() {
-    this.logger?.log(`${this.name}.fillText(${logArgs(arguments)})`);
-    this.ctx.fillText.apply(this.ctx, arguments);
+    this.logger?.log(`${this.name}.fillText(${logArgs(arguments as any)})`);
+    this.ctx.fillText.apply(this.ctx, arguments as any);
   }
 
   measureText() {
-    return this.ctx.measureText.apply(this.ctx, arguments);
+    return this.ctx.measureText.apply(this.ctx, arguments as any);
   }
 
   translate() {
-    this.logger?.log(`${this.name}.translate(${logArgs(arguments)})`);
-    this.ctx.translate.apply(this.ctx, arguments);
+    this.logger?.log(`${this.name}.translate(${logArgs(arguments as any)})`);
+    this.ctx.translate.apply(this.ctx, arguments as any);
   }
 
   get canvas() {
@@ -82,12 +85,12 @@ export class CanvasContext implements Partial<CanvasRenderingContext2D> {
   }
 
   getImageData() {
-    this.logger?.log(`${this.name}.getImageData(${logArgs(arguments)})`);
-    return this.ctx.getImageData.apply(this.ctx, arguments);
+    this.logger?.log(`${this.name}.getImageData(${logArgs(arguments as any)})`);
+    return this.ctx.getImageData.apply(this.ctx, arguments as any);
   }
   putImageData() {
     this.logger?.log(`${this.name}.putImageData(<data>)`);
-    return this.ctx.putImageData.apply(this.ctx, arguments);
+    return this.ctx.putImageData.apply(this.ctx, arguments as any);
   }
 
   set fillStyle(v: string) {

@@ -1,13 +1,15 @@
-import { IRenderItem } from '../canvas';
+import { IRenderItem } from "../canvas";
 
 // Helper function to convert RGB to HSL
 function rgbToHsl(r: number, g: number, b: number) {
-  (r /= 255), (g /= 255), (b /= 255);
+  r /= 255;
+  g /= 255;
+  b /= 255;
   const max = Math.max(r, g, b),
     min = Math.min(r, g, b);
-  let h,
-    s,
-    l = (max + min) / 2;
+  let h = 0;
+  let s = 0;
+  const l = (max + min) / 2;
 
   if (max === min) {
     h = s = 0; // achromatic
@@ -61,7 +63,7 @@ function hslToRgb(h: number, s: number, l: number) {
 export const saturation = ({
   factor = 0,
 }: { factor?: number } = {}): IRenderItem => ({
-  name: 'saturation',
+  name: "saturation",
   draw(ctx) {
     const imageData = ctx.getImageData(
       0,

@@ -117,14 +117,12 @@ export function drawKernel(ctx: CanvasRenderingContext2D, kernel: number[][]) {
 
   let min = 0;
   let max = 0;
-  let sum = 0;
   for (let y = 0; y < kernel.length; y++) {
     const row = kernel[y];
     for (let x = 0; x < row.length; x++) {
       const value = row[x];
       if (min > value) min = value;
       if (max < value) max = value;
-      sum += value;
     }
   }
 

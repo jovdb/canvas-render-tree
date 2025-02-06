@@ -1,4 +1,4 @@
-import { CanvasContext } from './canvas-context';
+import { CanvasContext } from "./canvas-context";
 
 type DrawFn = (ctx: CanvasRenderingContext2D) => void;
 
@@ -61,7 +61,7 @@ function walk(items: RenderTree, ctx: CanvasRenderingContext2D, name = '') {
 }
 */
 
-function walk(items: RenderTree | undefined, name = '') {
+function walk(items: RenderTree | undefined, name = "") {
   return items?.reduce((prev, item) => {
     return (ctx) => {
       if (name) console.group(name, items?.length ?? 0);
@@ -76,7 +76,7 @@ function walk(items: RenderTree | undefined, name = '') {
           );
         } else {
           prev?.(ctx);
-          item.draw(
+          item.draw?.(
             ctx,
             item.children
               ? (ctx) => walk(item.children, `${item.name}-children`)?.(ctx)
@@ -91,8 +91,8 @@ function walk(items: RenderTree | undefined, name = '') {
 }
 
 export function getContext2d(canvas: HTMLCanvasElement, name: string) {
-  const ctx = canvas.getContext('2d');
-  if (!ctx) throw new Error('Error creating canvas 2D context');
+  const ctx = canvas.getContext("2d");
+  if (!ctx) throw new Error("Error creating canvas 2D context");
 
   const ctx2 = new CanvasContext(
     ctx,
@@ -101,18 +101,21 @@ export function getContext2d(canvas: HTMLCanvasElement, name: string) {
   ) as unknown as CanvasRenderingContext2D;
 
   return new Proxy(ctx2, {
-    set(target, key, value) {
+    set(target, key: keyof CanvasRenderingContext2D, value) {
       if (!(key in target)) {
         throw new Error(`Missing prop '${key}' on CanvasContext`);
       }
-      return (target[key] = value);
+      // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+      // @ts-expect-error
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      return target[key as any] = value;
     },
   });
 }
 
 export function draw(items: IRenderItem[]) {
-  const canvasEl = document.querySelector<HTMLCanvasElement>('canvas')!;
-  const ctx = getContext2d(canvasEl, 'rootCtx');
+  const canvasEl = document.querySelector<HTMLCanvasElement>("canvas")!;
+  const ctx = getContext2d(canvasEl, "rootCtx");
   ctx.reset(); // clear and reset unclosed operations: globalAlpha, ...
-  walk(items, 'root')?.(ctx);
+  walk(items, "root")?.(ctx);
 }

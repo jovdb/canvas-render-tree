@@ -27,8 +27,6 @@ export const mask = (
   },
   draw(ctx, drawChildren) {
     ctx.save();
-    if (input) {
-    }
     drawChildren?.(ctx, mask); // as new layer?
     // Use alpha
     ctx.globalCompositeOperation = 'destination-in';

@@ -1,12 +1,12 @@
-import './App.css';
+import "./App.css";
 
-import { loadResourcesAsync } from './resources';
-import { IRenderItem } from './canvas';
-import { Canvas } from './components/Canvas';
-import { RenderTree } from './components/RenderTree';
-import { useMemo, useState } from 'react';
-import { useQuery } from '@tanstack/react-query';
-import { samples } from './samples';
+import { loadResourcesAsync } from "./resources";
+import { IRenderItem } from "./canvas";
+import { Canvas } from "./components/Canvas";
+import { RenderTree } from "./components/RenderTree";
+import { useMemo, useState } from "react";
+import { useQuery } from "@tanstack/react-query";
+import { samples } from "./samples";
 
 function filterTree(
   items: readonly IRenderItem[] | undefined,
@@ -37,12 +37,12 @@ function App() {
     isFetching,
   } = useQuery({
     queryFn: () => loadResourcesAsync(),
-    queryKey: ['init'],
+    queryKey: ["init"],
   });
 
   // TODO: Show Tree, multiselect layers
   const [selectedItems, setSelectedItems] = useState<IRenderItem[]>([]);
-  const [sampleKey, setSampleKey] = useState<keyof typeof samples>('cap');
+  const [sampleKey, setSampleKey] = useState<keyof typeof samples>("cap");
 
   const tree = useMemo(() => {
     if (!resources) return undefined;
@@ -57,7 +57,7 @@ function App() {
 
   return (
     <>
-      Samples:{' '}
+      Samples:{" "}
       <select
         value={sampleKey}
         onChange={(e) => {
@@ -67,18 +67,21 @@ function App() {
       >
         {Object.keys(samples).map((key) => (
           <option key={key} value={key}>
-            {samples[key].name}
+            {
+              // eslint-disable-next-line @typescript-eslint/no-explicit-any
+              ((samples as any)[key] as unknown as IRenderItem).name
+            }
           </option>
         ))}
       </select>
       <hr />
       {error && `Error loading resources: ${error.message}`}
       <Canvas items={selectedTree ?? []} />
-      {isFetching ? 'Loading...' : <br />}
+      {isFetching ? "Loading..." : <br />}
       <hr />
       <div>
         <h3>Render tree (select items)</h3>
-        <div style={{ display: 'flex' }}>
+        <div style={{ display: "flex" }}>
           <div>
             <RenderTree
               items={tree}

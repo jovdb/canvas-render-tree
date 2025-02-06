@@ -1,4 +1,4 @@
-import { getContext2d, IRenderItem, RenderTree } from '../canvas';
+import { getContext2d, IRenderItem, RenderTree } from "../canvas";
 
 /**
  * Add shadow last painted item, use a layer to appy on all
@@ -6,13 +6,13 @@ import { getContext2d, IRenderItem, RenderTree } from '../canvas';
  */
 export const shadow = (
   {
-    type = 'outer',
+    type = "outer",
     shadowBlur = 10,
     shadowOffsetX = 5,
     shadowOffsetY = 5,
-    shadowColor = '#0008',
+    shadowColor = "#0008",
   }: {
-    type: 'outer' | 'inner';
+    type: "outer" | "inner";
     shadowBlur?: number;
     shadowOffsetX?: number;
     shadowOffsetY?: number;
@@ -20,7 +20,7 @@ export const shadow = (
   },
   children?: RenderTree
 ): IRenderItem => ({
-  name: 'shadow',
+  name: "shadow",
   children,
   draw2(ctx, drawPrev, drawChildren) {
     // drawChildren?.(ctx);
@@ -32,40 +32,42 @@ export const shadow = (
       // ctx.filter = `drop-shadow(${shadowOffsetX}px ${shadowOffsetY}px ${shadowBlur}px ${shadowColor})`
     }
 
-    if (type === 'outer') {
+    if (type === "outer") {
       drawPrev?.(ctx);
       apply(ctx);
       drawChildren?.(ctx);
       return;
-    } else if (type === 'inner') {
+    } else if (type === "inner") {
       // Create shadow in a new layer
-      const shadowCanvas = document.createElement('canvas');
+      const shadowCanvas = document.createElement("canvas");
       shadowCanvas.width = ctx.canvas.width;
       shadowCanvas.height = ctx.canvas.height;
-      const shadowCtx = getContext2d(shadowCanvas, 'shaowCtx');
+      const shadowCtx = getContext2d(shadowCanvas, "shaowCtx");
 
-      // invert transpareny: Create an image with transparent area for the shadow
-      shadowCtx.fillStyle = 'white'; // color doesn't matter because it will be later removed with mask
+      // invert transparency: Create an image with transparent area for the shadow
+      shadowCtx.fillStyle = "white"; // color doesn't matter because it will be later removed with mask
       shadowCtx.fillRect(0, 0, ctx.canvas.width, ctx.canvas.height);
-      shadowCtx.globalCompositeOperation = 'xor';
-      drawChildren ? drawChildren?.(shadowCtx) : drawPrev?.(shadowCtx);
+      shadowCtx.globalCompositeOperation = "xor";
+      if (drawChildren) drawChildren?.(shadowCtx);
+      else drawPrev?.(shadowCtx);
 
       // Create mask in a new layer
-      const maskedCanvas = document.createElement('canvas');
+      const maskedCanvas = document.createElement("canvas");
       maskedCanvas.width = ctx.canvas.width;
       maskedCanvas.height = ctx.canvas.height;
-      const maskedCtx = getContext2d(maskedCanvas, 'maskedCtx');
+      const maskedCtx = getContext2d(maskedCanvas, "maskedCtx");
 
       // Mask to get only the shadows
       maskedCtx.save();
       apply(maskedCtx);
       maskedCtx.drawImage(shadowCtx.canvas, 0, 0);
       maskedCtx.restore();
-      maskedCtx.globalCompositeOperation = 'destination-out';
+      maskedCtx.globalCompositeOperation = "destination-out";
       maskedCtx.drawImage(shadowCtx.canvas, 0, 0);
 
       ctx.save();
-      drawChildren ? drawChildren?.(ctx) : drawPrev?.(ctx);
+      if (drawChildren) drawChildren?.(ctx);
+      else drawPrev?.(ctx);
 
       ctx.drawImage(maskedCtx.canvas, 0, 0); // Add masked shadow on top
       ctx.restore();
