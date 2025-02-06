@@ -17,7 +17,7 @@ export const mask = (mask: RenderTree | undefined): IRenderItem => ({
   name: 'mask',
   children: mask,
   /*
-  draw2(ctx, drawPrev, drawChildren) {
+  draw(ctx, drawPrev, drawChildren) {
     ctx.save();
     // Use alpha
     ctx.globalCompositeOperation = 'destination-in';
@@ -25,7 +25,7 @@ export const mask = (mask: RenderTree | undefined): IRenderItem => ({
     ctx.restore();
     return this;
   },*/
-  draw2(ctx, drawPrev, drawChildren) {
+  draw(ctx, drawPrev, drawChildren) {
     drawPrev?.(ctx);
     ctx.save();
     // ATM: Use alpha as mask (not configurable)

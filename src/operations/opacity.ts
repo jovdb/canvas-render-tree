@@ -8,7 +8,7 @@ export const opacity = (
   name: "opacity",
   children,
 
-  draw2(ctx, drawPrev, drawChildren) {
+  draw(ctx, drawPrev, drawChildren) {
     function apply() {
       ctx.globalAlpha = opacity;
     }

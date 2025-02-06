@@ -28,7 +28,7 @@ export const blur = ({
   sigma = 2,
 }: { radius?: number; sigma?: number } = {}): IRenderItem => ({
   name: "blur",
-  draw2(ctx, drawPrev) {
+  draw(ctx, drawPrev) {
     drawPrev?.(ctx);
     const imageData = ctx.getImageData(
       0,

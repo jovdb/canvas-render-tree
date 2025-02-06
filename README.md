@@ -1,10 +1,9 @@
 # Image filters experiments
 
-Only for testing purpose, the operations/filters are not written in a performent way.
+Only for testing purpose, the operations/filters are not written in a performant way.
 This is to understand the mechanics and math
 
 // TODO
-- draw2
 - opacity blend, transform refactor + test page
 - simplify tests
 - blend 2 colors, fix hard aliased edges

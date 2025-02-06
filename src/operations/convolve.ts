@@ -111,7 +111,7 @@ export const convolve = ({
   multiply?: number;
 }): IRenderItem => ({
   name: 'convolve',
-  draw2(ctx, drawPrev) {
+  draw(ctx, drawPrev) {
     drawPrev?.(ctx);
     function getBevelData() {
       const imageData = ctx.getImageData(

@@ -9,7 +9,7 @@ export const repaint = (
 ): IRenderItem => ({
   name: 'repaint',
   children: repaintWith,
-  draw2(ctx, drawPrev, drawChildren) {
+  draw(ctx, drawPrev, drawChildren) {
     drawPrev?.(ctx);
     ctx.save();
     // Use alpha

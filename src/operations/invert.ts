@@ -2,7 +2,7 @@ import { IRenderItem } from '../canvas';
 
 export const invert = (): IRenderItem => ({
   name: 'invert',
-  draw2(ctx, drawPrev) {
+  draw(ctx, drawPrev) {
     drawPrev?.(ctx);
     const imageData = ctx.getImageData(
       0,

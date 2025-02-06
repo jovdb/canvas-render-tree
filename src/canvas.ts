@@ -6,7 +6,7 @@ type ItemDrawFn = (
   ctx: CanvasRenderingContext2D,
 
   /**
-   * Item can decide on wich context the previous items must be drawn
+   * Item can decide on which context the previous items must be drawn
    */
   drawPrev: DrawFn | undefined,
   /**
@@ -19,70 +19,26 @@ export interface IRenderItem {
   name: string;
   children?: RenderTree | undefined;
   childNodes?: Record<string, RenderTree | undefined> | undefined;
-  draw?(
-    ctx: CanvasRenderingContext2D,
-    /**
-     * When there are children, a drawChildren function is passed
-     * The renderItem should becide to draw before, after, or both, pass the render context to draw on, ...
-     */
-    drawChildren:
-      | undefined
-      | ((ctx: CanvasRenderingContext2D, items?: RenderTree) => void)
-  ): void;
 
-  draw2?: ItemDrawFn;
+  draw: ItemDrawFn;
 }
 
 export type RenderTree = IRenderItem[];
 
 export type Drawable = HTMLImageElement | HTMLCanvasElement;
-/*
-function walkItem(item: IRenderItem, ctx: CanvasRenderingContext2D) {
-  // Caller execute code before, after, or both, pass new context
-  console.group(item.name);
-  try {
-    item.draw2(ctx, drawPrev, (ctx, children = item.children) =>
-      children ? walk(children, ctx, `${item.name}: children`) : undefined
-    );
-  } finally {
-    console.groupEnd();
-  }
-}*/
-
-/*
-function walk(items: RenderTree, ctx: CanvasRenderingContext2D, name = '') {
-  console.group(name);
-  try {
-    items.forEach((item) => walkItem(item, ctx));
-
-  } finally {
-    if (name) console.groupEnd();
-  }
-}
-*/
 
 function walk(items: RenderTree | undefined, name = "") {
   return items?.reduce((prev, item) => {
     return (ctx) => {
       if (name) console.group(name, items?.length ?? 0);
       try {
-        if (item.draw2) {
-          item.draw2(
-            ctx,
-            prev,
-            item.children
-              ? (ctx) => walk(item.children, `${item.name}-children`)?.(ctx)
-              : undefined
-          );
-        } else {
-          prev?.(ctx);
-          item.draw?.(
-            ctx,
-            item.children
-              ? (ctx) => walk(item.children, `${item.name}-children`)?.(ctx)
-              : undefined
-          );
-        }
+        item.draw(
+          ctx,
+          prev,
+          item.children
+            ? (ctx) => walk(item.children, `${item.name}-children`)?.(ctx)
+            : undefined
+        );
       } finally {
         console.groupEnd();
       }
@@ -108,7 +64,7 @@ export function getContext2d(canvas: HTMLCanvasElement, name: string) {
       // eslint-disable-next-line @typescript-eslint/ban-ts-comment
       // @ts-expect-error
       // eslint-disable-next-line @typescript-eslint/no-explicit-any
-      return target[key as any] = value;
+      return (target[key as any] = value);
     },
   });
 }

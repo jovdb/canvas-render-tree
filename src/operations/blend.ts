@@ -8,7 +8,7 @@ export const blend = (
   name: 'blend',
   children,
 
-  draw2(ctx, drawPrev, drawChildren) {
+  draw(ctx, drawPrev, drawChildren) {
     function apply() {
       ctx.globalCompositeOperation = blendMode;
     }

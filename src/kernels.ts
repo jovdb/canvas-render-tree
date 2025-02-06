@@ -16,7 +16,7 @@ export function boxBlurKernel(radius = 1) {
   return new Array(size).fill(value).map(() => new Array(size).fill(value));
 }
 
-export function guassianBlurKernel(
+export function gaussianBlurKernel(
   radius = 1,
   /**
    * Standard deviation (sigma) for Gaussian distribution
@@ -103,7 +103,7 @@ export function laplacianKernel() {
 
 export const kernels = {
   boxBlurKernel,
-  guassianBlurKernel,
+  gaussianBlurKernel,
   edgeDetectKernel,
   embossKernel,
   sharpenKernel,

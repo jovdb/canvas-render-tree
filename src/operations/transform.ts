@@ -18,7 +18,7 @@ export const transform = (
 ): IRenderItem => ({
   name: "translate",
   children,
-  draw2(ctx, drawPrev, drawChildren) {
+  draw(ctx, drawPrev, drawChildren) {
     drawPrev?.(ctx);
     ctx.save();
 

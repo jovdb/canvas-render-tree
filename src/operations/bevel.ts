@@ -1,5 +1,5 @@
 import { getContext2d, IRenderItem } from "../canvas";
-import { drawKernel, guassianBlurKernel as gaussianBlurKernel } from "../kernels";
+import { drawKernel, gaussianBlurKernel as gaussianBlurKernel } from "../kernels";
 
 type RGBA = [r: number, g: number, b: number, a?: number];
 
@@ -75,7 +75,7 @@ function getPixelValue(
   const data = imageData.data;
   const currentIndex = (y * width + x) * 4;
 
-  // Only for non-transparent pxels, start from transparent and look for non-transparent
+  // Only for non-transparent pixels, start from transparent and look for non-transparent
   if (data[currentIndex + 3] === 0) return 0;
 
   let value = 0;
@@ -124,7 +124,7 @@ export const bevel = ({
   kernel?: number[][];
 } = {}): IRenderItem => ({
   name: "bevel",
-  draw2(ctx, drawPrev) {
+  draw(ctx, drawPrev) {
     // Create 2 kernels, for top/left and bottom/right edge
     const highlightKernel = gaussianBlurKernel(
       Math.round(bevelSize * 0.8),

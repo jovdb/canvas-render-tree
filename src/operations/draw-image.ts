@@ -11,7 +11,7 @@ export const drawImage = ({
   targetRect?: readonly [x: number, y: number, w: number, h: number];
 }): IRenderItem => ({
   name: 'drawImage',
-  draw2(ctx, drawPrev) {
+  draw(ctx, drawPrev) {
     drawPrev?.(ctx);
     ctx.drawImage(
       image,

@@ -2,12 +2,12 @@ import { getContext2d, IRenderItem, RenderTree } from "../canvas";
 
 /**
  * Draw children on a new render layer
- * This can be usefull to scope input
+ * This can be useful to scope input
  */
 export const layer = (children: RenderTree): IRenderItem => ({
   name: "layer",
   children,
-  draw2(ctx, drawPrev, drawChildren) {
+  draw(ctx, drawPrev, drawChildren) {
     const canvas = document.createElement("canvas");
     canvas.width = ctx.canvas.width;
     canvas.height = ctx.canvas.height;

@@ -49,7 +49,7 @@ export function convolutionSamplesTree(resources: IRenderResources) {
         operations.convolve({
           ...commonKernelProps,
           // debugKernel: true,
-          kernel: kernels.guassianBlurKernel(5, 5/2),
+          kernel: kernels.gaussianBlurKernel(5, 5/2),
         }),
       ]),
       operations.drawText({ ...commonTextProps, text: 'Gaussian Blur' }),

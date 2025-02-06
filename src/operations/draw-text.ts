@@ -17,7 +17,7 @@ export const drawText = ({
   fontFamilyName?: string;
 }): IRenderItem => ({
   name: "drawText",
-  draw2(ctx, drawPrev) {
+  draw(ctx, drawPrev) {
     drawPrev?.(ctx);
     ctx.fillStyle = foregroundColor;
     ctx.font = `${fontSize}px '${fontFamilyName}'`;
