@@ -1,17 +1,19 @@
-import { IRenderItem, RenderTree } from '../canvas';
+import { IRenderItem, RenderTree } from "../canvas";
 
 export const opacity = (
   opacity: number,
   /** When passed, only the children will have opacity */
   children?: RenderTree | undefined
 ): IRenderItem => ({
-  name: 'opacity',
+  name: "opacity",
   children,
 
-  draw(ctx, drawChildren) {
+  draw2(ctx, drawPrev, drawChildren) {
     function apply() {
       ctx.globalAlpha = opacity;
     }
+
+    drawPrev?.(ctx);
 
     if (!drawChildren) {
       // Set for next items added

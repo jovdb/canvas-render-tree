@@ -1,11 +1,11 @@
-import { IRenderItem } from '../canvas';
+import { IRenderItem } from "../canvas";
 
 /** draw Text on a canvas */
 export const drawText = ({
   text,
-  foregroundColor = '#000',
+  foregroundColor = "#000",
   fontSize = 16,
-  fontFamilyName = 'Arial',
+  fontFamilyName = "Arial",
   x = 0,
   y = 0,
 }: {
@@ -16,8 +16,9 @@ export const drawText = ({
   fontSize?: number;
   fontFamilyName?: string;
 }): IRenderItem => ({
-  name: 'drawText',
-  draw(ctx) {
+  name: "drawText",
+  draw2(ctx, drawPrev) {
+    drawPrev?.(ctx);
     ctx.fillStyle = foregroundColor;
     ctx.font = `${fontSize}px '${fontFamilyName}'`;
     ctx.fillText(text, x, y);

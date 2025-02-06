@@ -203,9 +203,10 @@
 //   debugKernel?: boolean;
 // } = {}): IRenderItem => ({
 //   name: 'bevel2',
-//   draw(ctx) {
+//   draw2(ctx, drawPrev) {
 //     const kernel = kernels.guassianBlurKernel(bevelSize, bevelSize / 2);
 
+//     drawPrev?.(ctx);
 //     if (debugKernel) {
 //       drawKernel(ctx, kernel);
 //       return;

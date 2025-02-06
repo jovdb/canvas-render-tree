@@ -1,4 +1,4 @@
-import { IRenderItem } from '../canvas';
+import { IRenderItem } from "../canvas";
 
 // Function to create a Gaussian kernel
 function createGaussianKernel(radius: number, sigma: number) {
@@ -27,8 +27,9 @@ export const blur = ({
   radius = 5,
   sigma = 2,
 }: { radius?: number; sigma?: number } = {}): IRenderItem => ({
-  name: 'blur',
-  draw(ctx) {
+  name: "blur",
+  draw2(ctx, drawPrev) {
+    drawPrev?.(ctx);
     const imageData = ctx.getImageData(
       0,
       0,

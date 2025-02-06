@@ -64,7 +64,8 @@ export const saturation = ({
   factor = 0,
 }: { factor?: number } = {}): IRenderItem => ({
   name: "saturation",
-  draw(ctx) {
+  draw2(ctx, drawPrev) {
+    drawPrev?.(ctx);
     const imageData = ctx.getImageData(
       0,
       0,

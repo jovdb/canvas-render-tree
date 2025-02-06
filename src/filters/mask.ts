@@ -25,7 +25,8 @@ export const mask = (
     input: input,
     mask,
   },
-  draw(ctx, drawChildren) {
+  draw2(ctx, drawPrev, drawChildren) {
+    drawPrev?.(ctx);
     ctx.save();
     drawChildren?.(ctx, mask); // as new layer?
     // Use alpha

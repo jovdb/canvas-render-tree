@@ -49,7 +49,8 @@
 //   kernel?: number[][];
 // } = {}): IRenderItem => ({
 //   name: 'bevel',
-//   draw(ctx) {
+//   draw2(ctx, drawPrev) {
+//     drawPrev?.(ctx);
 //     function getPixelValue(
 //       imageData: ImageData,
 //       x: number,

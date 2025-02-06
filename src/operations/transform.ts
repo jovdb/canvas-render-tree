@@ -1,4 +1,4 @@
-import { IRenderItem, RenderTree } from '../canvas';
+import { IRenderItem, RenderTree } from "../canvas";
 
 export const transform = (
   {
@@ -16,17 +16,18 @@ export const transform = (
   },
   children: RenderTree
 ): IRenderItem => ({
-  name: 'translate',
+  name: "translate",
   children,
-  draw(ctx, drawChildren) {
+  draw2(ctx, drawPrev, drawChildren) {
+    drawPrev?.(ctx);
     ctx.save();
 
     // scale
-    if (typeof scaleX === 'number' || typeof scaleY === 'number')
+    if (typeof scaleX === "number" || typeof scaleY === "number")
       ctx.scale(scaleX ?? 1, scaleY ?? 1);
 
     // translate
-    if (typeof translateX === 'number' || typeof translateY === 'number')
+    if (typeof translateX === "number" || typeof translateY === "number")
       ctx.translate(translateX ?? 0, translateY ?? 0);
 
     drawChildren!(ctx);

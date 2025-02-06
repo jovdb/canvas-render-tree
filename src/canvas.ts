@@ -41,7 +41,7 @@ function walkItem(item: IRenderItem, ctx: CanvasRenderingContext2D) {
   // Caller execute code before, after, or both, pass new context
   console.group(item.name);
   try {
-    item.draw(ctx, (ctx, children = item.children) =>
+    item.draw2(ctx, drawPrev, (ctx, children = item.children) =>
       children ? walk(children, ctx, `${item.name}: children`) : undefined
     );
   } finally {

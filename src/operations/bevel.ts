@@ -1,5 +1,5 @@
-import { getContext2d, IRenderItem } from '../canvas';
-import { drawKernel, guassianBlurKernel } from '../kernels';
+import { getContext2d, IRenderItem } from "../canvas";
+import { drawKernel, guassianBlurKernel as gaussianBlurKernel } from "../kernels";
 
 type RGBA = [r: number, g: number, b: number, a?: number];
 
@@ -123,17 +123,18 @@ export const bevel = ({
    */
   kernel?: number[][];
 } = {}): IRenderItem => ({
-  name: 'bevel',
-  draw(ctx) {
+  name: "bevel",
+  draw2(ctx, drawPrev) {
     // Create 2 kernels, for top/left and bottom/right edge
-    const highlightKernel = guassianBlurKernel(
-      Math.round(bevelSize*0.8),
-      bevelSize * 0.3 ,
+    const highlightKernel = gaussianBlurKernel(
+      Math.round(bevelSize * 0.8),
+      bevelSize * 0.3,
       -0.5
     );
 
-    const shadowKernel = guassianBlurKernel(bevelSize, bevelSize / 3, 0.5);
+    const shadowKernel = gaussianBlurKernel(bevelSize, bevelSize / 3, 0.5);
 
+    drawPrev?.(ctx);
     if (debugKernel) {
       drawKernel(ctx, highlightKernel);
       return;
@@ -197,11 +198,11 @@ export const bevel = ({
       ctx.putImageData(bevel, 0, 0); // Put the ImageData onto the canvas
     } else {
       // Crate a new canvas that we can use as image so we can mix it on top, not replace
-      const canvas = document.createElement('canvas');
+      const canvas = document.createElement("canvas");
       canvas.width = bevel.width;
       canvas.height = bevel.height;
 
-      const bevelCtx = getContext2d(canvas, 'bevelCtx');
+      const bevelCtx = getContext2d(canvas, "bevelCtx");
       bevelCtx.putImageData(bevel, 0, 0); // Put the ImageData onto the canvas
 
       // Use drawImage because we want to multiply the bevel over the image
