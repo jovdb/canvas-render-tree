@@ -14,16 +14,9 @@ export const opacity = (
     }
 
     drawPrev?.(ctx);
-
-    if (!drawChildren) {
-      // Set for next items added
-      apply();
-    } else {
-      // Only set for the children
-      ctx.save();
-      apply();
-      drawChildren(ctx);
-      ctx.restore();
-    }
+    if (drawChildren) ctx.save();
+    apply();
+    drawChildren?.(ctx);
+    if (drawChildren) ctx.restore();
   },
 });

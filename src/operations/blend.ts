@@ -5,7 +5,7 @@ export const blend = (
   /** When passed, only the children will be blended */
   children?: RenderTree | undefined
 ): IRenderItem => ({
-  name: 'blend',
+  name: "blend",
   children,
 
   draw(ctx, drawPrev, drawChildren) {
@@ -14,15 +14,9 @@ export const blend = (
     }
 
     drawPrev?.(ctx);
-    if (!drawChildren) {
-      // Set for next items added
-      apply();
-    } else {
-      // Only set for the children
-      ctx.save();
-      apply();
-      drawChildren(ctx);
-      ctx.restore();
-    }
+    if (drawChildren) ctx.save();
+    apply();
+    drawChildren?.(ctx);
+    if (drawChildren) ctx.restore();
   },
 });

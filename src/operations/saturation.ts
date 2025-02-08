@@ -1,4 +1,4 @@
-import { IRenderItem } from "../canvas";
+import { IRenderItem, RenderTree } from "../canvas";
 
 // Helper function to convert RGB to HSL
 function rgbToHsl(r: number, g: number, b: number) {
@@ -60,40 +60,49 @@ function hslToRgb(h: number, s: number, l: number) {
 }
 
 /** Pass 0 for grayscale */
-export const saturation = ({
-  factor = 0,
-}: { factor?: number } = {}): IRenderItem => ({
+export const saturation = (
+  { factor = 0 }: { factor?: number } = {},
+  children: RenderTree
+): IRenderItem => ({
   name: "saturation",
-  draw(ctx, drawPrev) {
-    drawPrev?.(ctx);
-    const imageData = ctx.getImageData(
-      0,
-      0,
-      ctx.canvas.width,
-      ctx.canvas.height
-    );
-    const data = imageData.data;
+  children,
+  draw(ctx, drawPrev, drawChildren) {
+    function apply() {
+      const imageData = ctx.getImageData(
+        0,
+        0,
+        ctx.canvas.width,
+        ctx.canvas.height
+      );
+      const data = imageData.data;
 
-    for (let i = 0; i < data.length; i += 4) {
-      const r = data[i];
-      const g = data[i + 1];
-      const b = data[i + 2];
+      for (let i = 0; i < data.length; i += 4) {
+        const r = data[i];
+        const g = data[i + 1];
+        const b = data[i + 2];
 
-      // Convert RGB to HSL
-      const [h, s, l] = rgbToHsl(r, g, b);
+        // Convert RGB to HSL
+        const [h, s, l] = rgbToHsl(r, g, b);
 
-      // Adjust saturation
-      const newSaturation = Math.min(1, Math.max(0, s * factor));
+        // Adjust saturation
+        const newSaturation = Math.min(1, Math.max(0, s * factor));
 
-      // Convert HSL back to RGB
-      const [newR, newG, newB] = hslToRgb(h, newSaturation, l);
+        // Convert HSL back to RGB
+        const [newR, newG, newB] = hslToRgb(h, newSaturation, l);
 
-      // Update pixel data
-      data[i] = newR;
-      data[i + 1] = newG;
-      data[i + 2] = newB;
+        // Update pixel data
+        data[i] = newR;
+        data[i + 1] = newG;
+        data[i + 2] = newB;
+      }
+
+      ctx.putImageData(imageData, 0, 0);
     }
 
-    ctx.putImageData(imageData, 0, 0);
+    drawPrev?.(ctx);
+    if (drawChildren) ctx.save();
+    apply();
+    drawChildren?.(ctx);
+    if (drawChildren) ctx.restore();
   },
 });
