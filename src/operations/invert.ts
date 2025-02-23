@@ -9,7 +9,7 @@ export const invert = (children: RenderTree): IRenderItem => ({
         0,
         0,
         ctx.canvas.width,
-        ctx.canvas.height
+        ctx.canvas.height,
       );
       const data = imageData.data;
 

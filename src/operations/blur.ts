@@ -34,7 +34,7 @@ export const blur = ({
       0,
       0,
       ctx.canvas.width,
-      ctx.canvas.height
+      ctx.canvas.height,
     );
     const data = imageData.data;
     const width = imageData.width;

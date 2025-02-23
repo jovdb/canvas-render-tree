@@ -26,7 +26,7 @@ export function gaussianBlurKernel(
   /** value between -1 and 1 */
   offsetXFactor = 0,
   /** value between -1 and 1 */
-  offsetYFactor = offsetXFactor
+  offsetYFactor = offsetXFactor,
 ) {
   const size = 2 * radius + 1;
   const kernel = Array.from({ length: size }, () => Array(size).fill(0));
@@ -164,15 +164,15 @@ export function drawKernel(ctx: CanvasRenderingContext2D, kernel: number[][]) {
       ctx.fillStyle = `rgb(${r}, ${g}, ${b})`;
 
       ctx.fillRect(x * w, y * h, (x + 1) * w, (y + 1) * h);
-      ctx.strokeStyle = '#444';
+      ctx.strokeStyle = "#444";
       ctx.strokeRect(x * w, y * h, (x + 1) * w, (y + 1) * h);
 
-      ctx.fillStyle = r + b + g > 128 * 3 ? '#444' : '#BBB';
+      ctx.fillStyle = r + b + g > 128 * 3 ? "#444" : "#BBB";
       const textMetrics = ctx.measureText(value.toFixed(2).toString());
       ctx.fillText(
         value.toFixed(2).toString(),
         x * w + (w - textMetrics.width) / 2,
-        y * h + (h - fontSize) / 2 + fontSize
+        y * h + (h - fontSize) / 2 + fontSize,
       );
     }
   }

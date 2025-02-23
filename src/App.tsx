@@ -10,7 +10,7 @@ import { samples } from "./samples";
 
 function filterTree(
   items: readonly IRenderItem[] | undefined,
-  selectedItems: readonly IRenderItem[]
+  selectedItems: readonly IRenderItem[],
 ) {
   const newItems: IRenderItem[] = [];
 
@@ -53,7 +53,9 @@ function App() {
   }, [resources, sampleKey]);
 
   const selectedTree =
-    tree && selectedItems.length ? filterTree(tree, selectedItems) : tree ?? [];
+    tree && selectedItems.length
+      ? filterTree(tree, selectedItems)
+      : (tree ?? []);
 
   return (
     <>

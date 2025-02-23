@@ -1,4 +1,4 @@
-import { Drawable, IRenderItem } from '../canvas';
+import { Drawable, IRenderItem } from "../canvas";
 
 /** Draw an image on the canvas */
 export const drawImage = ({
@@ -10,7 +10,7 @@ export const drawImage = ({
   sourceRect?: readonly [x: number, y: number, w: number, h: number];
   targetRect?: readonly [x: number, y: number, w: number, h: number];
 }): IRenderItem => ({
-  name: 'drawImage',
+  name: "drawImage",
   draw(ctx, drawPrev) {
     drawPrev?.(ctx);
     ctx.drawImage(
@@ -22,7 +22,7 @@ export const drawImage = ({
       targetRect ? targetRect[0] : 0,
       targetRect ? targetRect[1] : 0,
       targetRect ? targetRect[2] : ctx.canvas.width,
-      targetRect ? targetRect[3] : ctx.canvas.height
+      targetRect ? targetRect[3] : ctx.canvas.height,
     );
   },
 });

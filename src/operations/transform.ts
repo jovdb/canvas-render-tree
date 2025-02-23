@@ -14,7 +14,7 @@ export const transform = (
     scaleX?: number;
     scaleY?: number;
   },
-  children: RenderTree
+  children: RenderTree,
 ): IRenderItem => ({
   name: "translate",
   children,

@@ -1,5 +1,8 @@
 import { getContext2d, IRenderItem } from "../canvas";
-import { drawKernel, gaussianBlurKernel as gaussianBlurKernel } from "../kernels";
+import {
+  drawKernel,
+  gaussianBlurKernel as gaussianBlurKernel,
+} from "../kernels";
 
 type RGBA = [r: number, g: number, b: number, a?: number];
 
@@ -50,13 +53,13 @@ function blendColors(color1: RGBA, color2: RGBA): RGBA {
 
   // Calculate the resulting color components
   const outR = Math.round(
-    (r1 * alpha1 + r2 * alpha2 * (1 - alpha1)) / outAlpha
+    (r1 * alpha1 + r2 * alpha2 * (1 - alpha1)) / outAlpha,
   );
   const outG = Math.round(
-    (g1 * alpha1 + g2 * alpha2 * (1 - alpha1)) / outAlpha
+    (g1 * alpha1 + g2 * alpha2 * (1 - alpha1)) / outAlpha,
   );
   const outB = Math.round(
-    (b1 * alpha1 + b2 * alpha2 * (1 - alpha1)) / outAlpha
+    (b1 * alpha1 + b2 * alpha2 * (1 - alpha1)) / outAlpha,
   );
 
   // Return the blended color as an RGBA byte array
@@ -68,7 +71,7 @@ function getPixelValue(
   imageData: ImageData,
   x: number,
   y: number,
-  kernel: number[][]
+  kernel: number[][],
 ) {
   const width = imageData.width;
   const height = imageData.height;
@@ -129,7 +132,7 @@ export const bevel = ({
     const highlightKernel = gaussianBlurKernel(
       Math.round(bevelSize * 0.8),
       bevelSize * 0.3,
-      -0.5
+      -0.5,
     );
 
     const shadowKernel = gaussianBlurKernel(bevelSize, bevelSize / 3, 0.5);
@@ -144,7 +147,7 @@ export const bevel = ({
       0,
       0,
       ctx.canvas.width,
-      ctx.canvas.height
+      ctx.canvas.height,
     );
     const width = imageData.width;
     const height = imageData.height;
@@ -159,7 +162,7 @@ export const bevel = ({
           imageData,
           x,
           y,
-          highlightKernel
+          highlightKernel,
         ); // Check if pixel is a bevel pixel
 
         if (shadowStrength >= 0 || highlightStrength >= 0) {

@@ -1,5 +1,5 @@
-import { IRenderItem } from '../canvas';
-import './RenderTree.css';
+import { IRenderItem } from "../canvas";
+import "./RenderTree.css";
 
 export function RenderTree({
   items,
@@ -38,8 +38,8 @@ export function RenderItem({
   return (
     <>
       <div
-        className={`render-item ${onClick ? 'render-item--selectable' : ''} ${
-          isSelected ? 'render-item--selected' : ''
+        className={`render-item ${onClick ? "render-item--selectable" : ""} ${
+          isSelected ? "render-item--selected" : ""
         }`}
         onClick={(e) => {
           e.stopPropagation();

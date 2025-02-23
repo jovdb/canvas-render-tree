@@ -18,7 +18,7 @@ export const shadow = (
     shadowOffsetY?: number;
     shadowColor?: string;
   },
-  children?: RenderTree
+  children?: RenderTree,
 ): IRenderItem => ({
   name: "shadow",
   children,

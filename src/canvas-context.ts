@@ -31,7 +31,7 @@ export class CanvasContext implements Partial<CanvasRenderingContext2D> {
 
   drawImage(): void {
     this.logger?.log(
-      `${this.name}.drawImage(image, ${logArgs([...arguments].slice(1))})`
+      `${this.name}.drawImage(image, ${logArgs([...arguments].slice(1))})`,
     );
     this.ctx.drawImage.apply(this.ctx, arguments as any);
   }

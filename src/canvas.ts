@@ -12,7 +12,7 @@ type ItemDrawFn = (
   /**
    * Method that draws the children of this render item
    */
-  drawChildren: DrawFn | undefined
+  drawChildren: DrawFn | undefined,
 ) => void;
 
 export interface IRenderItem {
@@ -28,22 +28,25 @@ export type RenderTree = IRenderItem[];
 export type Drawable = HTMLImageElement | HTMLCanvasElement;
 
 function walk(items: RenderTree | undefined, name = "") {
-  return items?.reduce((prev, item) => {
-    return (ctx) => {
-      if (name) console.group(name, items?.length ?? 0);
-      try {
-        item.draw(
-          ctx,
-          prev,
-          item.children
-            ? (ctx) => walk(item.children, `${item.name}-children`)?.(ctx)
-            : undefined
-        );
-      } finally {
-        console.groupEnd();
-      }
-    };
-  }, undefined as unknown as DrawFn | undefined);
+  return items?.reduce(
+    (prev, item) => {
+      return (ctx) => {
+        if (name) console.group(name, items?.length ?? 0);
+        try {
+          item.draw(
+            ctx,
+            prev,
+            item.children
+              ? (ctx) => walk(item.children, `${item.name}-children`)?.(ctx)
+              : undefined,
+          );
+        } finally {
+          console.groupEnd();
+        }
+      };
+    },
+    undefined as unknown as DrawFn | undefined,
+  );
 }
 
 export function getContext2d(canvas: HTMLCanvasElement, name: string) {
@@ -53,7 +56,7 @@ export function getContext2d(canvas: HTMLCanvasElement, name: string) {
   const ctx2 = new CanvasContext(
     ctx,
     console,
-    name
+    name,
   ) as unknown as CanvasRenderingContext2D;
 
   return new Proxy(ctx2, {

@@ -62,7 +62,7 @@ function hslToRgb(h: number, s: number, l: number) {
 /** Pass 0 for grayscale */
 export const saturation = (
   { factor = 0 }: { factor?: number } = {},
-  children: RenderTree
+  children: RenderTree,
 ): IRenderItem => ({
   name: "saturation",
   children,
@@ -72,7 +72,7 @@ export const saturation = (
         0,
         0,
         ctx.canvas.width,
-        ctx.canvas.height
+        ctx.canvas.height,
       );
       const data = imageData.data;
 

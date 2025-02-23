@@ -1,5 +1,5 @@
-import { useLayoutEffect, useRef } from 'react';
-import { draw, IRenderItem } from '../canvas';
+import { useLayoutEffect, useRef } from "react";
+import { draw, IRenderItem } from "../canvas";
 
 export function Canvas({ items }: { items: IRenderItem[] }) {
   const canvasRef = useRef<HTMLCanvasElement>(null);

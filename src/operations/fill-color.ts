@@ -1,7 +1,7 @@
 import { IRenderItem } from "../canvas";
 
 export const fillColor = (color = "#FFF"): IRenderItem => ({
-  name: 'fillColor',
+  name: "fillColor",
   draw(ctx, drawPrev) {
     drawPrev?.(ctx);
     ctx.fillStyle = color;

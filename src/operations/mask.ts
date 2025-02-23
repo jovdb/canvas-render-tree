@@ -1,4 +1,4 @@
-import { IRenderItem, RenderTree } from '../canvas';
+import { IRenderItem, RenderTree } from "../canvas";
 
 /**
  * Currently only opacity layer used of mask
@@ -14,7 +14,7 @@ import { IRenderItem, RenderTree } from '../canvas';
  *  ])
  */
 export const mask = (mask: RenderTree | undefined): IRenderItem => ({
-  name: 'mask',
+  name: "mask",
   children: mask,
   /*
   draw(ctx, drawPrev, drawChildren) {
@@ -29,7 +29,7 @@ export const mask = (mask: RenderTree | undefined): IRenderItem => ({
     drawPrev?.(ctx);
     ctx.save();
     // ATM: Use alpha as mask (not configurable)
-    ctx.globalCompositeOperation = 'destination-in';
+    ctx.globalCompositeOperation = "destination-in";
     drawChildren?.(ctx); // as new layer?
     ctx.restore();
     return this;

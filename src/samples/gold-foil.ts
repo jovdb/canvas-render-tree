@@ -1,6 +1,6 @@
-import { IRenderItem } from '../canvas';
-import { operations } from '../operations';
-import { IRenderResources } from '../resources';
+import { IRenderItem } from "../canvas";
+import { operations } from "../operations";
+import { IRenderResources } from "../resources";
 
 export function goldFoilTree(resources: IRenderResources) {
   const tree: IRenderItem[] = [
@@ -12,19 +12,19 @@ export function goldFoilTree(resources: IRenderResources) {
     ]),
 
     operations.shadow({
-      type: 'inner',
+      type: "inner",
       shadowBlur: 3,
       shadowOffsetX: -2,
       shadowOffsetY: -2,
-      shadowColor: '#0003',
+      shadowColor: "#0003",
     }),
 
     operations.shadow({
-      type: 'inner',
+      type: "inner",
       shadowBlur: 3,
       shadowOffsetX: 2,
       shadowOffsetY: 2,
-      shadowColor: '#fff2',
+      shadowColor: "#fff2",
     }),
   ];
 

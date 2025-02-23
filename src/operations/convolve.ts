@@ -1,5 +1,5 @@
-import { IRenderItem } from '../canvas';
-import { drawKernel, normalizeKernel } from '../kernels';
+import { IRenderItem } from "../canvas";
+import { drawKernel, normalizeKernel } from "../kernels";
 
 /** Same kernel will be used for all color channels */
 /*
@@ -110,7 +110,7 @@ export const convolve = ({
   normalize?: boolean;
   multiply?: number;
 }): IRenderItem => ({
-  name: 'convolve',
+  name: "convolve",
   draw(ctx, drawPrev) {
     drawPrev?.(ctx);
     function getBevelData() {
@@ -118,7 +118,7 @@ export const convolve = ({
         0,
         0,
         ctx.canvas.width,
-        ctx.canvas.height
+        ctx.canvas.height,
       );
       return applyKernel(imageData, kernel, multiply);
     }

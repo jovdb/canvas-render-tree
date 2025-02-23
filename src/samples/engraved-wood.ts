@@ -1,7 +1,7 @@
-import { IRenderItem } from '../canvas';
-import { operations } from '../operations';
+import { IRenderItem } from "../canvas";
+import { operations } from "../operations";
 
-import { IRenderResources } from '../resources';
+import { IRenderResources } from "../resources";
 
 export function engravedWoodTree(resources: IRenderResources) {
   const tree: IRenderItem[] = [
@@ -12,25 +12,25 @@ export function engravedWoodTree(resources: IRenderResources) {
       operations.repaint([
         operations.layer([
           operations.drawImage({ image: resources.wood }),
-          operations.fillColor('#0002'), // Make darker inside
-          operations.blend('multiply', [
+          operations.fillColor("#0002"), // Make darker inside
+          operations.blend("multiply", [
             operations.drawImage({ image: resources.noise }), // Add
           ]),
         ]),
       ]),
       operations.shadow({
-        type: 'inner',
+        type: "inner",
         shadowBlur: 3,
         shadowOffsetX: 3,
         shadowOffsetY: 3,
-        shadowColor: '#0008',
+        shadowColor: "#0008",
       }),
       operations.shadow({
-        type: 'inner',
+        type: "inner",
         shadowBlur: 2,
         shadowOffsetX: -2,
         shadowOffsetY: -2,
-        shadowColor: '#fff8',
+        shadowColor: "#fff8",
       }),
     ]),
     /*

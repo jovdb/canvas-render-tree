@@ -1,20 +1,20 @@
-import { IRenderItem } from '../canvas';
-import { operations } from '../operations';
+import { IRenderItem } from "../canvas";
+import { operations } from "../operations";
 
 export function bevel1Tree() {
   const x = 40;
   const offsetX = 220;
   const y = 150;
   const commonTextProps: Parameters<typeof operations.drawText>[0] = {
-    text: 'SY',
+    text: "SY",
     x,
     fontSize: 160,
-    fontFamilyName: 'Arial',
-    foregroundColor: '#CC0000',
+    fontFamilyName: "Arial",
+    foregroundColor: "#CC0000",
   };
   const commonTextProps2: Parameters<typeof operations.drawText>[0] = {
     ...commonTextProps,
-    text: 'SY',
+    text: "SY",
     x: commonTextProps.x! + offsetX,
   };
 

@@ -1,22 +1,21 @@
-import { IRenderItem } from '../canvas';
-import { operations } from '../operations';
-import { kernels } from '../kernels';
-import { IRenderResources } from '../resources';
+import { IRenderItem } from "../canvas";
+import { operations } from "../operations";
+import { kernels } from "../kernels";
+import { IRenderResources } from "../resources";
 
 export function convolutionSamplesTree(resources: IRenderResources) {
   const commonTextProps = {
     fontSize: 20,
-    fontFamilyName: 'Arial',
-    foregroundColor: '#2222DD',
+    fontFamilyName: "Arial",
+    foregroundColor: "#2222DD",
   };
   const imageProps = {
     image: resources.glass,
     targetRect: [0, 10, 200, 200],
   } as const;
 
-  const commonKernelProps: Partial<
-    Parameters<typeof operations.convolve>[0]
-  > = {};
+  const commonKernelProps: Partial<Parameters<typeof operations.convolve>[0]> =
+    {};
 
   const tree: IRenderItem[] = [
     operations.fillColor(),
@@ -24,7 +23,7 @@ export function convolutionSamplesTree(resources: IRenderResources) {
       operations.drawImage({
         ...imageProps,
       }),
-      operations.drawText({ ...commonTextProps, text: 'Original' }),
+      operations.drawText({ ...commonTextProps, text: "Original" }),
     ]),
     operations.transform({ translateX: 260, translateY: 30 }, [
       operations.layer([
@@ -38,7 +37,7 @@ export function convolutionSamplesTree(resources: IRenderResources) {
       ]),
       operations.drawText({
         ...commonTextProps,
-        text: 'Emboss',
+        text: "Emboss",
       }),
     ]),
     operations.transform({ translateX: 30, translateY: 270 }, [
@@ -49,10 +48,10 @@ export function convolutionSamplesTree(resources: IRenderResources) {
         operations.convolve({
           ...commonKernelProps,
           // debugKernel: true,
-          kernel: kernels.gaussianBlurKernel(5, 5/2),
+          kernel: kernels.gaussianBlurKernel(5, 5 / 2),
         }),
       ]),
-      operations.drawText({ ...commonTextProps, text: 'Gaussian Blur' }),
+      operations.drawText({ ...commonTextProps, text: "Gaussian Blur" }),
     ]),
     operations.transform({ translateX: 260, translateY: 270 }, [
       operations.layer([
@@ -67,7 +66,7 @@ export function convolutionSamplesTree(resources: IRenderResources) {
       ]),
       operations.drawText({
         ...commonTextProps,
-        text: 'Edge Detection',
+        text: "Edge Detection",
       }),
     ]),
   ];
