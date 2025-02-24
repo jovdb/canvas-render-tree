@@ -1,13 +1,22 @@
-import { IRenderItem } from "../canvas";
+import { IRenderItem, ItemDrawFn } from "../canvas";
 
-export const fillColor = (color = "#FFF"): IRenderItem => ({
+export interface IFillColorConfig {
+  color: string;
+}
+
+export const fillColor = (color = "#FFF"): IRenderItem<IFillColorConfig> => ({
   name: "fillColor",
   config: {
     color,
   },
-  draw(ctx, drawPrev) {
-    drawPrev?.(ctx);
-    ctx.fillStyle = color;
-    ctx.fillRect(0, 0, ctx.canvas.width, ctx.canvas.height);
-  },
 });
+
+export const drawFillColor: ItemDrawFn<IFillColorConfig> = (
+  ctx,
+  drawPrev,
+  config
+) => {
+  drawPrev?.(ctx);
+  ctx.fillStyle = config.color;
+  ctx.fillRect(0, 0, ctx.canvas.width, ctx.canvas.height);
+};

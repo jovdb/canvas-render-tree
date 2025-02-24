@@ -1,4 +1,4 @@
-import { IRenderItem } from "../canvas";
+import { IRenderItem, ItemDrawFn } from "../canvas";
 import { drawKernel, normalizeKernel } from "../kernels";
 
 /** Same kernel will be used for all color channels */
@@ -111,32 +111,37 @@ export const convolve = (
 ): IRenderItem<IConvolveConfig> => ({
   name: "convolve",
   config,
-  draw(ctx, drawPrev, config) {
-    const {
-      kernel,
-      debugKernel = false,
-      normalize = false,
-      multiply = 1,
-    } = config;
-    drawPrev?.(ctx);
-    function getBevelData() {
-      const imageData = ctx.getImageData(
-        0,
-        0,
-        ctx.canvas.width,
-        ctx.canvas.height
-      );
-      return applyKernel(imageData, kernel, multiply);
-    }
-
-    if (normalize) normalizeKernel(kernel);
-
-    if (debugKernel) {
-      drawKernel(ctx, kernel);
-      return;
-    }
-
-    const newImageData = getBevelData();
-    ctx.putImageData(newImageData, 0, 0); // Put the ImageData onto the canvas
-  },
 });
+
+export const drawConvolve: ItemDrawFn<IConvolveConfig> = (
+  ctx,
+  drawPrev,
+  config
+) => {
+  const {
+    kernel,
+    debugKernel = false,
+    normalize = false,
+    multiply = 1,
+  } = config;
+  drawPrev?.(ctx);
+  function getBevelData() {
+    const imageData = ctx.getImageData(
+      0,
+      0,
+      ctx.canvas.width,
+      ctx.canvas.height
+    );
+    return applyKernel(imageData, kernel, multiply);
+  }
+
+  if (normalize) normalizeKernel(kernel);
+
+  if (debugKernel) {
+    drawKernel(ctx, kernel);
+    return;
+  }
+
+  const newImageData = getBevelData();
+  ctx.putImageData(newImageData, 0, 0); // Put the ImageData onto the canvas
+};

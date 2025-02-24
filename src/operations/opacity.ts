@@ -1,4 +1,4 @@
-import { IRenderItem, RenderTree } from "../canvas";
+import { IRenderItem, ItemDrawFn, RenderTree } from "../canvas";
 
 export interface IOpacityConfig {
   opacity: number;
@@ -12,16 +12,17 @@ export const opacity = (
   name: "opacity",
   config: { opacity },
   children,
-
-  draw(ctx, drawPrev, config, drawChildren) {
-    function apply() {
-      ctx.globalAlpha = config.opacity;
-    }
-
-    drawPrev?.(ctx);
-    if (drawChildren) ctx.save();
-    apply();
-    drawChildren?.(ctx);
-    if (drawChildren) ctx.restore();
-  },
 });
+
+export const drawOpacity: ItemDrawFn<IOpacityConfig> = (
+  ctx,
+  drawPrev,
+  config,
+  drawChildren
+) => {
+  drawPrev?.(ctx);
+  if (drawChildren) ctx.save();
+  ctx.globalAlpha = config.opacity;
+  drawChildren?.(ctx);
+  if (drawChildren) ctx.restore();
+};

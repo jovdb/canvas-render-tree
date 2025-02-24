@@ -1,4 +1,4 @@
-import { IRenderItem, RenderTree } from "../canvas";
+import { IRenderItem, ItemDrawFn, RenderTree } from "../canvas";
 
 // Helper function to convert RGB to HSL
 function rgbToHsl(r: number, g: number, b: number) {
@@ -59,50 +59,63 @@ function hslToRgb(h: number, s: number, l: number) {
   return [r * 255, g * 255, b * 255];
 }
 
+export interface ISaturationConfig {
+  factor?: number;
+}
+
 /** Pass 0 for grayscale */
 export const saturation = (
-  { factor = 0 }: { factor?: number } = {},
-  children: RenderTree,
-): IRenderItem => ({
+  config: ISaturationConfig = {},
+  children: RenderTree
+): IRenderItem<ISaturationConfig> => ({
   name: "saturation",
+  config,
   children,
-  draw(ctx, drawPrev, _config, drawChildren) {
-    function apply() {
-      const imageData = ctx.getImageData(
-        0,
-        0,
-        ctx.canvas.width,
-        ctx.canvas.height,
-      );
-      const data = imageData.data;
+});
 
-      for (let i = 0; i < data.length; i += 4) {
-        const r = data[i];
-        const g = data[i + 1];
-        const b = data[i + 2];
+export const drawSaturation: ItemDrawFn<ISaturationConfig> = (
+  ctx,
+  drawPrev,
+  config,
+  drawChildren
+) => {
+  const { factor = 0 } = config;
 
-        // Convert RGB to HSL
-        const [h, s, l] = rgbToHsl(r, g, b);
+  function apply() {
+    const imageData = ctx.getImageData(
+      0,
+      0,
+      ctx.canvas.width,
+      ctx.canvas.height
+    );
+    const data = imageData.data;
 
-        // Adjust saturation
-        const newSaturation = Math.min(1, Math.max(0, s * factor));
+    for (let i = 0; i < data.length; i += 4) {
+      const r = data[i];
+      const g = data[i + 1];
+      const b = data[i + 2];
 
-        // Convert HSL back to RGB
-        const [newR, newG, newB] = hslToRgb(h, newSaturation, l);
+      // Convert RGB to HSL
+      const [h, s, l] = rgbToHsl(r, g, b);
 
-        // Update pixel data
-        data[i] = newR;
-        data[i + 1] = newG;
-        data[i + 2] = newB;
-      }
+      // Adjust saturation
+      const newSaturation = Math.min(1, Math.max(0, s * factor));
 
-      ctx.putImageData(imageData, 0, 0);
+      // Convert HSL back to RGB
+      const [newR, newG, newB] = hslToRgb(h, newSaturation, l);
+
+      // Update pixel data
+      data[i] = newR;
+      data[i + 1] = newG;
+      data[i + 2] = newB;
     }
 
-    drawPrev?.(ctx);
-    if (drawChildren) ctx.save();
-    apply();
-    drawChildren?.(ctx);
-    if (drawChildren) ctx.restore();
-  },
-});
+    ctx.putImageData(imageData, 0, 0);
+  }
+
+  drawPrev?.(ctx);
+  if (drawChildren) ctx.save();
+  apply();
+  drawChildren?.(ctx);
+  if (drawChildren) ctx.restore();
+};

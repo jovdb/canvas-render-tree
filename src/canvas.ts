@@ -1,8 +1,10 @@
+import React from "react";
 import { CanvasContext } from "./canvas-context";
+import { renderers } from "./renderers";
 
 type DrawFn = (ctx: CanvasRenderingContext2D) => void;
 
-type ItemDrawFn<TConfig = unknown> = (
+export type ItemDrawFn<TConfig = unknown> = (
   ctx: CanvasRenderingContext2D,
 
   /**
@@ -19,6 +21,12 @@ type ItemDrawFn<TConfig = unknown> = (
   drawChildren: DrawFn | undefined
 ) => void;
 
+/** Function to configure an item */
+export type ItemConfigFn<TConfig = unknown> = (props: {
+  config: TConfig;
+  onChange(config: TConfig): void;
+}) => React.ReactNode;
+
 export interface IRenderItem<TConfig = unknown> {
   /** Node name */
   name: string;
@@ -28,7 +36,8 @@ export interface IRenderItem<TConfig = unknown> {
 
   children?: RenderTree | undefined;
 
-  draw: ItemDrawFn<TConfig>;
+  /** function to render */
+  draw?: ItemDrawFn<TConfig>;
 }
 
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
@@ -41,14 +50,27 @@ function walk(items: RenderTree | undefined, name = "") {
     return (ctx) => {
       if (name) console.group(name, items?.length ?? 0);
       try {
-        item.draw(
-          ctx,
-          prev,
-          item.config,
-          item.children
-            ? (ctx) => walk(item.children, `${item.name}-children`)?.(ctx)
-            : undefined
-        );
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
+        const render = (renderers as any)[item.name] || item.draw;
+        if (render) {
+          render(
+            ctx,
+            prev,
+            item.config,
+            item.children
+              ? (ctx: CanvasRenderingContext2D) =>
+                  walk(item.children, `${item.name}-children`)?.(ctx)
+              : undefined
+          );
+        } else {
+          // Some items don't have a render function, but add a child render tree
+          // throw new Error(`Missing render function for item '${item.name}'`);
+          // correct default implementation or better throw
+          prev?.(ctx);
+          if (item.children) {
+            walk(item.children, `${item.name}-children`)?.(ctx);
+          }
+        }
       } finally {
         console.groupEnd();
       }

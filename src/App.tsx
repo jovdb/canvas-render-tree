@@ -1,16 +1,17 @@
 import "./App.css";
 
 import { loadResourcesAsync } from "./resources";
-import { IRenderItem } from "./canvas";
+import { IRenderItem, ItemConfigFn } from "./canvas";
 import { Canvas } from "./components/Canvas";
 import { RenderTree } from "./components/RenderTree";
 import { useMemo, useState } from "react";
 import { useQuery } from "@tanstack/react-query";
 import { samples } from "./samples";
+import { configs, ConfigsName } from "./configs";
 
 function filterTree(
   items: readonly IRenderItem[] | undefined,
-  selectedItems: readonly IRenderItem[],
+  selectedItems: readonly IRenderItem[]
 ) {
   const newItems: IRenderItem[] = [];
 
@@ -53,10 +54,16 @@ function App() {
   }, [resources, sampleKey]);
 
   const selectedTree =
-    tree && selectedItems.length
-      ? filterTree(tree, selectedItems)
-      : (tree ?? []);
+    tree && selectedItems.length ? filterTree(tree, selectedItems) : tree ?? [];
 
+  // Configurator
+  const configName = selectedItems[0]?.name as ConfigsName | undefined;
+  const ItemConfigurator =
+    configName && configs[configName]
+      ? (configs[configName] as ItemConfigFn)
+      : () => null;
+
+  console.log("TREE3", tree);
   return (
     <>
       Samples:{" "}
@@ -95,6 +102,18 @@ function App() {
                 });
               }}
             />
+          </div>
+          <div style={{ marginLeft: "1rem" }}>
+            <fieldset>
+              <ItemConfigurator
+                config={selectedItems[0]?.config}
+                onChange={(config) => {
+                  // TODO, don't mutate -> immer?
+                  if (!selectedItems[0]) return;
+                  selectedItems[0].config = config;
+                }}
+              />
+            </fieldset>
           </div>
         </div>
       </div>

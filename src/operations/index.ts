@@ -37,3 +37,5 @@ export const operations = {
   bSplineWrap,
   displacement,
 };
+
+export type RenderItemName = keyof typeof operations;

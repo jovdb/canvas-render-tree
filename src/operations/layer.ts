@@ -1,4 +1,4 @@
-import { getContext2d, IRenderItem, RenderTree } from "../canvas";
+import { getContext2d, IRenderItem, ItemDrawFn, RenderTree } from "../canvas";
 
 /**
  * Draw children on a new render layer
@@ -7,19 +7,20 @@ import { getContext2d, IRenderItem, RenderTree } from "../canvas";
 export const layer = (children: RenderTree): IRenderItem => ({
   name: "layer",
   children,
-  draw(ctx, drawPrev, _config, drawChildren) {
-    drawPrev?.(ctx);
-
-    // Create an offscreen canvas
-    const canvas = document.createElement("canvas");
-    canvas.width = ctx.canvas.width;
-    canvas.height = ctx.canvas.height;
-    const childCtx = getContext2d(canvas, "layerCtx");
-
-    // Draw children on the offscreen canvas
-    drawChildren?.(childCtx);
-
-    // Draw new children context on the parent context
-    ctx.drawImage(canvas, 0, 0, ctx.canvas.width, ctx.canvas.height);
-  },
 });
+
+export const drawLayer: ItemDrawFn = (ctx, drawPrev, _config, drawChildren) => {
+  drawPrev?.(ctx);
+
+  // Create an offscreen canvas
+  const canvas = document.createElement("canvas");
+  canvas.width = ctx.canvas.width;
+  canvas.height = ctx.canvas.height;
+  const childCtx = getContext2d(canvas, "layerCtx");
+
+  // Draw children on the offscreen canvas
+  drawChildren?.(childCtx);
+
+  // Draw new children context on the parent context
+  ctx.drawImage(canvas, 0, 0, ctx.canvas.width, ctx.canvas.height);
+};

@@ -1,4 +1,5 @@
-import { IRenderItem, RenderTree } from "../canvas";
+import { IRenderItem, ItemDrawFn, RenderTree } from "../canvas";
+import { blend } from "./blend";
 
 /**
  * Currently only opacity layer used of mask
@@ -15,26 +16,5 @@ import { IRenderItem, RenderTree } from "../canvas";
  */
 export const mask = (mask?: RenderTree | undefined): IRenderItem => ({
   name: "mask",
-  children: mask,
-  /*
-  draw(ctx, drawPrev, drawChildren) {
-    ctx.save();
-    // Use alpha
-    ctx.globalCompositeOperation = 'destination-in';
-    drawChildren?.(ctx); // as new layer?
-    ctx.restore();
-    return this;
-  },*/
-  draw(ctx, drawPrev, _config, drawChildren) {
-    function apply() {
-      ctx.globalCompositeOperation = "destination-in";
-    }
-
-    drawPrev?.(ctx);
-    if (drawChildren) ctx.save();
-    apply();
-    drawChildren?.(ctx);
-    if (drawChildren) ctx.restore();
-    return this;
-  },
+  children: [blend("destination-in", mask)],
 });

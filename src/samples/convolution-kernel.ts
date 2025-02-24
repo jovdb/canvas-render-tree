@@ -1,4 +1,4 @@
-import { IRenderItem } from "../canvas";
+import { RenderTree } from "../canvas";
 import { operations } from "../operations";
 import { kernels } from "../kernels";
 import { IRenderResources } from "../resources";
@@ -17,7 +17,7 @@ export function convolutionSamplesTree(resources: IRenderResources) {
   const commonKernelProps: Partial<Parameters<typeof operations.convolve>[0]> =
     {};
 
-  const tree: IRenderItem[] = [
+  const tree: RenderTree = [
     operations.fillColor(),
     operations.transform({ translateX: 30, translateY: 30 }, [
       operations.drawImage({

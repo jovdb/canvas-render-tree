@@ -1,4 +1,4 @@
-import { IRenderItem } from "../canvas";
+import { IRenderItem, ItemDrawFn } from "../canvas";
 
 interface Point {
   x: number;
@@ -301,50 +301,52 @@ function drawControlPoints(
  */
 export const bSplineWrap = (): IRenderItem => ({
   name: "b-spline-wrap",
-  draw(ctx, drawPrev, _config, drawChildren) {
-    drawPrev?.(ctx);
-    if (drawChildren) ctx.save();
-    drawChildren?.(ctx);
-
-    const canvas = ctx.canvas;
-
-    // Initialize B-Spline warper
-    // Initialize control points (4x4 grid)
-    const controlGrid: Point[][] = [];
-    for (let i = 0; i < 4; i++) {
-      const row: Point[] = [];
-      for (let j = 0; j < 4; j++) {
-        row.push({
-          x: (i / 3) * canvas.width,
-          y: (j / 3) * canvas.height,
-        });
-      }
-      controlGrid.push(row);
-    }
-
-    // Modify control points to create warp
-    controlGrid[1][1].x += 50;
-    controlGrid[1][1].y -= 30;
-    controlGrid[2][2].x -= 40;
-    controlGrid[2][2].y += 20;
-
-    const originalData = ctx.getImageData(
-      0,
-      0,
-      ctx.canvas.width,
-      ctx.canvas.height
-    );
-
-    const warper = new BSplineWarper(canvas, originalData);
-    const warpedData = warper.warp();
-
-    //drawControlPoints(ctx, warper.controlPoints);
-    ctx.putImageData(warpedData, 0, 0);
-    warper.drawControlPoints(ctx);
-
-    //     drawControlPoints(ctx, warp.controlPoints);
-
-    if (drawChildren) ctx.restore();
-    return this;
-  },
 });
+
+
+export const drawBSpline: ItemDrawFn<undefined> = (ctx, drawPrev, _config, drawChildren) => {
+  drawPrev?.(ctx);
+  if (drawChildren) ctx.save();
+  drawChildren?.(ctx);
+
+  const canvas = ctx.canvas;
+
+  // Initialize B-Spline warper
+  // Initialize control points (4x4 grid)
+  const controlGrid: Point[][] = [];
+  for (let i = 0; i < 4; i++) {
+    const row: Point[] = [];
+    for (let j = 0; j < 4; j++) {
+      row.push({
+        x: (i / 3) * canvas.width,
+        y: (j / 3) * canvas.height,
+      });
+    }
+    controlGrid.push(row);
+  }
+
+  // Modify control points to create warp
+  controlGrid[1][1].x += 50;
+  controlGrid[1][1].y -= 30;
+  controlGrid[2][2].x -= 40;
+  controlGrid[2][2].y += 20;
+
+  const originalData = ctx.getImageData(
+    0,
+    0,
+    ctx.canvas.width,
+    ctx.canvas.height
+  );
+
+  const warper = new BSplineWarper(canvas, originalData);
+  const warpedData = warper.warp();
+
+  //drawControlPoints(ctx, warper.controlPoints);
+  ctx.putImageData(warpedData, 0, 0);
+  warper.drawControlPoints(ctx);
+
+  //     drawControlPoints(ctx, warp.controlPoints);
+
+  if (drawChildren) ctx.restore();
+  return this;
+}

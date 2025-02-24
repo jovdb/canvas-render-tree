@@ -1,4 +1,4 @@
-import { IRenderItem, RenderTree } from "../canvas";
+import { IRenderItem, ItemDrawFn, RenderTree } from "../canvas";
 
 export interface IBlendConfig {
   blendMode: GlobalCompositeOperation;
@@ -12,16 +12,17 @@ export const blend = (
   name: "blend",
   config: { blendMode },
   children,
-
-  draw(ctx, drawPrev, config, drawChildren) {
-    function apply() {
-      ctx.globalCompositeOperation = config.blendMode;
-    }
-
-    drawPrev?.(ctx);
-    if (drawChildren) ctx.save();
-    apply();
-    drawChildren?.(ctx);
-    if (drawChildren) ctx.restore();
-  },
 });
+
+export const drawBlend: ItemDrawFn<IBlendConfig> = (
+  ctx,
+  drawPrev,
+  config,
+  drawChildren
+) => {
+  drawPrev?.(ctx);
+  if (drawChildren) ctx.save();
+  ctx.globalCompositeOperation = config.blendMode;
+  drawChildren?.(ctx);
+  if (drawChildren) ctx.restore();
+};
