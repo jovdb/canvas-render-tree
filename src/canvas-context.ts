@@ -84,6 +84,11 @@ export class CanvasContext implements Partial<CanvasRenderingContext2D> {
     return this.ctx.canvas;
   }
 
+  createImageData() {
+    this.logger?.log(`${this.name}.createImageData(${logArgs(arguments as any)})`);
+    return this.ctx.createImageData.apply(this.ctx, arguments as any);
+  }
+
   getImageData() {
     this.logger?.log(`${this.name}.getImageData(${logArgs(arguments as any)})`);
     return this.ctx.getImageData.apply(this.ctx, arguments as any);
@@ -93,14 +98,44 @@ export class CanvasContext implements Partial<CanvasRenderingContext2D> {
     return this.ctx.putImageData.apply(this.ctx, arguments as any);
   }
 
+  beginPath() {
+    this.logger?.log(`${this.name}.beginPath()`);
+    this.ctx.beginPath();
+  }
+
+  arc() {
+    this.logger?.log(`${this.name}.arc(${logArgs(arguments as any)})`);
+    this.ctx.arc.apply(this.ctx, arguments as any);
+  }
+
   set fillStyle(v: string) {
     this.logger?.log(`${this.name}.fillStyle = '${v}'`);
     this.ctx.fillStyle = v;
   }
 
+  fill() {
+    this.logger?.log(`${this.name}.fill(${logArgs(arguments as any)})`);
+    this.ctx.fill.apply(this.ctx, arguments as any);
+  }
+
   set strokeStyle(v: string) {
     this.logger?.log(`${this.name}.strokeStyle = '${v}'`);
     this.ctx.strokeStyle = v;
+  }
+
+  stroke() {
+    this.logger?.log(`${this.name}.stroke(${logArgs(arguments as any)})`);
+    this.ctx.stroke.apply(this.ctx, arguments as any);
+  }
+
+  moveTo() {
+    this.logger?.log(`${this.name}.moveTo(${logArgs(arguments as any)})`);
+    this.ctx.moveTo.apply(this.ctx, arguments as any);
+  }
+
+  lineTo() {
+    this.logger?.log(`${this.name}.lineTo(${logArgs(arguments as any)})`);
+    this.ctx.lineTo.apply(this.ctx, arguments as any);
   }
 
   set globalCompositeOperation(v: GlobalCompositeOperation) {

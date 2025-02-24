@@ -13,7 +13,7 @@ import { IRenderItem, RenderTree } from "../canvas";
  *    ])
  *  ])
  */
-export const mask = (mask: RenderTree | undefined): IRenderItem => ({
+export const mask = (mask?: RenderTree | undefined): IRenderItem => ({
   name: "mask",
   children: mask,
   /*
@@ -26,12 +26,15 @@ export const mask = (mask: RenderTree | undefined): IRenderItem => ({
     return this;
   },*/
   draw(ctx, drawPrev, drawChildren) {
+    function apply() {
+      ctx.globalCompositeOperation = "destination-in";
+    }
+
     drawPrev?.(ctx);
-    ctx.save();
-    // ATM: Use alpha as mask (not configurable)
-    ctx.globalCompositeOperation = "destination-in";
-    drawChildren?.(ctx); // as new layer?
-    ctx.restore();
+    if (drawChildren) ctx.save();
+    apply();
+    drawChildren?.(ctx);
+    if (drawChildren) ctx.restore();
     return this;
   },
 });

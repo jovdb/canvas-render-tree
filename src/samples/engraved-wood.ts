@@ -5,6 +5,7 @@ import { IRenderResources } from "../resources";
 
 export function engravedWoodTree(resources: IRenderResources) {
   const tree: IRenderItem[] = [
+    /*
     operations.drawImage({ image: resources.wood }),
 
     operations.layer([
@@ -33,6 +34,35 @@ export function engravedWoodTree(resources: IRenderResources) {
         shadowColor: "#fff8",
       }),
     ]),
+    */
+
+    operations.layer([
+      operations.drawImage({ image: resources.wood }),
+      operations.fillColor("#0001"), // Make darker inside
+      operations.blend("multiply"),
+      operations.drawImage({ image: resources.noise }), // Add
+      operations.blend("destination-in"),
+      operations.drawImage({ image: resources.text }),
+    ]),
+    operations.shadow({
+      type: "inner",
+      shadowBlur: 2,
+      shadowOffsetX: 2,
+      shadowOffsetY: 2,
+      shadowColor: "#0004",
+    }),
+    operations.shadow({
+      type: "inner",
+      shadowBlur: 1,
+      shadowOffsetX: -1,
+      shadowOffsetY: -1,
+      shadowColor: "#fff8",
+    }),
+
+    // Draw image behind text
+    operations.blend("destination-atop"),
+    operations.drawImage({ image: resources.wood }),
+
     /*
       operations.layer([
         operations.drawImage({ image: resources.wood }),

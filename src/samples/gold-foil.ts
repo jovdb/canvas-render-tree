@@ -8,7 +8,8 @@ export function goldFoilTree(resources: IRenderResources) {
 
     operations.layer([
       operations.drawImage({ image: resources.gold }),
-      operations.mask([operations.drawImage({ image: resources.goldFoil })]),
+      operations.blend("destination-in"),
+      operations.drawImage({ image: resources.goldFoil }),
     ]),
 
     operations.shadow({
