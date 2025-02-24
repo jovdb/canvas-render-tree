@@ -43,8 +43,7 @@ class BSplineWarper {
     const left =
       this.knots[i + degree] - this.knots[i] === 0
         ? 0
-        : ((t - this.knots[i]) /
-            (this.knots[i + degree] - this.knots[i])) *
+        : ((t - this.knots[i]) / (this.knots[i + degree] - this.knots[i])) *
           this.basisFunction(i, t, degree - 1);
 
     const right =
@@ -160,7 +159,7 @@ function drawControlPoints(
  */
 export const bSplineWrap = (): IRenderItem => ({
   name: "b-spline-wrap",
-  draw(ctx, drawPrev, drawChildren) {
+  draw(ctx, drawPrev, _config, drawChildren) {
     drawPrev?.(ctx);
     if (drawChildren) ctx.save();
     drawChildren?.(ctx);

@@ -25,7 +25,7 @@ export const mask = (mask?: RenderTree | undefined): IRenderItem => ({
     ctx.restore();
     return this;
   },*/
-  draw(ctx, drawPrev, drawChildren) {
+  draw(ctx, drawPrev, _config, drawChildren) {
     function apply() {
       ctx.globalCompositeOperation = "destination-in";
     }

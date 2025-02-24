@@ -18,7 +18,7 @@ export const transform = (
 ): IRenderItem => ({
   name: "translate",
   children,
-  draw(ctx, drawPrev, drawChildren) {
+  draw(ctx, drawPrev, _config, drawChildren) {
     function apply() {
       // scale
       if (typeof scaleX === "number" || typeof scaleY === "number")

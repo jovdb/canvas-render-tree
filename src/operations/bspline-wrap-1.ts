@@ -170,7 +170,7 @@ export class BSpline {
  */
 export const bSplineWrap = (): IRenderItem => ({
   name: "b-spline-wrap",
-  draw(ctx, drawPrev, drawChildren) {
+  draw(ctx, drawPrev, _config, drawChildren) {
     drawPrev?.(ctx);
     if (drawChildren) ctx.save();
     drawChildren?.(ctx);

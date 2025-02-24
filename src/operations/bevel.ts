@@ -53,13 +53,13 @@ function blendColors(color1: RGBA, color2: RGBA): RGBA {
 
   // Calculate the resulting color components
   const outR = Math.round(
-    (r1 * alpha1 + r2 * alpha2 * (1 - alpha1)) / outAlpha,
+    (r1 * alpha1 + r2 * alpha2 * (1 - alpha1)) / outAlpha
   );
   const outG = Math.round(
-    (g1 * alpha1 + g2 * alpha2 * (1 - alpha1)) / outAlpha,
+    (g1 * alpha1 + g2 * alpha2 * (1 - alpha1)) / outAlpha
   );
   const outB = Math.round(
-    (b1 * alpha1 + b2 * alpha2 * (1 - alpha1)) / outAlpha,
+    (b1 * alpha1 + b2 * alpha2 * (1 - alpha1)) / outAlpha
   );
 
   // Return the blended color as an RGBA byte array
@@ -71,7 +71,7 @@ function getPixelValue(
   imageData: ImageData,
   x: number,
   y: number,
-  kernel: number[][],
+  kernel: number[][]
 ) {
   const width = imageData.width;
   const height = imageData.height;
@@ -104,17 +104,7 @@ function getPixelValue(
   return 1 - value / total;
 }
 
-/**
- * Perform bevel on everything already draw
- * You can wrap it in a new layer to control bevel
- */
-export const bevel = ({
-  bevelSize = 6,
-  shadowColor = [0, 0, 0, 192],
-  highlightColor = [255, 255, 255, 192],
-  onlyBevel = false,
-  debugKernel = false,
-}: {
+export interface IBevelConfig {
   bevelSize?: number;
   shadowColor?: RGBA;
   highlightColor?: RGBA;
@@ -125,14 +115,31 @@ export const bevel = ({
    * https://docs.gimp.org/2.8/en/plug-in-convmatrix.html
    */
   kernel?: number[][];
-} = {}): IRenderItem => ({
+}
+
+/**
+ * Perform bevel on everything already draw
+ * You can wrap it in a new layer to control bevel
+ */
+export const bevel = (
+  config: IBevelConfig = {}
+): IRenderItem<IBevelConfig> => ({
   name: "bevel",
-  draw(ctx, drawPrev) {
+  config,
+  draw(ctx, drawPrev, config) {
+    const {
+      bevelSize = 6,
+      shadowColor = [0, 0, 0, 192],
+      highlightColor = [255, 255, 255, 192],
+      onlyBevel = false,
+      debugKernel = false,
+    } = config;
+
     // Create 2 kernels, for top/left and bottom/right edge
     const highlightKernel = gaussianBlurKernel(
       Math.round(bevelSize * 0.8),
       bevelSize * 0.3,
-      -0.5,
+      -0.5
     );
 
     const shadowKernel = gaussianBlurKernel(bevelSize, bevelSize / 3, 0.5);
@@ -147,7 +154,7 @@ export const bevel = ({
       0,
       0,
       ctx.canvas.width,
-      ctx.canvas.height,
+      ctx.canvas.height
     );
     const width = imageData.width;
     const height = imageData.height;
@@ -162,7 +169,7 @@ export const bevel = ({
           imageData,
           x,
           y,
-          highlightKernel,
+          highlightKernel
         ); // Check if pixel is a bevel pixel
 
         if (shadowStrength >= 0 || highlightStrength >= 0) {

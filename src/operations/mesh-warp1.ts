@@ -164,7 +164,7 @@ function drawControlPoints(
  */
 export const warp = (): IRenderItem => ({
   name: "warp",
-  draw(ctx, drawPrev, drawChildren) {
+  draw(ctx, drawPrev, _config, drawChildren) {
     // Source grid (original positions)
 
     const w = ctx.canvas.width;

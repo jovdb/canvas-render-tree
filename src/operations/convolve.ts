@@ -50,7 +50,7 @@ function applyKernel(
   imageData: ImageData,
   kernel: number[][],
   /** Extra factor to multiply */
-  multiply = 1,
+  multiply = 1
 ) {
   const width = imageData.width;
   const height = imageData.height;
@@ -90,16 +90,7 @@ function applyKernel(
   return newImageData;
 }
 
-/**
- * Apply a convolution kernel on an image
- * You can wrap it in a new layer to control the input image to target
- */
-export const convolve = ({
-  kernel,
-  debugKernel = false,
-  normalize = false,
-  multiply = 1,
-}: {
+interface IConvolveConfig {
   /**
    * Convolution Kernel to use
    * https://docs.gimp.org/2.10/en/gimp-filter-convolution-matrix.html
@@ -109,16 +100,31 @@ export const convolve = ({
   debugKernel?: boolean;
   normalize?: boolean;
   multiply?: number;
-}): IRenderItem => ({
+}
+
+/**
+ * Apply a convolution kernel on an image
+ * You can wrap it in a new layer to control the input image to target
+ */
+export const convolve = (
+  config: IConvolveConfig
+): IRenderItem<IConvolveConfig> => ({
   name: "convolve",
-  draw(ctx, drawPrev) {
+  config,
+  draw(ctx, drawPrev, config) {
+    const {
+      kernel,
+      debugKernel = false,
+      normalize = false,
+      multiply = 1,
+    } = config;
     drawPrev?.(ctx);
     function getBevelData() {
       const imageData = ctx.getImageData(
         0,
         0,
         ctx.canvas.width,
-        ctx.canvas.height,
+        ctx.canvas.height
       );
       return applyKernel(imageData, kernel, multiply);
     }

@@ -7,7 +7,7 @@ import { getContext2d, IRenderItem, RenderTree } from "../canvas";
 export const layer = (children: RenderTree): IRenderItem => ({
   name: "layer",
   children,
-  draw(ctx, drawPrev, drawChildren) {
+  draw(ctx, drawPrev, _config, drawChildren) {
     drawPrev?.(ctx);
 
     // Create an offscreen canvas

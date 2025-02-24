@@ -3,7 +3,7 @@ import { IRenderItem, RenderTree } from "../canvas";
 export const invert = (children: RenderTree): IRenderItem => ({
   name: "invert",
   children,
-  draw(ctx, drawPrev, drawChildren) {
+  draw(ctx, drawPrev, _config, drawChildren) {
     function apply() {
       const imageData = ctx.getImageData(
         0,

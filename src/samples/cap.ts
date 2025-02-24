@@ -1,4 +1,4 @@
-import { IRenderItem } from "../canvas";
+import { RenderTree } from "../canvas";
 import { operations } from "../operations";
 import { IRenderResources } from "../resources";
 
@@ -14,7 +14,7 @@ export function capTree(resources: IRenderResources) {
   //   ]),
   // ];
 
-  const tree: IRenderItem[] = [
+  const tree: RenderTree = [
     operations.fillColor("red"),
     operations.mask([operations.drawImage({ image: resources.glassText })]),
     operations.bevel({}),

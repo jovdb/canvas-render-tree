@@ -1,10 +1,10 @@
-import { IRenderItem } from "../canvas";
+import { RenderTree } from "../canvas";
 import { operations } from "../operations";
 
 import { IRenderResources } from "../resources";
 
 export function engravedWoodTree(resources: IRenderResources) {
-  const tree: IRenderItem[] = [
+  const tree: RenderTree = [
     /*
     operations.drawImage({ image: resources.wood }),
 

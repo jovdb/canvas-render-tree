@@ -22,7 +22,7 @@ export const shadow = (
 ): IRenderItem => ({
   name: "shadow",
   children,
-  draw(ctx, drawPrev, drawChildren) {
+  draw(ctx, drawPrev, _config, drawChildren) {
     // drawChildren?.(ctx);
     function apply(ctx: CanvasRenderingContext2D) {
       ctx.shadowBlur = shadowBlur;

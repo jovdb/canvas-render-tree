@@ -2,51 +2,58 @@ import { CanvasContext } from "./canvas-context";
 
 type DrawFn = (ctx: CanvasRenderingContext2D) => void;
 
-type ItemDrawFn = (
+type ItemDrawFn<TConfig = unknown> = (
   ctx: CanvasRenderingContext2D,
 
   /**
    * Item can decide on which context the previous items must be drawn
    */
   drawPrev: DrawFn | undefined,
+
+  /** Config of the node */
+  config: TConfig,
+
   /**
    * Method that draws the children of this render item
    */
-  drawChildren: DrawFn | undefined,
+  drawChildren: DrawFn | undefined
 ) => void;
 
-export interface IRenderItem {
+export interface IRenderItem<TConfig = unknown> {
+  /** Node name */
   name: string;
-  children?: RenderTree | undefined;
-  childNodes?: Record<string, RenderTree | undefined> | undefined;
 
-  draw: ItemDrawFn;
+  /** Optional Configuration of the node */
+  config?: TConfig;
+
+  children?: RenderTree | undefined;
+
+  draw: ItemDrawFn<TConfig>;
 }
 
-export type RenderTree = IRenderItem[];
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
+export type RenderTree = IRenderItem<any>[];
 
 export type Drawable = HTMLImageElement | HTMLCanvasElement;
 
 function walk(items: RenderTree | undefined, name = "") {
-  return items?.reduce(
-    (prev, item) => {
-      return (ctx) => {
-        if (name) console.group(name, items?.length ?? 0);
-        try {
-          item.draw(
-            ctx,
-            prev,
-            item.children
-              ? (ctx) => walk(item.children, `${item.name}-children`)?.(ctx)
-              : undefined,
-          );
-        } finally {
-          console.groupEnd();
-        }
-      };
-    },
-    undefined as unknown as DrawFn | undefined,
-  );
+  return items?.reduce((prev, item) => {
+    return (ctx) => {
+      if (name) console.group(name, items?.length ?? 0);
+      try {
+        item.draw(
+          ctx,
+          prev,
+          item.config,
+          item.children
+            ? (ctx) => walk(item.children, `${item.name}-children`)?.(ctx)
+            : undefined
+        );
+      } finally {
+        console.groupEnd();
+      }
+    };
+  }, undefined as unknown as DrawFn | undefined);
 }
 
 export function getContext2d(canvas: HTMLCanvasElement, name: string) {
@@ -56,7 +63,7 @@ export function getContext2d(canvas: HTMLCanvasElement, name: string) {
   const ctx2 = new CanvasContext(
     ctx,
     console,
-    name,
+    name
   ) as unknown as CanvasRenderingContext2D;
 
   return new Proxy(ctx2, {

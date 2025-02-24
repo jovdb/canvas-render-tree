@@ -66,7 +66,7 @@ export const saturation = (
 ): IRenderItem => ({
   name: "saturation",
   children,
-  draw(ctx, drawPrev, drawChildren) {
+  draw(ctx, drawPrev, _config, drawChildren) {
     function apply() {
       const imageData = ctx.getImageData(
         0,

@@ -2,7 +2,6 @@ import { IRenderItem } from "../canvas";
 
 type ControlPoint = [x: number, y: number];
 
-
 // https://demonstrations.wolfram.com/ImageWarping/
 // https://github.com/wxdrizzle/FreeFormDeformation-SketchDetection
 // https://chenxing.name/fun/imgwarp-js/
@@ -90,7 +89,7 @@ function warpImage(
  */
 export const warp = (): IRenderItem => ({
   name: "warp",
-  draw(ctx, drawPrev, drawChildren) {
+  draw(ctx, drawPrev, _config, drawChildren) {
     // Source grid (original positions)
 
     const w = ctx.canvas.width;

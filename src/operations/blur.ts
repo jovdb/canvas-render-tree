@@ -23,18 +23,23 @@ function createGaussianKernel(radius: number, sigma: number) {
   return { kernel, size };
 }
 
-export const blur = ({
-  radius = 5,
-  sigma = 2,
-}: { radius?: number; sigma?: number } = {}): IRenderItem => ({
+export interface IBlurConfig {
+  radius?: number;
+  sigma?: number;
+}
+
+export const blur = (config: IBlurConfig = {}): IRenderItem<IBlurConfig> => ({
   name: "blur",
+  config,
   draw(ctx, drawPrev) {
+    const { radius = 5, sigma = 2 } = config;
+
     drawPrev?.(ctx);
     const imageData = ctx.getImageData(
       0,
       0,
       ctx.canvas.width,
-      ctx.canvas.height,
+      ctx.canvas.height
     );
     const data = imageData.data;
     const width = imageData.width;

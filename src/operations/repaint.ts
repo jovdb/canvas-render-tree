@@ -12,7 +12,7 @@ export const repaint = (
 ): IRenderItem => ({
   name: "repaint",
   children: repaintWith,
-  draw(ctx, drawPrev, drawChildren) {
+  draw(ctx, drawPrev, _config, drawChildren) {
     function apply() {
       ctx.globalCompositeOperation = "source-in";
     }

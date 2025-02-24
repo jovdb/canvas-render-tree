@@ -84,7 +84,7 @@ export const displacement = (
 ): IRenderItem => ({
   name: "displacement",
   children: displacement,
-  draw(ctx, drawPrev, drawChildren) {
+  draw(ctx, drawPrev, _config, drawChildren) {
     drawPrev?.(ctx);
     if (drawChildren) ctx.save();
 
