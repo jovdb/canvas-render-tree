@@ -1,23 +1,29 @@
 import { IRenderItem } from "../canvas";
 import "./RenderTree.css";
 
+/** Indexes in tree */
+export type TreeIndex = number[];
+
 export function RenderTree({
   items,
-  indentLevel = 0,
+  parentIndexes = [],
   selectedItems = [],
+  editIndex,
   onClick,
 }: {
   items: readonly IRenderItem[] | undefined;
-  indentLevel?: number;
+  parentIndexes?: TreeIndex;
   selectedItems?: readonly IRenderItem[];
-  onClick?(item: IRenderItem): void;
+  editIndex?: TreeIndex | undefined;
+  onClick?(item: IRenderItem, treeIndex: TreeIndex): void;
 }) {
   return items?.map((item, index) => (
     <RenderItem
       key={`${item.name}-${index}`}
       item={item}
-      indentLevel={indentLevel}
       onClick={onClick}
+      treeIndex={[...parentIndexes, index]}
+      editIndex={editIndex}
       selectedItems={selectedItems}
     />
   ));
@@ -25,16 +31,22 @@ export function RenderTree({
 
 export function RenderItem({
   item,
-  indentLevel = 0,
   selectedItems = [],
+  treeIndex,
+  editIndex,
   onClick,
 }: {
   item: IRenderItem;
-  indentLevel?: number;
   selectedItems?: readonly IRenderItem[];
-  onClick?(item: IRenderItem): void;
+  /** Tree index of this item */
+  treeIndex: TreeIndex;
+  /** Tree index of the item selected for editing */
+  editIndex: TreeIndex | undefined;
+  onClick?(item: IRenderItem, treeIndex: TreeIndex): void;
 }) {
-  const isSelected = selectedItems.includes(item);
+  // const isSelected = selectedItems.includes(item);
+  const isSelected = treeIndex.join() === editIndex?.join();
+
   return (
     <>
       <div
@@ -43,15 +55,18 @@ export function RenderItem({
         }`}
         onClick={(e) => {
           e.stopPropagation();
-          onClick?.(item);
+          onClick?.(item, treeIndex);
         }}
       >
-        <div style={{ paddingLeft: indentLevel * 10 }}>{item.name}</div>
+        <div style={{ paddingLeft: (treeIndex.length - 1) * 10 }}>
+          {item.name}
+        </div>
       </div>
       <RenderTree
         items={item.children}
-        indentLevel={indentLevel + 1}
         selectedItems={selectedItems}
+        parentIndexes={treeIndex}
+        editIndex={editIndex}
         onClick={onClick}
       />
     </>

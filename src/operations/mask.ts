@@ -1,4 +1,4 @@
-import { IRenderItem, ItemDrawFn, RenderTree } from "../canvas";
+import { IRenderItem, RenderTree } from "../canvas";
 import { blend } from "./blend";
 
 /**

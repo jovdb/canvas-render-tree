@@ -236,55 +236,55 @@ class BSplineWarper {
   }
 }
 
-function drawControlPoints(
-  ctx: CanvasRenderingContext2D,
-  grid: ControlPoint[],
-  radius = 5,
-  fillColor = "red",
-  strokeColor = "red"
-) {
-  ctx.save(); // Save current canvas state
-  ctx.fillStyle = fillColor;
-  ctx.strokeStyle = strokeColor;
+// function drawControlPoints(
+//   ctx: CanvasRenderingContext2D,
+//   grid: ControlPoint[],
+//   radius = 5,
+//   fillColor = "red",
+//   strokeColor = "red"
+// ) {
+//   ctx.save(); // Save current canvas state
+//   ctx.fillStyle = fillColor;
+//   ctx.strokeStyle = strokeColor;
 
-  // Draw grid lines
-  ctx.strokeStyle = "#0004";
-  ctx.beginPath();
+//   // Draw grid lines
+//   ctx.strokeStyle = "#0004";
+//   ctx.beginPath();
 
-  const rows = Math.sqrt(grid.length);
-  const cols = rows;
+//   const rows = Math.sqrt(grid.length);
+//   const cols = rows;
 
-  // Horizontal lines
-  for (let row = 0; row < rows; row++) {
-    for (let col = 0; col < cols - 1; col++) {
-      const current = grid[row * cols + col];
-      const next = grid[row * cols + col + 1];
-      ctx.moveTo(current[0], current[1]);
-      ctx.lineTo(next[0], next[1]);
-    }
-  }
+//   // Horizontal lines
+//   for (let row = 0; row < rows; row++) {
+//     for (let col = 0; col < cols - 1; col++) {
+//       const current = grid[row * cols + col];
+//       const next = grid[row * cols + col + 1];
+//       ctx.moveTo(current[0], current[1]);
+//       ctx.lineTo(next[0], next[1]);
+//     }
+//   }
 
-  // Vertical lines
-  for (let col = 0; col < cols; col++) {
-    for (let row = 0; row < rows - 1; row++) {
-      const current = grid[row * cols + col];
-      const next = grid[(row + 1) * cols + col];
-      ctx.moveTo(current[0], current[1]);
-      ctx.lineTo(next[0], next[1]);
-    }
-  }
+//   // Vertical lines
+//   for (let col = 0; col < cols; col++) {
+//     for (let row = 0; row < rows - 1; row++) {
+//       const current = grid[row * cols + col];
+//       const next = grid[(row + 1) * cols + col];
+//       ctx.moveTo(current[0], current[1]);
+//       ctx.lineTo(next[0], next[1]);
+//     }
+//   }
 
-  ctx.stroke();
+//   ctx.stroke();
 
-  grid.forEach((point: ControlPoint) => {
-    ctx.beginPath();
-    ctx.arc(point[0], point[1], radius, 0, Math.PI * 2); // Draw circle at control point
-    ctx.fill();
-    ctx.stroke();
-  });
+//   grid.forEach((point: ControlPoint) => {
+//     ctx.beginPath();
+//     ctx.arc(point[0], point[1], radius, 0, Math.PI * 2); // Draw circle at control point
+//     ctx.fill();
+//     ctx.stroke();
+//   });
 
-  ctx.restore(); // Restore original canvas state
-}
+//   ctx.restore(); // Restore original canvas state
+// }
 
 /**
  * Currently only opacity layer used of mask
@@ -303,8 +303,12 @@ export const bSplineWrap = (): IRenderItem => ({
   name: "b-spline-wrap",
 });
 
-
-export const drawBSpline: ItemDrawFn<undefined> = (ctx, drawPrev, _config, drawChildren) => {
+export const drawBSpline: ItemDrawFn<undefined> = (
+  ctx,
+  drawPrev,
+  _config,
+  drawChildren
+) => {
   drawPrev?.(ctx);
   if (drawChildren) ctx.save();
   drawChildren?.(ctx);
@@ -345,8 +349,8 @@ export const drawBSpline: ItemDrawFn<undefined> = (ctx, drawPrev, _config, drawC
   ctx.putImageData(warpedData, 0, 0);
   warper.drawControlPoints(ctx);
 
-  //     drawControlPoints(ctx, warp.controlPoints);
+  // if (false) drawControlPoints(ctx, warp.controlPoints);
 
   if (drawChildren) ctx.restore();
   return this;
-}
+};

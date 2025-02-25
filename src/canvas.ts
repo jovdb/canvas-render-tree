@@ -23,8 +23,8 @@ export type ItemDrawFn<TConfig = unknown> = (
 
 /** Function to configure an item */
 export type ItemConfigFn<TConfig = unknown> = (props: {
-  config: TConfig;
-  onChange(config: TConfig): void;
+  config: Readonly<TConfig>;
+  mutateConfig: (mutate: (config: TConfig) => void) => void;
 }) => React.ReactNode;
 
 export interface IRenderItem<TConfig = unknown> {
@@ -37,7 +37,7 @@ export interface IRenderItem<TConfig = unknown> {
   children?: RenderTree | undefined;
 
   /** function to render */
-  draw?: ItemDrawFn<TConfig>;
+  // draw?: ItemDrawFn<TConfig>;
 }
 
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
@@ -51,7 +51,7 @@ function walk(items: RenderTree | undefined, name = "") {
       if (name) console.group(name, items?.length ?? 0);
       try {
         // eslint-disable-next-line @typescript-eslint/no-explicit-any
-        const render = (renderers as any)[item.name] || item.draw;
+        const render = (renderers as any)[item.name];
         if (render) {
           render(
             ctx,

@@ -6,7 +6,6 @@ import { capTree } from "./cap";
 import { bevel1Tree } from "./bevel";
 import { convolutionSamplesTree } from "./convolution-kernel";
 import { displacementTree } from "./displacement";
-import { meshWarpTree } from "./mesh-warp";
 import { bSplineWarpTree } from "./spline-warp";
 
 export const samples = {
@@ -35,10 +34,10 @@ export const samples = {
     name: "Convolution Kernel",
     tree: convolutionSamplesTree,
   },
-  meshWarp: {
-    name: "Mesh Warp",
-    tree: meshWarpTree,
-  },
+  // meshWarp: {
+  //   name: "Mesh Warp",
+  //   tree: meshWarpTree,
+  // },
   splineWarp: {
     name: "B-Spline Warp",
     tree: bSplineWarpTree,

@@ -13,7 +13,7 @@ import { convolve } from "./convolve";
 import { transform } from "./transform";
 import { invert } from "./invert";
 import { repaint } from "./repaint";
-import { meshWarp } from "./copilot-warp";
+// import { meshWarp } from "./copilot-warp";
 import { displacement } from "./displacement";
 import { bSplineWrap } from "./bspline-warp";
 
@@ -33,7 +33,7 @@ export const operations = {
   convolve,
   invert,
   repaint,
-  meshWarp,
+//  meshWarp,
   bSplineWrap,
   displacement,
 };

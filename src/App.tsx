@@ -3,11 +3,22 @@ import "./App.css";
 import { loadResourcesAsync } from "./resources";
 import { IRenderItem, ItemConfigFn } from "./canvas";
 import { Canvas } from "./components/Canvas";
-import { RenderTree } from "./components/RenderTree";
-import { useMemo, useState } from "react";
+import { RenderTree, TreeIndex } from "./components/RenderTree";
+import { useEffect, useState } from "react";
 import { useQuery } from "@tanstack/react-query";
 import { samples } from "./samples";
 import { configs, ConfigsName } from "./configs";
+import { produce } from "immer";
+
+export function selectIndex(tree: IRenderItem[], index: TreeIndex) {
+  if (index.length === 0) return undefined;
+  if (index.length === 1) return tree[index[0]];
+
+  const [nextIndex, ...restIndex] = index;
+  const restTree = tree[nextIndex];
+  if (!restTree || !restTree.children) return undefined;
+  return selectIndex(restTree.children, restIndex);
+}
 
 function filterTree(
   items: readonly IRenderItem[] | undefined,
@@ -42,28 +53,41 @@ function App() {
   });
 
   // TODO: Show Tree, multiselect layers
-  const [selectedItems, setSelectedItems] = useState<IRenderItem[]>([]);
+  const [selectedItems] = useState<IRenderItem[]>([]);
+  const [editIndex, setEditIndex] = useState<TreeIndex | undefined>();
+
   const [sampleKey, setSampleKey] = useState<keyof typeof samples>("cap");
 
-  const tree = useMemo(() => {
+  const [workTree, setWorkTree] = useState<IRenderItem[]>([]);
+
+  useEffect(() => {
     if (!resources) return undefined;
     const sample = samples[sampleKey];
     const tree = sample.tree(resources);
-
-    return tree;
+    setWorkTree(tree);
   }, [resources, sampleKey]);
 
   const selectedTree =
-    tree && selectedItems.length ? filterTree(tree, selectedItems) : tree ?? [];
+    workTree && selectedItems.length
+      ? filterTree(workTree, selectedItems)
+      : workTree ?? [];
 
   // Configurator
-  const configName = selectedItems[0]?.name as ConfigsName | undefined;
+  const editItem = selectIndex(selectedTree, editIndex ?? []);
+  const configName = editItem?.name as ConfigsName | undefined;
   const ItemConfigurator =
     configName && configs[configName]
       ? (configs[configName] as ItemConfigFn)
       : () => null;
 
-  console.log("TREE3", tree);
+  const onConfigChange = (mutate: (config: unknown) => void) => {
+    const newTree = produce(workTree, (draftTree) => {
+      const item = selectIndex(draftTree, editIndex ?? []);
+      mutate(item?.config);
+    });
+    setWorkTree(newTree);
+  };
+
   return (
     <>
       Samples:{" "}
@@ -93,25 +117,25 @@ function App() {
         <div style={{ display: "flex" }}>
           <div>
             <RenderTree
-              items={tree}
+              items={workTree}
               selectedItems={selectedItems}
-              onClick={(item) => {
+              parentIndexes={[]}
+              editIndex={editIndex}
+              onClick={(_item, treeIndex) => {
+                /*
                 setSelectedItems((prev) => {
                   const has = prev.includes(item);
                   return has ? prev.filter((i) => i !== item) : [...prev, item];
-                });
+                });*/
+                setEditIndex(treeIndex);
               }}
             />
           </div>
           <div style={{ marginLeft: "1rem" }}>
             <fieldset>
               <ItemConfigurator
-                config={selectedItems[0]?.config}
-                onChange={(config) => {
-                  // TODO, don't mutate -> immer?
-                  if (!selectedItems[0]) return;
-                  selectedItems[0].config = config;
-                }}
+                config={editItem?.config as IRenderItem<unknown>}
+                mutateConfig={onConfigChange}
               />
             </fieldset>
           </div>
