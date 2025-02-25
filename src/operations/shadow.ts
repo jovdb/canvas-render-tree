@@ -1,6 +1,6 @@
 import { getContext2d, IRenderItem, ItemDrawFn, RenderTree } from "../canvas";
 
-interface IShadowConfig {
+export interface IShadowConfig {
   type: "outer" | "inner";
   shadowBlur: number;
   shadowOffsetX: number;

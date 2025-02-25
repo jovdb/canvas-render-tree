@@ -48,7 +48,7 @@ export type Drawable = HTMLImageElement | HTMLCanvasElement;
 function walk(items: RenderTree | undefined, name = "") {
   return items?.reduce((prev, item) => {
     return (ctx) => {
-      if (name) console.group(name, items?.length ?? 0);
+      //if (name) console.group(name, items?.length ?? 0);
       try {
         // eslint-disable-next-line @typescript-eslint/no-explicit-any
         const render = (renderers as any)[item.name];
@@ -72,7 +72,7 @@ function walk(items: RenderTree | undefined, name = "") {
           }
         }
       } finally {
-        console.groupEnd();
+        //console.groupEnd();
       }
     };
   }, undefined as unknown as DrawFn | undefined);
@@ -82,6 +82,8 @@ export function getContext2d(canvas: HTMLCanvasElement, name: string) {
   const ctx = canvas.getContext("2d");
   if (!ctx) throw new Error("Error creating canvas 2D context");
 
+  return ctx;
+  /*
   const ctx2 = new CanvasContext(
     ctx,
     console,
@@ -99,6 +101,7 @@ export function getContext2d(canvas: HTMLCanvasElement, name: string) {
       return (target[key as any] = value);
     },
   });
+  */
 }
 
 export function draw(items: IRenderItem[]) {

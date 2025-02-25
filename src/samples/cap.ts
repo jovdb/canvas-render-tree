@@ -15,8 +15,10 @@ export function capTree(resources: IRenderResources) {
   // ];
 
   const tree: RenderTree = [
-    operations.fillColor("red"),
-    operations.mask([operations.drawImage({ image: resources.glassText })]),
+    operations.fillColor("#ff0000"),
+    operations.blend("destination-in", [
+      operations.drawImage({ image: resources.glassText }),
+    ]),
     operations.bevel({}),
     operations.blend("multiply"),
     operations.drawImage({ image: resources.cap }),

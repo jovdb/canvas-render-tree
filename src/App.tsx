@@ -1,14 +1,13 @@
 import "./App.css";
 
-import { loadResourcesAsync } from "./resources";
 import { IRenderItem, ItemConfigFn } from "./canvas";
 import { Canvas } from "./components/Canvas";
 import { RenderTree, TreeIndex } from "./components/RenderTree";
 import { useEffect, useState } from "react";
-import { useQuery } from "@tanstack/react-query";
 import { samples } from "./samples";
 import { configs, ConfigsName } from "./configs";
 import { produce } from "immer";
+import { useResources } from "./hooks/use-resources";
 
 export function selectIndex(tree: IRenderItem[], index: TreeIndex) {
   if (index.length === 0) return undefined;
@@ -43,14 +42,7 @@ function filterTree(
 }
 
 function App() {
-  const {
-    data: resources,
-    error,
-    isFetching,
-  } = useQuery({
-    queryFn: () => loadResourcesAsync(),
-    queryKey: ["init"],
-  });
+  const { resources, error, isFetching } = useResources();
 
   // TODO: Show Tree, multiselect layers
   const [selectedItems] = useState<IRenderItem[]>([]);
@@ -89,59 +81,106 @@ function App() {
   };
 
   return (
-    <>
-      Samples:{" "}
-      <select
-        value={sampleKey}
-        onChange={(e) => {
-          const sampleKey = e.target.value as keyof typeof samples;
-          setSampleKey(sampleKey);
+    <div
+      style={{
+        display: "flex",
+        position: "absolute",
+        width: "100%",
+        height: "100%",
+      }}
+    >
+      <div style={{ flexGrow: 1, padding: "0.5rem" }}>
+        Samples:{" "}
+        <select
+          value={sampleKey}
+          onChange={(e) => {
+            const sampleKey = e.target.value as keyof typeof samples;
+            setSampleKey(sampleKey);
+          }}
+          style={{ marginBottom: "1rem" }}
+        >
+          {Object.keys(samples).map((key) => (
+            <option key={key} value={key}>
+              {
+                // eslint-disable-next-line @typescript-eslint/no-explicit-any
+                ((samples as any)[key] as unknown as IRenderItem).name
+              }
+            </option>
+          ))}
+        </select>
+        <br />
+        {error && `Error loading resources: ${error.message}`}
+        <Canvas items={selectedTree ?? []} />
+        {isFetching ? "Loading..." : <br />}
+      </div>
+
+      <div
+        style={{
+          borderLeft: "2px solid #888",
+          width: 280,
+          display: "flex",
+          flexDirection: "column",
         }}
       >
-        {Object.keys(samples).map((key) => (
-          <option key={key} value={key}>
-            {
-              // eslint-disable-next-line @typescript-eslint/no-explicit-any
-              ((samples as any)[key] as unknown as IRenderItem).name
+        <div
+          style={{ flexGrow: 1, height: "50%", padding: "0.5rem" }}
+          onKeyDown={(e) => {
+            const key = e.key;
+            const divEl = e.currentTarget as HTMLDivElement;
+            const items = [
+              ...divEl.querySelectorAll(".render-item"),
+            ] as HTMLDivElement[];
+            const item = e.target as HTMLDivElement;
+            const index = items.indexOf(item);
+            if (index === -1) return;
+
+            let selectEl: HTMLDivElement | undefined = undefined;
+            if (key === "ArrowUp") {
+              selectEl = items[index - 1];
+            } else if (key === "ArrowDown") {
+              selectEl = items[index + 1];
             }
-          </option>
-        ))}
-      </select>
-      <hr />
-      {error && `Error loading resources: ${error.message}`}
-      <Canvas items={selectedTree ?? []} />
-      {isFetching ? "Loading..." : <br />}
-      <hr />
-      <div>
-        <h3>Render tree (select items)</h3>
-        <div style={{ display: "flex" }}>
-          <div>
-            <RenderTree
-              items={workTree}
-              selectedItems={selectedItems}
-              parentIndexes={[]}
-              editIndex={editIndex}
-              onClick={(_item, treeIndex) => {
-                /*
+
+            if (selectEl) {
+              selectEl.focus();
+              selectEl.click();
+              selectEl.scrollIntoView({ block: "nearest" });
+              e.preventDefault();
+            }
+          }}
+        >
+          <h3>Render tree (select items)</h3>
+          <RenderTree
+            items={workTree}
+            selectedItems={selectedItems}
+            parentIndexes={[]}
+            editIndex={editIndex}
+            onClick={(_item, treeIndex) => {
+              /*
                 setSelectedItems((prev) => {
                   const has = prev.includes(item);
                   return has ? prev.filter((i) => i !== item) : [...prev, item];
                 });*/
-                setEditIndex(treeIndex);
-              }}
-            />
-          </div>
-          <div style={{ marginLeft: "1rem" }}>
-            <fieldset>
-              <ItemConfigurator
-                config={editItem?.config as IRenderItem<unknown>}
-                mutateConfig={onConfigChange}
-              />
-            </fieldset>
-          </div>
+              setEditIndex(treeIndex);
+            }}
+          />
+        </div>
+        <div
+          style={{
+            flexGrow: 1,
+            height: "50%",
+            borderTop: "1px solid #888",
+            padding: "0.5rem",
+          }}
+        >
+          <h3>Details</h3>
+          <ItemConfigurator
+            config={editItem?.config as IRenderItem<unknown>}
+            mutateConfig={onConfigChange}
+          />
         </div>
       </div>
-    </>
+    </div>
   );
 }
 

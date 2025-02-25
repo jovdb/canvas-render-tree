@@ -31,7 +31,7 @@ export class CanvasContext implements Partial<CanvasRenderingContext2D> {
 
   drawImage(): void {
     this.logger?.log(
-      `${this.name}.drawImage(image, ${logArgs([...arguments].slice(1))})`,
+      `${this.name}.drawImage(image, ${logArgs([...arguments].slice(1))})`
     );
     this.ctx.drawImage.apply(this.ctx, arguments as any);
   }
@@ -85,7 +85,9 @@ export class CanvasContext implements Partial<CanvasRenderingContext2D> {
   }
 
   createImageData() {
-    this.logger?.log(`${this.name}.createImageData(${logArgs(arguments as any)})`);
+    this.logger?.log(
+      `${this.name}.createImageData(${logArgs(arguments as any)})`
+    );
     return this.ctx.createImageData.apply(this.ctx, arguments as any);
   }
 
@@ -156,6 +158,14 @@ export class CanvasContext implements Partial<CanvasRenderingContext2D> {
   set shadowOffsetY(v: number) {
     this.logger?.log(`${this.name}.shadowOffsetY = ${v}`);
     this.ctx.shadowOffsetY = v;
+  }
+
+  get shadowOffsetX() {
+    return this.ctx.shadowOffsetX;
+  }
+
+  get shadowOffsetY() {
+    return this.ctx.shadowOffsetY;
   }
 
   set shadowColor(v: string) {

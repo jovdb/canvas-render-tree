@@ -49,7 +49,7 @@ export function RenderItem({
 
   return (
     <>
-      <div
+      <button
         className={`render-item ${onClick ? "render-item--selectable" : ""} ${
           isSelected ? "render-item--selected" : ""
         }`}
@@ -61,7 +61,7 @@ export function RenderItem({
         <div style={{ paddingLeft: (treeIndex.length - 1) * 10 }}>
           {item.name}
         </div>
-      </div>
+      </button>
       <RenderTree
         items={item.children}
         selectedItems={selectedItems}

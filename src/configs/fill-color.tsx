@@ -1,5 +1,6 @@
 import { ItemConfigFn } from "../canvas";
 import { IFillColorConfig } from "../operations/fill-color";
+import { ColorConfig } from "./color";
 
 export const FillColorConfig: ItemConfigFn<IFillColorConfig> = ({
   config,
@@ -7,12 +8,12 @@ export const FillColorConfig: ItemConfigFn<IFillColorConfig> = ({
 }) => {
   return (
     <div>
-      Fill Color:{" "}
-      <input
-        value={config.color}
-        onChange={(e) => {
-          mutateConfig((draft) => {
-            draft.color = e.target.value;
+      Fill Color:
+      <ColorConfig
+        color={config.color}
+        onChange={(newColor) => {
+          mutateConfig((draftConfig) => {
+            draftConfig.color = newColor;
           });
         }}
       />
