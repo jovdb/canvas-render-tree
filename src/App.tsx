@@ -81,15 +81,8 @@ function App() {
   };
 
   return (
-    <div
-      style={{
-        display: "flex",
-        position: "absolute",
-        width: "100%",
-        height: "100%",
-      }}
-    >
-      <div style={{ flexGrow: 1, padding: "0.5rem" }}>
+    <div className="app">
+      <div className="app__preview">
         Samples:{" "}
         <select
           value={sampleKey}
@@ -111,19 +104,21 @@ function App() {
         <br />
         {error && `Error loading resources: ${error.message}`}
         <Canvas items={selectedTree ?? []} />
-        {isFetching ? "Loading..." : <br />}
+        {isFetching ? (
+          <>
+            <br />
+            Loading...
+          </>
+        ) : (
+          <>
+            <br />
+          </>
+        )}
       </div>
 
-      <div
-        style={{
-          borderLeft: "2px solid #888",
-          width: 280,
-          display: "flex",
-          flexDirection: "column",
-        }}
-      >
+      <div className="app__edit-panel">
         <div
-          style={{ flexGrow: 1, height: "50%", padding: "0.5rem" }}
+          className="app__render-tree"
           onKeyDown={(e) => {
             const key = e.key;
             const divEl = e.currentTarget as HTMLDivElement;
@@ -165,14 +160,7 @@ function App() {
             }}
           />
         </div>
-        <div
-          style={{
-            flexGrow: 1,
-            height: "50%",
-            borderTop: "1px solid #888",
-            padding: "0.5rem",
-          }}
-        >
+        <div className="app__render-item-details">
           <h3>Details</h3>
           <ItemConfigurator
             config={editItem?.config as IRenderItem<unknown>}

@@ -7,12 +7,17 @@ export function ColorConfig({
   onChange: (color: string) => void;
 }) {
   return (
-    <div style={{
-      display: "flex",
-      alignItems: "center",
-    }}>
+    <div
+      style={{
+        display: "inline-flex",
+        alignItems: "center",
+      }}
+    >
       <input
         value={color}
+        style={{
+          width: "5rem",
+        }}
         onChange={(e) => {
           onChange(e.target.value);
         }}
