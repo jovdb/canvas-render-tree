@@ -2,12 +2,13 @@ import "./App.css";
 
 import { IRenderItem, ItemConfigFn } from "./canvas";
 import { Canvas } from "./components/Canvas";
-import { RenderTree, TreeIndex } from "./components/RenderTree";
 import { useEffect, useState } from "react";
 import { samples } from "./samples";
 import { configs, ConfigsName } from "./configs";
 import { produce } from "immer";
 import { useResources } from "./hooks/use-resources";
+import { RenderTreePanel } from "./components/RenderTreePanel";
+import { TreeIndex } from "./components/RenderTree";
 
 export function selectIndex(tree: IRenderItem[], index: TreeIndex) {
   if (index.length === 0) return undefined;
@@ -117,45 +118,11 @@ function App() {
       </div>
 
       <div className="app__edit-panel">
-        <div
-          className="app__render-tree"
-          onKeyDown={(e) => {
-            const key = e.key;
-            const divEl = e.currentTarget as HTMLDivElement;
-            const items = [
-              ...divEl.querySelectorAll(".render-item"),
-            ] as HTMLDivElement[];
-            const item = e.target as HTMLDivElement;
-            const index = items.indexOf(item);
-            if (index === -1) return;
-
-            let selectEl: HTMLDivElement | undefined = undefined;
-            if (key === "ArrowUp") {
-              selectEl = items[index - 1];
-            } else if (key === "ArrowDown") {
-              selectEl = items[index + 1];
-            }
-
-            if (selectEl) {
-              selectEl.focus();
-              selectEl.click();
-              selectEl.scrollIntoView({ block: "nearest" });
-              e.preventDefault();
-            }
-          }}
-        >
-          <h3>Render tree (select items)</h3>
-          <RenderTree
+        <div className="app__render-tree">
+          <RenderTreePanel
             items={workTree}
-            selectedItems={selectedItems}
-            parentIndexes={[]}
             editIndex={editIndex}
             onClick={(_item, treeIndex) => {
-              /*
-                setSelectedItems((prev) => {
-                  const has = prev.includes(item);
-                  return has ? prev.filter((i) => i !== item) : [...prev, item];
-                });*/
               setEditIndex(treeIndex);
             }}
           />

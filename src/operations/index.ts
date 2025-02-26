@@ -16,6 +16,7 @@ import { repaint } from "./repaint";
 // import { meshWarp } from "./copilot-warp";
 import { displacement } from "./displacement";
 import { bSplineWrap } from "./bspline-warp";
+import { uvMap } from "./uv-map";
 
 export const operations = {
   drawImage,
@@ -36,6 +37,7 @@ export const operations = {
 //  meshWarp,
   bSplineWrap,
   displacement,
+  uvMap,
 };
 
 export type RenderItemName = keyof typeof operations;

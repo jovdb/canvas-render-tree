@@ -15,6 +15,7 @@ import { drawOpacity } from "./operations/opacity";
 import { drawSaturation } from "./operations/saturation";
 import { drawShadow } from "./operations/shadow";
 import { drawTransform } from "./operations/transform";
+import { drawUvMap } from "./operations/uv-map";
 
 export const renderers: Partial<Record<RenderItemName, IRenderItem<unknown>>> =
   {
@@ -35,4 +36,5 @@ export const renderers: Partial<Record<RenderItemName, IRenderItem<unknown>>> =
     convolve: drawConvolve,
     displacement: drawDisplacement,
     bSplineWrap: drawBSpline,
+    uvMap: drawUvMap,
   };

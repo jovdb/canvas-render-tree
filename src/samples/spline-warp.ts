@@ -4,7 +4,7 @@ import { IRenderResources } from "../resources";
 
 export function bSplineWarpTree(resources: IRenderResources) {
   const tree: IRenderItem[] = [
-    operations.drawImage({ image: resources.parrot}),
+    operations.drawImage({ image: resources.checkerboard }),
     operations.bSplineWrap(),
   ];
   return tree;

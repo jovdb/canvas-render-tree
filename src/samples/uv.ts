@@ -2,11 +2,11 @@ import { IRenderItem } from "../canvas";
 import { operations } from "../operations";
 import { IRenderResources } from "../resources";
 
-export function displacementTree(resources: IRenderResources) {
+export function uvTree(resources: IRenderResources) {
   const tree: IRenderItem[] = [
     operations.drawImage({ image: resources.checkerboard }),
-    operations.displacement(20, [
-      operations.drawImage({ image: resources.displacementMap1 }),
+    operations.uvMap(20, [
+      operations.drawImage({ image: resources.uvMap }),
     ]),
   ];
 

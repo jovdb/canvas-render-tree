@@ -1,5 +1,4 @@
 import React from "react";
-import { CanvasContext } from "./canvas-context";
 import { renderers } from "./renderers";
 
 type DrawFn = (ctx: CanvasRenderingContext2D) => void;
@@ -45,7 +44,7 @@ export type RenderTree = IRenderItem<any>[];
 
 export type Drawable = HTMLImageElement | HTMLCanvasElement;
 
-function walk(items: RenderTree | undefined, name = "") {
+function walk(items: RenderTree | undefined, _name = "") {
   return items?.reduce((prev, item) => {
     return (ctx) => {
       //if (name) console.group(name, items?.length ?? 0);
@@ -78,7 +77,7 @@ function walk(items: RenderTree | undefined, name = "") {
   }, undefined as unknown as DrawFn | undefined);
 }
 
-export function getContext2d(canvas: HTMLCanvasElement, name: string) {
+export function getContext2d(canvas: HTMLCanvasElement, _name: string) {
   const ctx = canvas.getContext("2d");
   if (!ctx) throw new Error("Error creating canvas 2D context");
 

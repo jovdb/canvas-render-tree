@@ -7,6 +7,7 @@ import { bevel1Tree } from "./bevel";
 import { convolutionSamplesTree } from "./convolution-kernel";
 import { displacementTree } from "./displacement";
 import { bSplineWarpTree } from "./spline-warp";
+import { uvTree } from "./uv";
 
 export const samples = {
   wood: {
@@ -45,5 +46,9 @@ export const samples = {
   displacement: {
     name: "Displacement Map",
     tree: displacementTree,
+  },
+  uv: {
+    name: "UV Map",
+    tree: uvTree,
   },
 } as const;
