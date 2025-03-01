@@ -13,7 +13,6 @@ export const DrawTextConfig: ItemConfigFn<IDrawTextConfig> = ({
     fontFamilyName = "Arial",
     text = "",
   } = config;
-  const { resources } = useResources();
 
   return (
     <div>
@@ -24,7 +23,6 @@ export const DrawTextConfig: ItemConfigFn<IDrawTextConfig> = ({
           onChange={(e) => {
             const newText = e.target.value;
             mutateConfig((draftConfig) => {
-              if (!resources) return;
               draftConfig.text = newText;
             });
           }}

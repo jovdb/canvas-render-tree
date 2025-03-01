@@ -6,7 +6,6 @@ import { useEffect, useState } from "react";
 import { samples } from "./samples";
 import { configs, ConfigsName } from "./configs";
 import { produce } from "immer";
-import { useResources } from "./hooks/use-resources";
 import { RenderTreePanel } from "./components/RenderTreePanel";
 import { TreeIndex } from "./components/RenderTree";
 
@@ -43,8 +42,6 @@ function filterTree(
 }
 
 function App() {
-  const { resources, error, isFetching } = useResources();
-
   // TODO: Show Tree, multiselect layers
   const [selectedItems] = useState<IRenderItem[]>([]);
   const [editIndex, setEditIndex] = useState<TreeIndex | undefined>();
@@ -54,11 +51,10 @@ function App() {
   const [workTree, setWorkTree] = useState<IRenderItem[]>([]);
 
   useEffect(() => {
-    if (!resources) return undefined;
     const sample = samples[sampleKey];
-    const tree = sample.tree(resources);
+    const tree = sample.tree();
     setWorkTree(tree);
-  }, [resources, sampleKey]);
+  }, [sampleKey]);
 
   const selectedTree =
     workTree && selectedItems.length
@@ -103,18 +99,7 @@ function App() {
           ))}
         </select>
         <br />
-        {error && `Error loading resources: ${error.message}`}
         <Canvas items={selectedTree ?? []} />
-        {isFetching ? (
-          <>
-            <br />
-            Loading...
-          </>
-        ) : (
-          <>
-            <br />
-          </>
-        )}
       </div>
 
       <div className="app__edit-panel">

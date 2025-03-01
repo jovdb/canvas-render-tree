@@ -1,5 +1,3 @@
-import { uvMap } from "./operations/uv-map";
-
 export function loadImageAsync(url: string) {
   return new Promise<HTMLImageElement>((resolve, reject) => {
     const image = document.createElement("img");
@@ -35,8 +33,29 @@ export async function loadResourcesAsync() {
     displacementMap2: await loadImageAsync("displacement-map2.png"),
     homer: await loadImageAsync("homer.png"),
     checkerboard: await loadImageAsync("checkerboard.png"),
-    uvMap: await loadImageAsync("uv-map.png"),
+    uvMap1: await loadImageAsync("uv-map1.png"),
+    uvMap2: await loadImageAsync("uv-map2.png"),
   };
 }
 
 export type IRenderResources = Awaited<ReturnType<typeof loadResourcesAsync>>;
+
+export const availableImages = {
+  parrot: "./parrot.png",
+  wood: "./hout.jpg",
+  woodEngraved: "./hout-engraved.jpg",
+  noise: "./noise.jpg",
+  glass: "./glass.jpg",
+  glassText: "./glass-text.png",
+  text: "./text.png",
+  gold: "gold.jpg",
+  goldBack: "foil-back.jpg",
+  goldFoil: "foil-layer2.png",
+  cap: "cap.jpg",
+  displacementMap1: "displacement-map1.png",
+  displacementMap2: "displacement-map2.png",
+  homer: "homer.png",
+  checkerboard: "checkerboard.png",
+  uvMap1: "uv-map1.png",
+  uvMap2: "uv-map2.png",
+};

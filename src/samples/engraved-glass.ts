@@ -1,14 +1,14 @@
 import { IRenderItem } from "../canvas";
 import { operations } from "../operations";
-import { IRenderResources } from "../resources";
+import { availableImages } from "../resources";
 
-export function engravedGlassTree(resources: IRenderResources) {
+export function engravedGlassTree() {
   const tree: IRenderItem[] = [
-    // operations.drawImage({ image: resources.glass }),
+    // operations.drawImage({ imageUrl: availableImages.glass }),
     // operations.layer([
-    //   operations.drawImage({ image: resources.noise }),
+    //   operations.drawImage({ imageUrl: availableImages.noise }),
     //   operations.fillColor("#0001"), // make a bit darker
-    //   operations.mask([operations.drawImage({ image: resources.glassText })]),
+    //   operations.mask([operations.drawImage({ imageUrl: availableImages.glassText })]),
     // ]),
     // operations.shadow({
     //   type: "inner",
@@ -18,12 +18,12 @@ export function engravedGlassTree(resources: IRenderResources) {
     //   shadowColor: "#0003",
     // }),
 
-    operations.drawImage({ image: resources.glass }),
+    operations.drawImage({ imageUrl: availableImages.glass }),
     operations.layer([
-      operations.drawImage({ image: resources.noise }),
+      operations.drawImage({ imageUrl: availableImages.noise }),
       operations.fillColor("#0001"), // make a bit darker
       operations.blend("destination-in"),
-      operations.drawImage({ image: resources.glassText }),
+      operations.drawImage({ imageUrl: availableImages.glassText }),
     ]),
     operations.shadow({
       type: "inner",

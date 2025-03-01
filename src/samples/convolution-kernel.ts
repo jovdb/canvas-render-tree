@@ -1,16 +1,16 @@
 import { RenderTree } from "../canvas";
 import { operations } from "../operations";
 import { kernels } from "../kernels";
-import { IRenderResources } from "../resources";
+import { availableImages } from "../resources";
 
-export function convolutionSamplesTree(resources: IRenderResources) {
+export function convolutionSamplesTree() {
   const commonTextProps = {
     fontSize: 20,
     fontFamilyName: "Arial",
     foregroundColor: "#2222DD",
   };
   const imageProps = {
-    image: resources.glass,
+    imageUrl: availableImages.glass,
     targetRect: [0, 10, 200, 200],
   } as const;
 

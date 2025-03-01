@@ -1,15 +1,15 @@
 import { IRenderItem } from "../canvas";
 import { operations } from "../operations";
-import { IRenderResources } from "../resources";
+import { availableImages } from "../resources";
 
-export function goldFoilTree(resources: IRenderResources) {
+export function goldFoilTree() {
   const tree: IRenderItem[] = [
-    operations.drawImage({ image: resources.goldBack }),
+    operations.drawImage({ imageUrl: availableImages.goldBack }),
 
     operations.layer([
-      operations.drawImage({ image: resources.gold }),
+      operations.drawImage({ imageUrl: availableImages.gold }),
       operations.blend("destination-in"),
-      operations.drawImage({ image: resources.goldFoil }),
+      operations.drawImage({ imageUrl: availableImages.goldFoil }),
     ]),
 
     operations.shadow({

@@ -20,12 +20,30 @@ export type ItemDrawFn<TConfig = unknown> = (
   drawChildren: DrawFn | undefined
 ) => void;
 
+/**
+ * Function to load resources
+ * Return undefined is nothing to load or it is cached
+ */
+export type ItemLoadFn<TConfig = unknown> = (
+  /** Config of the node */
+  config: TConfig
+) => Promise<void> | undefined;
+
+export interface IItemRenderer<TConfig = unknown> {
+  draw?: ItemDrawFn<TConfig>;
+  load?: ItemLoadFn<TConfig>;
+}
+
 /** Function to configure an item */
 export type ItemConfigFn<TConfig = unknown> = (props: {
   config: Readonly<TConfig>;
   mutateConfig: (mutate: (config: TConfig) => void) => void;
 }) => React.ReactNode;
 
+/**
+ * The data describing the render step. \
+ * This will be serialized and saved
+ */
 export interface IRenderItem<TConfig = unknown> {
   /** Node name */
   name: string;
@@ -34,9 +52,6 @@ export interface IRenderItem<TConfig = unknown> {
   config?: TConfig;
 
   children?: RenderTree | undefined;
-
-  /** function to render */
-  // draw?: ItemDrawFn<TConfig>;
 }
 
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
@@ -44,21 +59,21 @@ export type RenderTree = IRenderItem<any>[];
 
 export type Drawable = HTMLImageElement | HTMLCanvasElement;
 
-function walk(items: RenderTree | undefined, _name = "") {
+function drawTree(items: RenderTree | undefined, _name = "") {
   return items?.reduce((prev, item) => {
     return (ctx) => {
       //if (name) console.group(name, items?.length ?? 0);
       try {
         // eslint-disable-next-line @typescript-eslint/no-explicit-any
-        const render = (renderers as any)[item.name];
-        if (render) {
-          render(
+        const renderer = (renderers as any)[item.name] as IItemRenderer;
+        if (renderer?.draw) {
+          renderer.draw(
             ctx,
             prev,
             item.config,
             item.children
               ? (ctx: CanvasRenderingContext2D) =>
-                  walk(item.children, `${item.name}-children`)?.(ctx)
+                  drawTree(item.children, `${item.name}-children`)?.(ctx)
               : undefined
           );
         } else {
@@ -67,7 +82,7 @@ function walk(items: RenderTree | undefined, _name = "") {
           // correct default implementation or better throw
           prev?.(ctx);
           if (item.children) {
-            walk(item.children, `${item.name}-children`)?.(ctx);
+            drawTree(item.children, `${item.name}-children`)?.(ctx);
           }
         }
       } finally {
@@ -75,6 +90,32 @@ function walk(items: RenderTree | undefined, _name = "") {
       }
     };
   }, undefined as unknown as DrawFn | undefined);
+}
+
+export function loadTree(items: RenderTree | undefined) {
+  const promises: Promise<void>[] = [];
+
+  // Inner function so I can store promises in the outer scope
+  function loadTreeInner(items: RenderTree | undefined) {
+    return items?.forEach((item) => {
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      const renderer = (renderers as any)[item.name] as IItemRenderer;
+      if (renderer?.load) {
+        const promise = renderer?.load(item.config);
+        if (promise) {
+          promises.push(promise);
+        }
+      }
+
+      if (item.children) {
+        loadTreeInner(item.children);
+      }
+    });
+  }
+
+  loadTreeInner(items);
+
+  return promises.length === 0 ? undefined : Promise.all(promises);
 }
 
 export function getContext2d(canvas: HTMLCanvasElement, _name: string) {
@@ -103,9 +144,8 @@ export function getContext2d(canvas: HTMLCanvasElement, _name: string) {
   */
 }
 
-export function draw(items: IRenderItem[]) {
-  const canvasEl = document.querySelector<HTMLCanvasElement>("canvas")!;
+export function draw(canvasEl: HTMLCanvasElement, items: IRenderItem[]) {
   const ctx = getContext2d(canvasEl, "rootCtx");
   ctx.reset(); // clear and reset unclosed operations: globalAlpha, ...
-  walk(items, "root")?.(ctx);
+  drawTree(items, "root")?.(ctx);
 }

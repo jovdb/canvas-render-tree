@@ -1,21 +1,21 @@
 import { RenderTree } from "../canvas";
 import { operations } from "../operations";
 
-import { IRenderResources } from "../resources";
+import { availableImages } from "../resources";
 
-export function engravedWoodTree(resources: IRenderResources) {
+export function engravedWoodTree() {
   const tree: RenderTree = [
     /*
-    operations.drawImage({ image: resources.wood }),
+    operations.drawImage({ imageUrl: availableImages.wood }),
 
     operations.layer([
-      operations.drawImage({ image: resources.text }),
+      operations.drawImage({ imageUrl: availableImages.text }),
       operations.repaint([
         operations.layer([
-          operations.drawImage({ image: resources.wood }),
+          operations.drawImage({ imageUrl: availableImages.wood }),
           operations.fillColor("#0002"), // Make darker inside
           operations.blend("multiply", [
-            operations.drawImage({ image: resources.noise }), // Add
+            operations.drawImage({ imageUrl: availableImages.noise }), // Add
           ]),
         ]),
       ]),
@@ -37,12 +37,12 @@ export function engravedWoodTree(resources: IRenderResources) {
     */
 
     operations.layer([
-      operations.drawImage({ image: resources.wood }),
+      operations.drawImage({ imageUrl: availableImages.wood }),
       operations.fillColor("#0001"), // Make darker inside
       operations.blend("multiply"),
-      operations.drawImage({ image: resources.noise }), // Add
+      operations.drawImage({ imageUrl: availableImages.noise }), // Add
       operations.blend("destination-in"),
-      operations.drawImage({ image: resources.text }),
+      operations.drawImage({ imageUrl: availableImages.text }),
     ]),
     operations.shadow({
       type: "inner",
@@ -61,18 +61,18 @@ export function engravedWoodTree(resources: IRenderResources) {
 
     // Draw image behind text
     operations.blend("destination-atop"),
-    operations.drawImage({ image: resources.wood }),
+    operations.drawImage({ imageUrl: availableImages.wood }),
 
     /*
       operations.layer([
-        operations.drawImage({ image: resources.wood }),
+        operations.drawImage({ imageUrl: availableImages.wood }),
         operations.fillColor('#0002'), // Make darker inside
         operations.blend('multiply', [
-          operations.drawImage({ image: resources.noise }), // Add
+          operations.drawImage({ imageUrl: availableImages.noise }), // Add
         ]),
       ]),
       operations.mask([
-        operations.drawImage({ image: resources.text }),
+        operations.drawImage({ imageUrl: availableImages.text }),
       ])
       */
     //]),
@@ -82,7 +82,7 @@ export function engravedWoodTree(resources: IRenderResources) {
 
 // export function engravedWoodTree(resources: IRenderResources) {
 //   const tree: IRenderItem[] = [
-//     operations.drawImage({ image: resources.wood }),
+//     operations.drawImage({ imageUrl: availableImages.wood }),
 //     operations.shadow(
 //       {
 //         type: 'inner',
@@ -102,9 +102,9 @@ export function engravedWoodTree(resources: IRenderResources) {
 //           },
 //           [
 //             operations.layer([
-//               operations.drawImage({ image: resources.woodEngraved }),
+//               operations.drawImage({ imageUrl: availableImages.woodEngraved }),
 //               operations.mask([
-//                 operations.drawImage({ image: resources.text }),
+//                 operations.drawImage({ imageUrl: availableImages.text }),
 //               ]),
 //             ]),
 //           ]

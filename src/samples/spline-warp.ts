@@ -1,10 +1,10 @@
 import { IRenderItem } from "../canvas";
 import { operations } from "../operations";
-import { IRenderResources } from "../resources";
+import { availableImages } from "../resources";
 
-export function bSplineWarpTree(resources: IRenderResources) {
+export function bSplineWarpTree() {
   const tree: IRenderItem[] = [
-    operations.drawImage({ image: resources.checkerboard }),
+    operations.drawImage({ imageUrl: availableImages.checkerboard }),
     operations.bSplineWrap(),
   ];
   return tree;

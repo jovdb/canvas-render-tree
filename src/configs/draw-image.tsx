@@ -1,17 +1,16 @@
 import { ItemConfigFn } from "../canvas";
-import { useResources } from "../hooks/use-resources";
 import { IDrawImageConfig } from "../operations/draw-image";
+import { availableImages } from "../resources";
 
 export const DrawImageConfig: ItemConfigFn<IDrawImageConfig> = ({
   config,
   mutateConfig,
 }) => {
-  const { image } = config;
-  const { resources } = useResources();
+  const { imageUrl } = config;
 
-  const [resourceName] = resources
-    ? Object.entries(resources).find(([_resourceName, image2]) => {
-        return image === image2;
+  const [resourceName] = availableImages
+    ? Object.entries(availableImages).find(([_resourceName, imageUrl2]) => {
+        return imageUrl === imageUrl2;
       }) ?? [undefined, undefined]
     : [undefined, undefined];
 
@@ -21,16 +20,19 @@ export const DrawImageConfig: ItemConfigFn<IDrawImageConfig> = ({
       <select
         value={resourceName}
         onChange={(e) => {
-          const resourceName = e.target.value as keyof typeof resources;
+          const resourceName = e.target.value as keyof typeof availableImages;
           mutateConfig((draftConfig) => {
-            if (!resources) return;
-            draftConfig.image = resources[resourceName];
+            draftConfig.imageUrl = availableImages[resourceName];
           });
         }}
       >
-        {resources &&
-          Object.keys(resources).map((resourceName) => {
-            return <option value={resourceName}>{resourceName}</option>;
+        {availableImages &&
+          Object.keys(availableImages).map((resourceName) => {
+            return (
+              <option key={resourceName} value={resourceName}>
+                {resourceName}
+              </option>
+            );
           })}
       </select>
     </div>

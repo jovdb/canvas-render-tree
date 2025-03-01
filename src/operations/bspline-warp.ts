@@ -1,290 +1,238 @@
-import { IRenderItem, ItemDrawFn } from "../canvas";
+import { getContext2d, IRenderItem, ItemDrawFn } from "../canvas";
 
 interface Point {
   x: number;
   y: number;
 }
 
-class BSplineWarper {
-  private ctx: CanvasRenderingContext2D;
-  private width: number;
-  private height: number;
-  public controlPoints: Point[][];
-  private degree: number = 3; // Cubic B-Spline
+function clamp(value: number, min: number, max: number): number {
+  return Math.max(min, Math.min(max, value));
+}
 
-  constructor(
-    private canvas: HTMLCanvasElement,
-    private originalImage: ImageData
-  ) {
-    this.ctx = canvas.getContext("2d")!;
-    if (!this.ctx) {
-      throw new Error("Could not get 2D context");
-    }
-    this.width = originalImage.width;
-    this.height = originalImage.height;
-    this.canvas.width = this.width;
-    this.canvas.height = this.height;
-    this.controlPoints = [];
+// Calculate knot vector for B-spline (uniform, open)
+function calculateKnotVector(
+  degree: number,
+  numControlPoints: number
+): number[] {
+  // const numKnots = numControlPoints + degree + 1;
+  const knots: number[] = [];
 
-    // Initialize control points (e.g., a 4x4 grid)
-    this.initializeControlPoints(2, 2);
-    this.addControlPointInteraction();
-    this.drawImage(originalImage);
+  // Start with 'degree + 1' repetitions of 0
+  for (let i = 0; i <= degree; i++) {
+    knots.push(0);
   }
 
-  private initializeControlPoints(rows: number, cols: number) {
-    const xSpacing = this.width / (cols + 1);
-    const ySpacing = this.height / (rows + 1);
-
-    const randomOffset = 0;
-    for (let i = 0; i < rows + 2; i++) {
-      // +2 for padding
-      this.controlPoints[i] = [];
-      for (let j = 0; j < cols + 2; j++) {
-        // +2 for padding
-        this.controlPoints[i][j] = {
-          x: j * xSpacing + Math.random() * randomOffset * 2 - randomOffset, // Add random offset for better visualization
-          y: i * ySpacing + Math.random() * randomOffset * 2 - randomOffset, // Add random offset for better visualization,
-        };
-      }
-    }
-
-    const cp = this.controlPoints[2][2];
-    cp.x += 80;
-    cp.y += 80;
+  // Uniformly spaced knots in the middle
+  for (let i = 1; i < numControlPoints - degree; i++) {
+    knots.push(i);
   }
 
-  private drawImage(image: ImageData) {
-    this.ctx.putImageData(image, 0, 0);
+  // End with 'degree + 1' repetitions of the last knot value
+  const lastKnotValue = numControlPoints - degree;
+  for (let i = 0; i <= degree; i++) {
+    knots.push(lastKnotValue);
   }
 
-  public drawControlPoints(ctx: CanvasRenderingContext2D) {
-    ctx.fillStyle = "red";
-    ctx.strokeStyle = "gray";
+  return knots;
+}
 
-    for (let i = 0; i < this.controlPoints.length; i++) {
-      for (let j = 0; j < this.controlPoints[i].length; j++) {
-        const point = this.controlPoints[i][j];
-        ctx.beginPath();
-        ctx.arc(point.x, point.y, 5, 0, 2 * Math.PI);
-        ctx.fill();
-
-        // Optional: Draw lines connecting control points
-        if (j < this.controlPoints[i].length - 1) {
-          ctx.beginPath();
-          ctx.moveTo(point.x, point.y);
-          ctx.lineTo(
-            this.controlPoints[i][j + 1].x,
-            this.controlPoints[i][j + 1].y
-          );
-          ctx.stroke();
-        }
-        if (i < this.controlPoints.length - 1) {
-          ctx.beginPath();
-          ctx.moveTo(point.x, point.y);
-          ctx.lineTo(
-            this.controlPoints[i + 1][j].x,
-            this.controlPoints[i + 1][j].y
-          );
-          ctx.stroke();
-        }
-      }
-    }
+// B-spline basis function (Cox-de Boor recursion formula)
+function bSplineBasis(
+  i: number,
+  degree: number,
+  u: number,
+  knots: number[]
+): number {
+  if (degree === 0) {
+    return knots[i] <= u && u < knots[i + 1] ? 1 : 0;
   }
 
-  private basis(i: number, k: number, u: number, knots: number[]): number {
-    if (k === 0) {
-      return knots[i] <= u && u < knots[i + 1] ? 1 : 0;
+  const term1Numerator = u - knots[i];
+  const term1Denominator = knots[i + degree] - knots[i];
+  const term1 =
+    term1Denominator !== 0
+      ? (term1Numerator / term1Denominator) *
+        bSplineBasis(i, degree - 1, u, knots)
+      : 0;
+
+  const term2Numerator = knots[i + degree + 1] - u;
+  const term2Denominator = knots[i + degree + 1] - knots[i + 1];
+  const term2 =
+    term2Denominator !== 0
+      ? (term2Numerator / term2Denominator) *
+        bSplineBasis(i + 1, degree - 1, u, knots)
+      : 0;
+
+  return term1 + term2;
+}
+
+// Evaluate B-spline curve at parameter u
+function bSpline(
+  u: number,
+  v: number,
+  degree: number,
+  controlPoints: Point[][],
+  knotsU: number[],
+  knotsV: number[]
+): Point {
+  let x = 0;
+  let y = 0;
+
+  const numControlPointsU = controlPoints.length;
+  const numControlPointsV = controlPoints[0].length;
+
+  for (let i = 0; i < numControlPointsU; i++) {
+    for (let j = 0; j < numControlPointsV; j++) {
+      const basisU = bSplineBasis(i, degree, u, knotsU);
+      const basisV = bSplineBasis(j, degree, v, knotsV);
+
+      x += controlPoints[i][j].x * basisU * basisV;
+      y += controlPoints[i][j].y * basisU * basisV;
     }
+  }
+  return { x, y };
+}
 
-    let firstTermNumerator = (u - knots[i]) * this.basis(i, k - 1, u, knots);
-    let firstTermDenominator = knots[i + k] - knots[i];
+function warpImage(
+  sourceImageData: ImageData,
+  destinationImageData: ImageData,
+  controlPoints: Point[][]
+): void {
+  const width = sourceImageData.width;
+  const height = sourceImageData.height;
+  const destWidth = destinationImageData.width;
+  const destHeight = destinationImageData.height;
+  const degree = 3; // Cubic B-spline
 
-    // Avoid division by zero
-    let firstTerm =
-      firstTermDenominator !== 0
-        ? firstTermNumerator / firstTermDenominator
-        : 0;
-
-    let secondTermNumerator =
-      (knots[i + k + 1] - u) * this.basis(i + 1, k - 1, u, knots);
-    let secondTermDenominator = knots[i + k + 1] - knots[i + 1];
-    // Avoid division by zero
-    let secondTerm =
-      secondTermDenominator !== 0
-        ? secondTermNumerator / secondTermDenominator
-        : 0;
-
-    return firstTerm + secondTerm;
+  if (destWidth !== width || destHeight !== height) {
+    throw new Error("source and destination dimensions must be the same!");
   }
 
-  private generateKnots(numControlPoints: number, degree: number): number[] {
-    const knots = [];
-    // Create knot vector (clamped, uniform)
-    for (let i = 0; i < degree + 1; i++) {
-      knots.push(0);
+  const numControlPointsU = controlPoints.length;
+  const numControlPointsV = controlPoints[0].length;
+
+  const knotsU = calculateKnotVector(degree, numControlPointsU);
+  const knotsV = calculateKnotVector(degree, numControlPointsV);
+  // console.log("Knots U:", knotsU); // Debugging
+  // console.log("Knots V:", knotsV);
+
+  for (let y = 0; y < destHeight; y++) {
+    for (let x = 0; x < destWidth; x++) {
+      const u = (x / (destWidth - 1)) * (numControlPointsU - degree); // Normalize and scale to knot range
+      const v = (y / (destHeight - 1)) * (numControlPointsV - degree);
+
+      const mappedPoint = bSpline(u, v, degree, controlPoints, knotsU, knotsV);
+
+      // Bi-linear interpolation for smoother results
+      const srcX = Math.floor(mappedPoint.x);
+      const srcY = Math.floor(mappedPoint.y);
+
+      const x0 = clamp(srcX, 0, width - 1);
+      const y0 = clamp(srcY, 0, height - 1);
+      const x1 = clamp(srcX + 1, 0, width - 1);
+      const y1 = clamp(srcY + 1, 0, height - 1);
+
+      const dx = mappedPoint.x - srcX;
+      const dy = mappedPoint.y - srcY;
+
+      const index00 = (y0 * width + x0) * 4;
+      const index01 = (y0 * width + x1) * 4;
+      const index10 = (y1 * width + x0) * 4;
+      const index11 = (y1 * width + x1) * 4;
+
+      const destIndex = (y * destWidth + x) * 4;
+
+      // Interpolate Red
+      const p00r = sourceImageData.data[index00];
+      const p01r = sourceImageData.data[index01];
+      const p10r = sourceImageData.data[index10];
+      const p11r = sourceImageData.data[index11];
+      destinationImageData.data[destIndex] =
+        (1 - dx) * (1 - dy) * p00r +
+        dx * (1 - dy) * p01r +
+        (1 - dx) * dy * p10r +
+        dx * dy * p11r;
+
+      // Interpolate Green
+      const p00g = sourceImageData.data[index00 + 1];
+      const p01g = sourceImageData.data[index01 + 1];
+      const p10g = sourceImageData.data[index10 + 1];
+      const p11g = sourceImageData.data[index11 + 1];
+      destinationImageData.data[destIndex + 1] =
+        (1 - dx) * (1 - dy) * p00g +
+        dx * (1 - dy) * p01g +
+        (1 - dx) * dy * p10g +
+        dx * dy * p11g;
+
+      // Interpolate Blue
+      const p00b = sourceImageData.data[index00 + 2];
+      const p01b = sourceImageData.data[index01 + 2];
+      const p10b = sourceImageData.data[index10 + 2];
+      const p11b = sourceImageData.data[index11 + 2];
+      destinationImageData.data[destIndex + 2] =
+        (1 - dx) * (1 - dy) * p00b +
+        dx * (1 - dy) * p01b +
+        (1 - dx) * dy * p10b +
+        dx * dy * p11b;
+
+      destinationImageData.data[destIndex + 3] = 255; // Alpha
     }
-    for (let i = 1; i < numControlPoints - degree; i++) {
-      knots.push(i);
-    }
-    for (let i = 0; i < degree + 1; i++) {
-      knots.push(numControlPoints - degree);
-    }
-    return knots;
-  }
-
-  private warpPixel(x: number, y: number): Point {
-    let u = (x / this.width) * (this.controlPoints[0].length - this.degree); //Map pixel to control point index
-    let v = (y / this.height) * (this.controlPoints.length - this.degree);
-
-    let knotsX = this.generateKnots(this.controlPoints[0].length, this.degree);
-    let knotsY = this.generateKnots(this.controlPoints.length, this.degree);
-
-    let warpedX = 0;
-    let warpedY = 0;
-
-    for (let i = 0; i < this.controlPoints.length; i++) {
-      for (let j = 0; j < this.controlPoints[i].length; j++) {
-        const basisX = this.basis(j, this.degree, u, knotsX);
-        const basisY = this.basis(i, this.degree, v, knotsY);
-        warpedX += this.controlPoints[i][j].x * basisX * basisY;
-        warpedY += this.controlPoints[i][j].y * basisX * basisY;
-      }
-    }
-
-    return { x: warpedX, y: warpedY };
-  }
-
-  public warp() {
-    const warpedImageData = this.ctx.createImageData(this.width, this.height);
-    const originalData = this.originalImage.data;
-    const warpedData = warpedImageData.data;
-
-    for (let y = 0; y < this.height; y++) {
-      for (let x = 0; x < this.width; x++) {
-        const warpedPoint = this.warpPixel(x, y);
-
-        // Nearest-neighbor interpolation (for simplicity)
-        const srcX = Math.round(warpedPoint.x);
-        const srcY = Math.round(warpedPoint.y);
-
-        // Bounds check
-        if (srcX >= 0 && srcX < this.width && srcY >= 0 && srcY < this.height) {
-          const srcIndex = (srcY * this.width + srcX) * 4;
-          const dstIndex = (y * this.width + x) * 4;
-
-          warpedData[dstIndex] = originalData[srcIndex]; // R
-          warpedData[dstIndex + 1] = originalData[srcIndex + 1]; // G
-          warpedData[dstIndex + 2] = originalData[srcIndex + 2]; // B
-          warpedData[dstIndex + 3] = originalData[srcIndex + 3]; // A
-        }
-      }
-    }
-    return warpedImageData;
-  }
-
-  private addControlPointInteraction() {
-    let draggedPoint: Point | null = null;
-    let dragOffsetX = 0;
-    let dragOffsetY = 0;
-
-    const getMousePos = (event: MouseEvent): Point => {
-      const rect = this.canvas.getBoundingClientRect();
-      return {
-        x: event.clientX - rect.left,
-        y: event.clientY - rect.top,
-      };
-    };
-
-    this.canvas.addEventListener("mousedown", (event) => {
-      const mousePos = getMousePos(event);
-      // Find closest control point
-      for (let i = 0; i < this.controlPoints.length; i++) {
-        for (let j = 0; j < this.controlPoints[i].length; j++) {
-          const point = this.controlPoints[i][j];
-          const distance = Math.sqrt(
-            (mousePos.x - point.x) ** 2 + (mousePos.y - point.y) ** 2
-          );
-          if (distance < 10) {
-            // 10 pixel radius
-            draggedPoint = point;
-            dragOffsetX = mousePos.x - point.x;
-            dragOffsetY = mousePos.y - point.y;
-            break;
-          }
-        }
-      }
-    });
-
-    this.canvas.addEventListener("mousemove", (event) => {
-      if (draggedPoint) {
-        const mousePos = getMousePos(event);
-        draggedPoint.x = mousePos.x - dragOffsetX;
-        draggedPoint.y = mousePos.y - dragOffsetY;
-        this.warp();
-      }
-    });
-
-    this.canvas.addEventListener("mouseup", () => {
-      draggedPoint = null;
-    });
-
-    this.canvas.addEventListener("mouseleave", () => {
-      // Stop dragging if mouse leaves canvas
-      draggedPoint = null;
-    });
   }
 }
 
-// function drawControlPoints(
-//   ctx: CanvasRenderingContext2D,
-//   grid: ControlPoint[],
-//   radius = 5,
-//   fillColor = "red",
-//   strokeColor = "red"
-// ) {
-//   ctx.save(); // Save current canvas state
-//   ctx.fillStyle = fillColor;
-//   ctx.strokeStyle = strokeColor;
+function drawControlPoints(
+  ctx: CanvasRenderingContext2D,
+  grid: Point[][],
+  radius = 5,
+  fillColor = "red",
+  strokeColor = "red"
+) {
+  ctx.save(); // Save current canvas state
+  ctx.fillStyle = fillColor;
+  ctx.strokeStyle = strokeColor;
 
-//   // Draw grid lines
-//   ctx.strokeStyle = "#0004";
-//   ctx.beginPath();
+  // Draw grid lines
+  ctx.strokeStyle = "#0004";
+  ctx.beginPath();
 
-//   const rows = Math.sqrt(grid.length);
-//   const cols = rows;
+  const rows = grid.length;
+  const cols = grid[0].length;
 
-//   // Horizontal lines
-//   for (let row = 0; row < rows; row++) {
-//     for (let col = 0; col < cols - 1; col++) {
-//       const current = grid[row * cols + col];
-//       const next = grid[row * cols + col + 1];
-//       ctx.moveTo(current[0], current[1]);
-//       ctx.lineTo(next[0], next[1]);
-//     }
-//   }
+  // Horizontal lines
+  for (let row = 0; row < rows; row++) {
+    for (let col = 0; col < cols - 1; col++) {
+      const current = grid[row][col];
+      const next = grid[row][col + 1];
+      ctx.moveTo(current.x, current.y);
+      ctx.lineTo(next.x, next.y);
+    }
+  }
 
-//   // Vertical lines
-//   for (let col = 0; col < cols; col++) {
-//     for (let row = 0; row < rows - 1; row++) {
-//       const current = grid[row * cols + col];
-//       const next = grid[(row + 1) * cols + col];
-//       ctx.moveTo(current[0], current[1]);
-//       ctx.lineTo(next[0], next[1]);
-//     }
-//   }
+  // Vertical lines
+  for (let col = 0; col < cols; col++) {
+    for (let row = 0; row < rows - 1; row++) {
+      const current = grid[row][col];
+      const next = grid[row + 1][col];
+      ctx.moveTo(current.x, current.y);
+      ctx.lineTo(next.x, next.y);
+    }
+  }
 
-//   ctx.stroke();
+  ctx.stroke();
 
-//   grid.forEach((point: ControlPoint) => {
-//     ctx.beginPath();
-//     ctx.arc(point[0], point[1], radius, 0, Math.PI * 2); // Draw circle at control point
-//     ctx.fill();
-//     ctx.stroke();
-//   });
+  for (let col = 0; col < cols; col++) {
+    for (let row = 0; row < rows - 1; row++) {
+      const point = grid[row][col];
+      console.log(point);
+      ctx.beginPath();
+      ctx.arc(point.x, point.y, radius, 0, Math.PI * 2); // Draw circle at control point
+      ctx.fill();
+      ctx.stroke();
+    }
+  }
 
-//   ctx.restore(); // Restore original canvas state
-// }
+  ctx.restore(); // Restore original canvas state
+}
 
 /**
  * Currently only opacity layer used of mask
@@ -300,7 +248,7 @@ class BSplineWarper {
  *  ])
  */
 export const bSplineWrap = (): IRenderItem => ({
-  name: "b-spline-wrap",
+  name: "bSplineWrap",
 });
 
 export const drawBSpline: ItemDrawFn<undefined> = (
@@ -314,26 +262,29 @@ export const drawBSpline: ItemDrawFn<undefined> = (
   drawChildren?.(ctx);
 
   const canvas = ctx.canvas;
+  const { width, height } = canvas;
 
-  // Initialize B-Spline warper
-  // Initialize control points (4x4 grid)
-  const controlGrid: Point[][] = [];
+  // 16 control points (4x4 grid)
+  const controlPoints: Point[][] = [];
   for (let i = 0; i < 4; i++) {
-    const row: Point[] = [];
+    controlPoints[i] = [];
     for (let j = 0; j < 4; j++) {
-      row.push({
-        x: (i / 3) * canvas.width,
-        y: (j / 3) * canvas.height,
-      });
+      // Initial control points (no deformation)
+      controlPoints[i][j] = {
+        x: (i / 3) * width,
+        y: (j / 3) * height,
+      };
     }
-    controlGrid.push(row);
   }
 
-  // Modify control points to create warp
-  controlGrid[1][1].x += 50;
-  controlGrid[1][1].y -= 30;
-  controlGrid[2][2].x -= 40;
-  controlGrid[2][2].y += 20;
+  // Example deformation: move some control points
+  const strength = 3;
+  controlPoints[1][1].x += 50 * strength;
+  controlPoints[1][1].y += 20 * strength;
+  controlPoints[2][2].x -= 30 * strength;
+  controlPoints[2][2].y -= 40 * strength;
+  controlPoints[1][2].x -= 50 * strength;
+  controlPoints[1][2].y += 40 * strength;
 
   const originalData = ctx.getImageData(
     0,
@@ -342,15 +293,23 @@ export const drawBSpline: ItemDrawFn<undefined> = (
     ctx.canvas.height
   );
 
-  const warper = new BSplineWarper(canvas, originalData);
-  const warpedData = warper.warp();
+  // Create an offscreen canvas
+  const destinationCanvas = document.createElement("canvas");
+  destinationCanvas.width = ctx.canvas.width;
+  destinationCanvas.height = ctx.canvas.height;
+  const destinationContext = getContext2d(destinationCanvas, "displacementCtx");
+  const destinationImageData = destinationContext.getImageData(
+    0,
+    0,
+    destinationCanvas.width,
+    destinationCanvas.height
+  );
 
-  //drawControlPoints(ctx, warper.controlPoints);
-  ctx.putImageData(warpedData, 0, 0);
-  warper.drawControlPoints(ctx);
+  warpImage(originalData, destinationImageData, controlPoints);
 
-  // if (false) drawControlPoints(ctx, warp.controlPoints);
+  ctx.putImageData(destinationImageData, 0, 0);
+
+  drawControlPoints(ctx, controlPoints);
 
   if (drawChildren) ctx.restore();
-  return this;
 };

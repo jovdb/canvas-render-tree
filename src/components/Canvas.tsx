@@ -1,13 +1,22 @@
-import { useLayoutEffect, useRef } from "react";
-import { draw, IRenderItem } from "../canvas";
+import { useRef } from "react";
+import { draw, IRenderItem, loadTree } from "../canvas";
+import { useQuery } from "@tanstack/react-query";
 
 export function Canvas({ items }: { items: IRenderItem[] }) {
   const canvasRef = useRef<HTMLCanvasElement>(null);
 
-  useLayoutEffect(() => {
-    //draw([operations.fillColor("#fff"), ...items]);
-    draw(items);
-  }, [items]);
-
-  return <canvas ref={canvasRef} width="500" height="500" className="canvas" />;
+  const { isFetching } = useQuery({
+    queryKey: ["canvas", items],
+    queryFn: async () => {
+      if (!canvasRef.current) return;
+      await loadTree(items);
+      draw(canvasRef.current, items);
+    },
+  });
+  return (
+    <>
+      <canvas ref={canvasRef} width="500" height="500" className="canvas" />;
+      {isFetching && <div>Loading...</div>}
+    </>
+  );
 }

@@ -1,10 +1,6 @@
 import { getContext2d, IRenderItem, ItemDrawFn, RenderTree } from "../canvas";
 
-interface UVCoordinate {
-  u: number;
-  v: number;
-}
-
+/*
 function interpolateColor(
   topLeft: [number, number, number],
   topRight: [number, number, number],
@@ -22,6 +18,7 @@ function interpolateColor(
     number
   ];
 }
+*/
 
 function manipulateImageData(
   sourceContext: CanvasRenderingContext2D,
@@ -60,10 +57,10 @@ function manipulateImageData(
   );
 
   // Define identity texture map colors
-  const topLeftColor: [number, number, number] = [0, 255, 0]; // Green
-  const topRightColor: [number, number, number] = [255, 255, 0]; // Yellow
-  const bottomLeftColor: [number, number, number] = [0, 0, 0]; // Black
-  const bottomRightColor: [number, number, number] = [255, 0, 0]; // Red
+  // const topLeftColor: [number, number, number] = [0, 255, 0]; // Green
+  // const topRightColor: [number, number, number] = [255, 255, 0]; // Yellow
+  // const bottomLeftColor: [number, number, number] = [0, 0, 0]; // Black
+  // const bottomRightColor: [number, number, number] = [255, 0, 0]; // Red
 
   for (let y = 0; y < destHeight; y++) {
     for (let x = 0; x < destWidth; x++) {
@@ -73,6 +70,7 @@ function manipulateImageData(
       //const a = uvMapImageData.data[uvMapIndex + 3] / 255; // could be used for masking.
 
       // Determine source pixel coordinates based on UV map color
+      /*
       const sourceColor = interpolateColor(
         topLeftColor,
         topRightColor,
@@ -81,6 +79,7 @@ function manipulateImageData(
         u,
         v
       );
+      */
 
       // Map the interpolated color back to a position in the source image
       // We use bilinear interpolation to find which point in source corresponds
@@ -108,6 +107,7 @@ function manipulateImageData(
   return destinationImageData;
 }
 
+/*
 function createUVMapImageData(width: number, height: number): ImageData {
   const imageData = new ImageData(width, height);
   for (let y = 0; y < height; y++) {
@@ -121,10 +121,7 @@ function createUVMapImageData(width: number, height: number): ImageData {
   }
   return imageData;
 }
-
-export interface IDisplacementConfig {
-  strength?: number;
-}
+*/
 
 export const uvMap = (strength: number, uv: RenderTree): IRenderItem => ({
   name: "uvMap",
@@ -132,13 +129,12 @@ export const uvMap = (strength: number, uv: RenderTree): IRenderItem => ({
   children: uv,
 });
 
-export const drawUvMap: ItemDrawFn<IDisplacementConfig> = (
+export const drawUvMap: ItemDrawFn<undefined> = (
   ctx,
   drawPrev,
-  config,
+  _config,
   drawChildren
 ) => {
-  const { strength } = config;
   drawPrev?.(ctx);
   if (drawChildren) ctx.save();
 

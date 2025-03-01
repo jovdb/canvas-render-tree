@@ -1,12 +1,12 @@
 import { IRenderItem } from "../canvas";
 import { operations } from "../operations";
-import { IRenderResources } from "../resources";
+import { availableImages } from "../resources";
 
-export function uvTree(resources: IRenderResources) {
+export function uvTree() {
   const tree: IRenderItem[] = [
-    operations.drawImage({ image: resources.checkerboard }),
+    operations.drawImage({ imageUrl: availableImages.checkerboard }),
     operations.uvMap(20, [
-      operations.drawImage({ image: resources.uvMap }),
+      operations.drawImage({ imageUrl: availableImages.uvMap2 }),
     ]),
   ];
 

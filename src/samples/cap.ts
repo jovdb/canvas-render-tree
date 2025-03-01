@@ -1,14 +1,14 @@
 import { RenderTree } from "../canvas";
 import { operations } from "../operations";
-import { IRenderResources } from "../resources";
+import { availableImages } from "../resources";
 
-export function capTree(resources: IRenderResources) {
+export function capTree() {
   // const tree: IRenderItem[] = [
-  //   operations.drawImage({ image: resources.cap }),
+  //   operations.drawImage({ imageUrl: availableImages.cap }),
   //   operations.blend("multiply", [
   //     operations.layer([
   //       operations.fillColor("red"),
-  //       operations.mask([operations.drawImage({ image: resources.glassText })]),
+  //       operations.mask([operations.drawImage({ imageUrl: availableImages.glassText })]),
   //       operations.bevel({}),
   //     ]),
   //   ]),
@@ -17,11 +17,11 @@ export function capTree(resources: IRenderResources) {
   const tree: RenderTree = [
     operations.fillColor("#ff0000"),
     operations.blend("destination-in", [
-      operations.drawImage({ image: resources.glassText }),
+      operations.drawImage({ imageUrl: availableImages.glassText }),
     ]),
     operations.bevel({}),
     operations.blend("multiply"),
-    operations.drawImage({ image: resources.cap }),
+    operations.drawImage({ imageUrl: availableImages.cap }),
   ];
 
   return tree;

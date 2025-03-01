@@ -4,7 +4,7 @@
 
 // export function meshWarpTree(resources: IRenderResources) {
 //   const tree: IRenderItem[] = [
-//     operations.drawImage({ image: resources.checkerboard}),
+//     operations.drawImage({ imageUrl: availableImages.checkerboard}),
 //     operations.meshWarp(),
 //   ];
 //   return tree;
