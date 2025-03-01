@@ -1,4 +1,5 @@
 import { IRenderItem, ItemDrawFn, RenderTree } from "../canvas";
+import { addRenderer } from "../renderers";
 
 export interface IOpacityConfig {
   opacity: number;
@@ -14,7 +15,7 @@ export const opacity = (
   children,
 });
 
-export const drawOpacity: ItemDrawFn<IOpacityConfig> = (
+export const draw: ItemDrawFn<IOpacityConfig> = (
   ctx,
   drawPrev,
   config,
@@ -26,3 +27,7 @@ export const drawOpacity: ItemDrawFn<IOpacityConfig> = (
   drawChildren?.(ctx);
   if (drawChildren) ctx.restore();
 };
+
+addRenderer("opacity", {
+  draw,
+});

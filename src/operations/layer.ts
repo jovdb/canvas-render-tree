@@ -1,4 +1,5 @@
 import { getContext2d, IRenderItem, ItemDrawFn, RenderTree } from "../canvas";
+import { addRenderer } from "../renderers";
 
 /**
  * Draw children on a new render layer
@@ -9,7 +10,7 @@ export const layer = (children: RenderTree): IRenderItem => ({
   children,
 });
 
-export const drawLayer: ItemDrawFn = (ctx, drawPrev, _config, drawChildren) => {
+export const draw: ItemDrawFn = (ctx, drawPrev, _config, drawChildren) => {
   drawPrev?.(ctx);
 
   // Create an offscreen canvas
@@ -24,3 +25,7 @@ export const drawLayer: ItemDrawFn = (ctx, drawPrev, _config, drawChildren) => {
   // Draw new children context on the parent context
   ctx.drawImage(canvas, 0, 0, ctx.canvas.width, ctx.canvas.height);
 };
+
+addRenderer("layer", {
+  draw,
+});

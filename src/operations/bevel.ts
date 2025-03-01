@@ -3,6 +3,7 @@ import {
   drawKernel,
   gaussianBlurKernel as gaussianBlurKernel,
 } from "../kernels";
+import { addRenderer } from "../renderers";
 
 type RGBA = [r: number, g: number, b: number, a?: number];
 
@@ -128,7 +129,7 @@ export const bevel = (
   config,
 });
 
-export const drawBevel: ItemDrawFn<IBevelConfig> = (ctx, drawPrev, config) => {
+export const draw: ItemDrawFn<IBevelConfig> = (ctx, drawPrev, config) => {
   const {
     bevelSize = 6,
     shadowColor = [0, 0, 0, 192],
@@ -211,3 +212,7 @@ export const drawBevel: ItemDrawFn<IBevelConfig> = (ctx, drawPrev, config) => {
     ctx.drawImage(canvas, 0, 0);
   }
 };
+
+addRenderer("bevel", {
+  draw,
+});

@@ -1,4 +1,5 @@
 import { getContext2d, IRenderItem, ItemDrawFn, RenderTree } from "../canvas";
+import { addRenderer } from "../renderers";
 
 // displacement map
 
@@ -91,7 +92,7 @@ export const displacement = (
   children: displacement,
 });
 
-export const drawDisplacement: ItemDrawFn<IDisplacementConfig> = (
+export const draw: ItemDrawFn<IDisplacementConfig> = (
   ctx,
   drawPrev,
   config,
@@ -115,3 +116,7 @@ export const drawDisplacement: ItemDrawFn<IDisplacementConfig> = (
   if (drawChildren) ctx.restore();
   return this;
 };
+
+addRenderer("displacement", {
+  draw,
+});

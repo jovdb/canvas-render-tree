@@ -1,4 +1,5 @@
 import { getContext2d, IRenderItem, ItemDrawFn, RenderTree } from "../canvas";
+import { addRenderer } from "../renderers";
 
 export interface IShadowConfig {
   type: "outer" | "inner";
@@ -21,7 +22,7 @@ export const shadow = (
   children,
 });
 
-export const drawShadow: ItemDrawFn<IShadowConfig> = (
+export const draw: ItemDrawFn<IShadowConfig> = (
   ctx,
   drawPrev,
   config,
@@ -85,3 +86,7 @@ export const drawShadow: ItemDrawFn<IShadowConfig> = (
     ctx.restore();
   }
 };
+
+addRenderer("shadow", {
+  draw,
+});

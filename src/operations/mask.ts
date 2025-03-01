@@ -1,4 +1,5 @@
 import { IRenderItem, RenderTree } from "../canvas";
+import { addRenderer } from "../renderers";
 import { blend } from "./blend";
 
 /**
@@ -17,4 +18,8 @@ import { blend } from "./blend";
 export const mask = (mask?: RenderTree | undefined): IRenderItem => ({
   name: "mask",
   children: [blend("destination-in", mask)],
+});
+
+addRenderer("mask", {
+  draw: undefined,
 });

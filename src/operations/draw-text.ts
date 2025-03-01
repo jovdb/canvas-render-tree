@@ -1,4 +1,5 @@
 import { IRenderItem, ItemDrawFn } from "../canvas";
+import { addRenderer } from "../renderers";
 
 export interface IDrawTextConfig {
   text: string;
@@ -15,11 +16,7 @@ export const drawText = (config: IDrawTextConfig): IRenderItem => ({
   config,
 });
 
-export const drawDrawText: ItemDrawFn<IDrawTextConfig> = (
-  ctx,
-  drawPrev,
-  config
-) => {
+export const draw: ItemDrawFn<IDrawTextConfig> = (ctx, drawPrev, config) => {
   const {
     text,
     foregroundColor = "#000",
@@ -33,3 +30,7 @@ export const drawDrawText: ItemDrawFn<IDrawTextConfig> = (
   ctx.font = `${fontSize}px '${fontFamilyName}'`;
   ctx.fillText(text, x, y);
 };
+
+addRenderer("drawText", {
+  draw,
+});

@@ -1,16 +1,12 @@
 import { IRenderItem, ItemDrawFn, RenderTree } from "../canvas";
+import { addRenderer } from "../renderers";
 
 export const invert = (children: RenderTree): IRenderItem<undefined> => ({
   name: "invert",
   children,
 });
 
-export const drawInvert: ItemDrawFn = (
-  ctx,
-  drawPrev,
-  _config,
-  drawChildren
-) => {
+export const draw: ItemDrawFn = (ctx, drawPrev, _config, drawChildren) => {
   function apply() {
     const imageData = ctx.getImageData(
       0,
@@ -42,3 +38,7 @@ export const drawInvert: ItemDrawFn = (
 
   drawPrev?.(ctx);
 };
+
+addRenderer("invert", {
+  draw,
+});

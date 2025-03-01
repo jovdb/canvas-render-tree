@@ -1,4 +1,5 @@
 import { IRenderItem, ItemDrawFn, RenderTree } from "../canvas";
+import { addRenderer } from "../renderers";
 
 // Helper function to convert RGB to HSL
 function rgbToHsl(r: number, g: number, b: number) {
@@ -73,7 +74,7 @@ export const saturation = (
   children,
 });
 
-export const drawSaturation: ItemDrawFn<ISaturationConfig> = (
+export const draw: ItemDrawFn<ISaturationConfig> = (
   ctx,
   drawPrev,
   config,
@@ -119,3 +120,7 @@ export const drawSaturation: ItemDrawFn<ISaturationConfig> = (
   drawChildren?.(ctx);
   if (drawChildren) ctx.restore();
 };
+
+addRenderer("saturation", {
+  draw,
+});

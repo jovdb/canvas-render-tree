@@ -1,3 +1,4 @@
+import { addRendererConfig } from ".";
 import { ItemConfigFn } from "../canvas";
 import { IDisplacementConfig } from "../operations/displacement";
 
@@ -26,3 +27,5 @@ export const DisplacementConfig: ItemConfigFn<IDisplacementConfig> = ({
     </div>
   );
 };
+
+addRendererConfig("displacement", DisplacementConfig);

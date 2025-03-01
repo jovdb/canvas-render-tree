@@ -1,3 +1,4 @@
+import { addRendererConfig } from ".";
 import { ItemConfigFn } from "../canvas";
 import { IShadowConfig } from "../operations/shadow";
 
@@ -41,3 +42,5 @@ export const ShadowConfig: ItemConfigFn<IShadowConfig> = ({
     </>
   );
 };
+
+addRendererConfig("shadow", ShadowConfig);

@@ -1,21 +1,23 @@
-import { BevelConfig } from "./bevel";
-import { BlendConfig } from "./blend";
-import { DisplacementConfig } from "./displacement";
-import { DrawImageConfig } from "./draw-image";
-import { DrawTextConfig } from "./draw-text";
-import { FillColorConfig } from "./fill-color";
-import { ShadowConfig } from "./shadow";
-import { TransformConfig } from "./transform";
+import { ItemConfigFn } from "../canvas";
+import { RenderItemName } from "../operations";
 
-export const configs = {
-  fillColor: FillColorConfig,
-  blend: BlendConfig,
-  bevel: BevelConfig,
-  drawImage: DrawImageConfig,
-  drawText: DrawTextConfig,
-  shadow: ShadowConfig,
-  displacement: DisplacementConfig,
-  transform: TransformConfig,
-} as const;
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
+const configs: Partial<Record<RenderItemName, ItemConfigFn<any>>> = {} as const;
 
-export type ConfigsName = keyof typeof configs;
+export function addRendererConfig(
+  name: RenderItemName,
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  rendererConfig: ItemConfigFn<any>
+) {
+  if (configs[name as RenderItemName]) {
+    throw new Error(`Renderer config for '${name}' already exists`);
+  }
+  configs[name as RenderItemName] = rendererConfig;
+}
+
+export function getRendererConfig(
+  name: RenderItemName | undefined
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+): ItemConfigFn<any> | undefined {
+  return configs[name as RenderItemName];
+}

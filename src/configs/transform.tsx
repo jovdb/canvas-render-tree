@@ -1,3 +1,4 @@
+import { addRendererConfig } from ".";
 import { ItemConfigFn } from "../canvas";
 import { ITransformConfig } from "../operations/transform";
 
@@ -55,3 +56,5 @@ export const TransformConfig: ItemConfigFn<ITransformConfig> = ({
     </div>
   );
 };
+
+addRendererConfig("transform", TransformConfig);

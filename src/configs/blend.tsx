@@ -1,3 +1,4 @@
+import { addRendererConfig } from ".";
 import { ItemConfigFn } from "../canvas";
 import { IBlendConfig } from "../operations/blend";
 
@@ -55,3 +56,5 @@ export const BlendConfig: ItemConfigFn<IBlendConfig> = ({
     </div>
   );
 };
+
+addRendererConfig("blend", BlendConfig);

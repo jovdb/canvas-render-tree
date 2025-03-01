@@ -1,3 +1,4 @@
+import { addRendererConfig } from ".";
 import { ItemConfigFn } from "../canvas";
 import { IBevelConfig } from "../operations/bevel";
 
@@ -24,3 +25,5 @@ export const BevelConfig: ItemConfigFn<IBevelConfig> = ({
     </div>
   );
 };
+
+addRendererConfig("bevel", BevelConfig);

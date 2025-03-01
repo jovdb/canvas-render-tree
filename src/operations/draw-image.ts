@@ -1,4 +1,5 @@
 import { IRenderItem, ItemDrawFn, ItemLoadFn } from "../canvas";
+import { addRenderer } from "../renderers";
 import { loadImageAsync } from "../resources";
 
 export interface IDrawImageConfig {
@@ -18,11 +19,7 @@ const imageCache = new Map<
   Promise<HTMLImageElement> | HTMLImageElement
 >();
 
-export const drawDrawImage: ItemDrawFn<IDrawImageConfig> = (
-  ctx,
-  drawPrev,
-  config
-) => {
+export const draw: ItemDrawFn<IDrawImageConfig> = (ctx, drawPrev, config) => {
   const { imageUrl, sourceRect, targetRect } = config;
 
   drawPrev?.(ctx);
@@ -43,7 +40,7 @@ export const drawDrawImage: ItemDrawFn<IDrawImageConfig> = (
   }
 };
 
-export const loadDrawImage: ItemLoadFn<IDrawImageConfig> = (config) => {
+export const load: ItemLoadFn<IDrawImageConfig> = (config) => {
   // Nothing to load: sync return undefined
   if (!config.imageUrl) return undefined;
 
@@ -66,3 +63,8 @@ export const loadDrawImage: ItemLoadFn<IDrawImageConfig> = (config) => {
     imageCache.set(key, image);
   });
 };
+
+addRenderer("drawImage", {
+  draw,
+  load,
+});

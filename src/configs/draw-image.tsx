@@ -1,3 +1,4 @@
+import { addRendererConfig } from ".";
 import { ItemConfigFn } from "../canvas";
 import { IDrawImageConfig } from "../operations/draw-image";
 import { availableImages } from "../resources";
@@ -38,3 +39,5 @@ export const DrawImageConfig: ItemConfigFn<IDrawImageConfig> = ({
     </div>
   );
 };
+
+addRendererConfig("drawImage", DrawImageConfig);

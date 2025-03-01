@@ -1,4 +1,5 @@
 import { IRenderItem, ItemDrawFn } from "../canvas";
+import { addRenderer } from "../renderers";
 
 // Function to create a Gaussian kernel
 function createGaussianKernel(radius: number, sigma: number) {
@@ -33,7 +34,7 @@ export const blur = (config: IBlurConfig = {}): IRenderItem<IBlurConfig> => ({
   config,
 });
 
-export const drawBlur: ItemDrawFn<IBlurConfig> = (ctx, drawPrev, config) => {
+export const draw: ItemDrawFn<IBlurConfig> = (ctx, drawPrev, config) => {
   const { radius = 5, sigma = 2 } = config;
 
   drawPrev?.(ctx);
@@ -81,3 +82,7 @@ export const drawBlur: ItemDrawFn<IBlurConfig> = (ctx, drawPrev, config) => {
 
   ctx.putImageData(output, 0, 0);
 };
+
+addRenderer("blur", {
+  draw,
+});

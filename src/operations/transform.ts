@@ -1,4 +1,5 @@
 import { IRenderItem, ItemDrawFn, RenderTree } from "../canvas";
+import { addRenderer } from "../renderers";
 
 export interface ITransformConfig {
   translateX?: number;
@@ -17,7 +18,7 @@ export const transform = (
   children,
 });
 
-export const drawTransform: ItemDrawFn<ITransformConfig> = (
+export const draw: ItemDrawFn<ITransformConfig> = (
   ctx,
   drawPrev,
   config,
@@ -47,3 +48,7 @@ export const drawTransform: ItemDrawFn<ITransformConfig> = (
   drawChildren?.(ctx);
   if (drawChildren) ctx.restore();
 };
+
+addRenderer("transform", {
+  draw,
+});

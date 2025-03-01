@@ -1,4 +1,5 @@
 import { getContext2d, IRenderItem, ItemDrawFn } from "../canvas";
+import { addRenderer } from "../renderers";
 
 interface Point {
   x: number;
@@ -251,7 +252,7 @@ export const bSplineWrap = (): IRenderItem => ({
   name: "bSplineWrap",
 });
 
-export const drawBSpline: ItemDrawFn<undefined> = (
+export const draw: ItemDrawFn<undefined> = (
   ctx,
   drawPrev,
   _config,
@@ -313,3 +314,7 @@ export const drawBSpline: ItemDrawFn<undefined> = (
 
   if (drawChildren) ctx.restore();
 };
+
+addRenderer("bSplineWrap", {
+  draw,
+});

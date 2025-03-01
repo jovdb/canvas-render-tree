@@ -1,4 +1,5 @@
 import { IRenderItem } from "../canvas";
+import { addRenderer } from "../renderers";
 import { blend } from "./blend";
 
 /**
@@ -13,4 +14,8 @@ export const repaint = (
 ): IRenderItem => ({
   name: "repaint",
   children: [blend("source-in", repaintWith)],
+});
+
+addRenderer("repaint", {
+  draw: undefined,
 });

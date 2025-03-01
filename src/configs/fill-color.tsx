@@ -1,3 +1,4 @@
+import { addRendererConfig } from ".";
 import { ItemConfigFn } from "../canvas";
 import { IFillColorConfig } from "../operations/fill-color";
 import { ColorConfig } from "./color";
@@ -20,3 +21,5 @@ export const FillColorConfig: ItemConfigFn<IFillColorConfig> = ({
     </div>
   );
 };
+
+addRendererConfig("fillColor", FillColorConfig);

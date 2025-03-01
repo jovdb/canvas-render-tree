@@ -1,5 +1,5 @@
+import { addRendererConfig } from ".";
 import { ItemConfigFn } from "../canvas";
-import { useResources } from "../hooks/use-resources";
 import { IDrawTextConfig } from "../operations/draw-text";
 import { ColorConfig } from "./color";
 
@@ -40,7 +40,6 @@ export const DrawTextConfig: ItemConfigFn<IDrawTextConfig> = ({
           onChange={(e) => {
             const newFontSize = parseInt(e.target.value, 10);
             mutateConfig((draftConfig) => {
-              if (!resources) return;
               draftConfig.fontSize = newFontSize;
             });
           }}
@@ -53,7 +52,6 @@ export const DrawTextConfig: ItemConfigFn<IDrawTextConfig> = ({
           onChange={(e) => {
             const newFontFamily = e.target.value;
             mutateConfig((draftConfig) => {
-              if (!resources) return;
               draftConfig.fontFamilyName = newFontFamily;
             });
           }}
@@ -71,7 +69,6 @@ export const DrawTextConfig: ItemConfigFn<IDrawTextConfig> = ({
           color={foregroundColor}
           onChange={(newColor) => {
             mutateConfig((draftConfig) => {
-              if (!resources) return;
               draftConfig.foregroundColor = newColor;
             });
           }}
@@ -80,3 +77,5 @@ export const DrawTextConfig: ItemConfigFn<IDrawTextConfig> = ({
     </div>
   );
 };
+
+addRendererConfig("drawText", DrawTextConfig);

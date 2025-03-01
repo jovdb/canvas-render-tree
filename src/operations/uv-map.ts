@@ -1,4 +1,5 @@
 import { getContext2d, IRenderItem, ItemDrawFn, RenderTree } from "../canvas";
+import { addRenderer } from "../renderers";
 
 /*
 function interpolateColor(
@@ -129,7 +130,7 @@ export const uvMap = (strength: number, uv: RenderTree): IRenderItem => ({
   children: uv,
 });
 
-export const drawUvMap: ItemDrawFn<undefined> = (
+export const draw: ItemDrawFn<undefined> = (
   ctx,
   drawPrev,
   _config,
@@ -152,3 +153,7 @@ export const drawUvMap: ItemDrawFn<undefined> = (
   if (drawChildren) ctx.restore();
   return this;
 };
+
+addRenderer("uvMap", {
+  draw,
+});
