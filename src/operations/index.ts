@@ -17,6 +17,7 @@ import { repaint } from "./repaint";
 import { displacement } from "./displacement";
 import { bSplineWrap } from "./bspline-warp";
 import { uvMap } from "./uv-map";
+import { cyl } from "./cyl";
 
 export const operations = {
   drawImage,
@@ -34,10 +35,11 @@ export const operations = {
   convolve,
   invert,
   repaint,
-//  meshWarp,
+  //  meshWarp,
   bSplineWrap,
   displacement,
   uvMap,
+  cyl,
 };
 
 export type RenderItemName = keyof typeof operations;
