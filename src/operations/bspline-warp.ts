@@ -15,11 +15,11 @@ function calculateKnotVector(
   degree: number,
   numControlPoints: number
 ): number[] {
-  // const numKnots = numControlPoints + degree + 1;
+  const numKnots = numControlPoints + degree + 1;
   const knots: number[] = [];
 
   // Start with 'degree + 1' repetitions of 0
-  for (let i = 0; i <= degree; i++) {
+  for (let i = 0; i < degree + 1; i++) {
     knots.push(0);
   }
 
@@ -30,7 +30,7 @@ function calculateKnotVector(
 
   // End with 'degree + 1' repetitions of the last knot value
   const lastKnotValue = numControlPoints - degree;
-  for (let i = 0; i <= degree; i++) {
+  for (let i = 0; i < degree + 1; i++) {
     knots.push(lastKnotValue);
   }
 
@@ -67,7 +67,7 @@ function bSplineBasis(
   return term1 + term2;
 }
 
-// Evaluate B-spline curve at parameter u
+// Evaluate B-spline surface at parameter u, v
 function bSpline(
   u: number,
   v: number,
@@ -94,35 +94,100 @@ function bSpline(
   return { x, y };
 }
 
+// Inverse distance weighted interpolation (Shepard's method) for smoother warping
+function inverseDistanceWeighted(
+  targetX: number,
+  targetY: number,
+  controlPoints: Point[][],
+  sourcePoints: Point[][],
+  power: number = 2
+): Point {
+  let weightedSumX = 0;
+  let weightedSumY = 0;
+  let totalWeight = 0;
+
+  const numControlPointsU = controlPoints.length;
+  const numControlPointsV = controlPoints[0].length;
+
+  for (let i = 0; i < numControlPointsU; i++) {
+    for (let j = 0; j < numControlPointsV; j++) {
+      const dx = targetX - controlPoints[i][j].x;
+      const dy = targetY - controlPoints[i][j].y;
+      const distance = Math.sqrt(dx * dx + dy * dy);
+
+      // Avoid division by zero
+      if (distance < 0.0001) {
+        return { x: sourcePoints[i][j].x, y: sourcePoints[i][j].y };
+      }
+
+      const weight = 1 / Math.pow(distance, power);
+      weightedSumX += sourcePoints[i][j].x * weight;
+      weightedSumY += sourcePoints[i][j].y * weight;
+      totalWeight += weight;
+    }
+  }
+
+  return { x: weightedSumX / totalWeight, y: weightedSumY / totalWeight };
+}
+
 function warpImage(
   sourceImageData: ImageData,
   destinationImageData: ImageData,
-  controlPoints: Point[][]
+  originalControlPoints: Point[][], // Initial, undeformed control point grid
+  deformedControlPoints: Point[][] // Deformed control point grid
 ): void {
   const width = sourceImageData.width;
   const height = sourceImageData.height;
   const destWidth = destinationImageData.width;
   const destHeight = destinationImageData.height;
-  const degree = 3; // Cubic B-spline
+  const degree = 3; // Cubic B-spline (you can adjust this)
 
   if (destWidth !== width || destHeight !== height) {
-    throw new Error("source and destination dimensions must be the same!");
+    throw new Error("Source and destination dimensions must be the same!");
+  }
+  if (
+    originalControlPoints.length !== deformedControlPoints.length ||
+    originalControlPoints[0].length !== deformedControlPoints[0].length
+  ) {
+    throw new Error(
+      "Original and deformed control points grids must have the same dimensions"
+    );
   }
 
-  const numControlPointsU = controlPoints.length;
-  const numControlPointsV = controlPoints[0].length;
+  const numControlPointsU = originalControlPoints.length;
+  const numControlPointsV = originalControlPoints[0].length;
 
+  //Option 1: B-Spline interpolation
   const knotsU = calculateKnotVector(degree, numControlPointsU);
   const knotsV = calculateKnotVector(degree, numControlPointsV);
-  // console.log("Knots U:", knotsU); // Debugging
-  // console.log("Knots V:", knotsV);
+
+  //Option 2: inverse distance
+  const useInverseDistance = false;
 
   for (let y = 0; y < destHeight; y++) {
     for (let x = 0; x < destWidth; x++) {
-      const u = (x / (destWidth - 1)) * (numControlPointsU - degree); // Normalize and scale to knot range
-      const v = (y / (destHeight - 1)) * (numControlPointsV - degree);
+      let mappedPoint: Point;
 
-      const mappedPoint = bSpline(u, v, degree, controlPoints, knotsU, knotsV);
+      if (useInverseDistance) {
+        mappedPoint = inverseDistanceWeighted(
+          x,
+          y,
+          deformedControlPoints,
+          originalControlPoints
+        );
+      } else {
+        // Normalize (x, y) to (u, v) in the range [0, 1] and then scale to knot range.
+        const u = (x / (destWidth - 1)) * (numControlPointsU - degree);
+        const v = (y / (destHeight - 1)) * (numControlPointsV - degree);
+        mappedPoint = bSpline(
+          u,
+          v,
+          degree,
+          deformedControlPoints,
+          knotsU,
+          knotsV
+        );
+      }
 
       // Bi-linear interpolation for smoother results
       const srcX = Math.floor(mappedPoint.x);
@@ -265,28 +330,6 @@ export const draw: ItemDrawFn<undefined> = (
   const canvas = ctx.canvas;
   const { width, height } = canvas;
 
-  // 16 control points (4x4 grid)
-  const controlPoints: Point[][] = [];
-  for (let i = 0; i < 4; i++) {
-    controlPoints[i] = [];
-    for (let j = 0; j < 4; j++) {
-      // Initial control points (no deformation)
-      controlPoints[i][j] = {
-        x: (i / 3) * width,
-        y: (j / 3) * height,
-      };
-    }
-  }
-
-  // Example deformation: move some control points
-  const strength = 3;
-  controlPoints[1][1].x += 50 * strength;
-  controlPoints[1][1].y += 20 * strength;
-  controlPoints[2][2].x -= 30 * strength;
-  controlPoints[2][2].y -= 40 * strength;
-  controlPoints[1][2].x -= 50 * strength;
-  controlPoints[1][2].y += 40 * strength;
-
   const originalData = ctx.getImageData(
     0,
     0,
@@ -306,11 +349,37 @@ export const draw: ItemDrawFn<undefined> = (
     destinationCanvas.height
   );
 
-  warpImage(originalData, destinationImageData, controlPoints);
+  const numControlPointsU = 4; // 4x4 grid of control points
+  const numControlPointsV = 4;
+  const originalControlPoints: Point[][] = [];
+  for (let i = 0; i < numControlPointsU; i++) {
+    originalControlPoints[i] = [];
+    for (let j = 0; j < numControlPointsV; j++) {
+      originalControlPoints[i][j] = {
+        x: (i / (numControlPointsU - 1)) * width, // Evenly spaced
+        y: (j / (numControlPointsV - 1)) * height,
+      };
+    }
+  }
+
+  // Create a *copy* of the original grid, and then deform *that*
+  const deformedControlPoints: Point[][] = originalControlPoints.map((row) =>
+    row.map((p) => ({ ...p }))
+  );
+
+  // Example deformation: Move some control points.
+  deformedControlPoints[1][1].x += 400;
+  deformedControlPoints[1][1].y += 100;
+  deformedControlPoints[2][2].x -= 200;
+  deformedControlPoints[2][2].y -= 300;
+  deformedControlPoints[1][2].x -= 400;
+  deformedControlPoints[1][2].y += 300;
+
+  warpImage(originalData, destinationImageData, originalControlPoints, deformedControlPoints);
 
   ctx.putImageData(destinationImageData, 0, 0);
 
-  drawControlPoints(ctx, controlPoints);
+  drawControlPoints(ctx, originalControlPoints);
 
   if (drawChildren) ctx.restore();
 };

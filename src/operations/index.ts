@@ -18,6 +18,7 @@ import { displacement } from "./displacement";
 import { bSplineWrap } from "./bspline-warp";
 import { uvMap } from "./uv-map";
 import { cyl } from "./cyl";
+import { perspective } from "./perspective";
 
 export const operations = {
   drawImage,
@@ -40,6 +41,7 @@ export const operations = {
   displacement,
   uvMap,
   cyl,
+  perspective,
 };
 
 export type RenderItemName = keyof typeof operations;

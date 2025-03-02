@@ -8,7 +8,7 @@ import { convolutionSamplesTree } from "./convolution-kernel";
 import { displacementTree } from "./displacement";
 import { bSplineWarpTree } from "./spline-warp";
 import { uvTree } from "./uv";
-import { cylTree } from "./cyl";
+import { perspectiveTree } from "./perspective";
 
 export const samples = {
   wood: {
@@ -52,8 +52,8 @@ export const samples = {
     name: "UV Map",
     tree: uvTree,
   },
-  cyl: {
-    name: "Cylinder",
-    tree: cylTree,
+  perspective: {
+    name: "Perspective",
+    tree: perspectiveTree,
   },
 } as const;
