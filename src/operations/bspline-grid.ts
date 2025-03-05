@@ -197,12 +197,51 @@ function setPixel(
   imageData.data.set(pixel, i);
 }
 
+function drawControlPointDisplacement(
+  ctx: CanvasRenderingContext2D,
+  point1: Point,
+  point2: Point,
+  radius = 5
+) {
+  ctx.save(); // Save current canvas state
+
+  // Draw grid lines
+  ctx.save();
+  ctx.globalCompositeOperation = "difference";
+  ctx.strokeStyle = "#fff8";
+  ctx.lineWidth = 2;
+  ctx.beginPath();
+  ctx.moveTo(point1.x, point1.y);
+  ctx.lineTo(point2.x, point2.y);
+  ctx.stroke();
+  ctx.restore();
+
+  ctx.fillStyle = "red";
+  ctx.strokeStyle = "#000a";
+  ctx.beginPath();
+  ctx.arc(point1.x, point1.y, radius, 0, Math.PI * 2); // Draw circle at control point
+  ctx.fill();
+  ctx.stroke();
+
+  ctx.fillStyle = "green";
+  ctx.strokeStyle = "#000a";
+  ctx.beginPath();
+  ctx.arc(point2.x, point2.y, radius, 0, Math.PI * 2); // Draw circle at control point
+  ctx.fill();
+  ctx.stroke();
+  ctx.stroke();
+
+  ctx.restore(); // Restore original canvas state
+}
 export interface IBSplineGridConfig {
-  blendMode: GlobalCompositeOperation;
+  debug?: boolean;
 }
 
-export const bSplineGrid = (): IRenderItem<IBSplineGridConfig> => ({
+export const bSplineGrid = (
+  config?: IBSplineGridConfig
+): IRenderItem<IBSplineGridConfig> => ({
   name: "bspline-grid",
+  config: config || {},
 });
 
 export const draw: ItemDrawFn<IBSplineGridConfig> = (
@@ -221,13 +260,40 @@ export const draw: ItemDrawFn<IBSplineGridConfig> = (
     5
   );
   deformationGrid[0][1].x += 50;
-  deformationGrid[0][1].y += 50;
-  deformationGrid[0][2].x -= 50;
-  deformationGrid[0][2].y -= 50;
+  deformationGrid[0][1].y += 20;
+
+  deformationGrid[2][2].x -= 20;
+  deformationGrid[2][2].y -= 10;
+
+  for (let j = 0; j < deformationGrid.length; j++) {
+    for (let i = 0; i < deformationGrid[j].length; i++) {
+      deformationGrid[i][j].x += Math.random() * 30 - 15;
+      deformationGrid[i][j].y += Math.random() * 30 - 15;
+    }
+  }
 
   const imageData = ctx.getImageData(0, 0, ctx.canvas.width, ctx.canvas.height);
   const newImageData = deformImage(imageData, deformationGrid);
   ctx.putImageData(newImageData, 0, 0);
+
+  if (config?.debug) {
+    const originalGrid = createOriginalGrid(
+      ctx.canvas.width,
+      ctx.canvas.height,
+      5,
+      5
+    );
+
+    for (let j = 0; j < deformationGrid.length; j++) {
+      for (let i = 0; i < deformationGrid[j].length; i++) {
+        drawControlPointDisplacement(
+          ctx,
+          originalGrid[j][i],
+          deformationGrid[j][i]
+        );
+      }
+    }
+  }
 
   drawChildren?.(ctx);
   if (drawChildren) ctx.restore();

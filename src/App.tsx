@@ -48,7 +48,7 @@ function App() {
   const [selectedItems] = useState<IRenderItem[]>([]);
   const [editIndex, setEditIndex] = useState<TreeIndex | undefined>();
 
-  const [sampleKey, setSampleKey] = useState<keyof typeof samples>("cap");
+  const [sampleKey, setSampleKey] = useState<keyof typeof samples>("bSplineGrid");
 
   const [workTree, setWorkTree] = useState<IRenderItem[]>([]);
 

@@ -5,7 +5,9 @@ import { availableImages } from "../resources";
 export function bSplineGridsTree() {
   const tree: IRenderItem[] = [
     operations.drawImage({ imageUrl: availableImages.checkerboard }),
-    operations.bSplineGrid(),
+    operations.bSplineGrid({
+      debug: true,
+    }),
   ];
   return tree;
 }
