@@ -2,7 +2,7 @@ import "./App.css";
 
 import { IRenderItem } from "./canvas";
 import { Canvas } from "./components/Canvas";
-import { useEffect, useState } from "react";
+import { useEffect, useState, useTransition } from "react";
 import { samples } from "./samples";
 import { produce } from "immer";
 import { RenderTreePanel } from "./components/RenderTreePanel";
@@ -10,7 +10,6 @@ import { TreeIndex } from "./components/RenderTree";
 import { getRendererConfig } from "./configs";
 import { RenderItemName } from "./operations";
 import "./configs/load";
-
 
 export function selectIndex(tree: IRenderItem[], index: TreeIndex) {
   if (index.length === 0) return undefined;
@@ -68,13 +67,14 @@ function App() {
   const editItem = selectIndex(selectedTree, editIndex ?? []);
   const renderItemName = editItem?.name as RenderItemName | undefined;
   const ItemConfigurator = getRendererConfig(renderItemName) || (() => null);
-  console.log(getRendererConfig(renderItemName));
+
+  const [_isPending, startTransition] = useTransition();
   const onConfigChange = (mutate: (config: unknown) => void) => {
     const newTree = produce(workTree, (draftTree) => {
       const item = selectIndex(draftTree, editIndex ?? []);
       mutate(item?.config);
     });
-    setWorkTree(newTree);
+    startTransition(() => setWorkTree(newTree));
   };
 
   return (

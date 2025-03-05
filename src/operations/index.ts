@@ -15,7 +15,7 @@ import { invert } from "./invert";
 import { repaint } from "./repaint";
 // import { meshWarp } from "./copilot-warp";
 import { displacement } from "./displacement";
-import { bSplineWrap } from "./bspline-warp";
+import { bSplinePoints } from "./bspline-points";
 import { uvMap } from "./uv-map";
 import { cyl } from "./cyl";
 import { perspective } from "./perspective";
@@ -36,8 +36,7 @@ export const operations = {
   convolve,
   invert,
   repaint,
-  //  meshWarp,
-  bSplineWrap,
+  bSplinePoints,
   displacement,
   uvMap,
   cyl,

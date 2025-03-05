@@ -6,6 +6,6 @@ import "./draw-text";
 import "./shadow";
 import "./transform";
 import "./fill-color";
+import "./bspline-points";
 
-console.log("loading");
 export const _ = null;

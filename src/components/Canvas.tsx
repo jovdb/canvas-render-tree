@@ -11,11 +11,12 @@ export function Canvas({ items }: { items: IRenderItem[] }) {
       if (!canvasRef.current) return;
       await loadTree(items);
       draw(canvasRef.current, items);
+      return null;
     },
   });
   return (
     <>
-      <canvas ref={canvasRef} width="500" height="500" className="canvas" />;
+      <canvas ref={canvasRef} width="500" height="500" className="canvas" />
       {isFetching && <div>Loading...</div>}
     </>
   );
