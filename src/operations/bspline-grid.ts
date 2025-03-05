@@ -28,24 +28,28 @@ function deformImage(
 
   for (let y = 0; y < height; y++) {
     for (let x = 0; x < width; x++) {
+      // Find current grid cell
       const i = Math.max(0, Math.min(Math.floor(x / gridWidth), cols - 2));
       const j = Math.max(0, Math.min(Math.floor(y / gridHeight), rows - 2));
 
+      // Normalized coordinates within grid cell
       const gx = (x - i * gridWidth) / gridWidth;
       const gy = (y - j * gridHeight) / gridHeight;
 
-      const d00 = displacements[j][i];
-      const d10 = displacements[j][i + 1];
-      const d01 = displacements[j + 1][i];
-      const d11 = displacements[j + 1][i + 1];
+      // Get 4x4 grid of displacements for bicubic interpolation
+      const dispGridX = createDisplacementGrid(displacements, i, j, "dx");
+      const dispGridY = createDisplacementGrid(displacements, i, j, "dy");
 
-      const dx = bilinearInterpolate(d00.dx, d10.dx, d01.dx, d11.dx, gx, gy);
-      const dy = bilinearInterpolate(d00.dy, d10.dy, d01.dy, d11.dy, gx, gy);
+      // Bicubic interpolation of displacements
+      const dx = bicubicInterpolate(dispGridX, gx, gy);
+      const dy = bicubicInterpolate(dispGridY, gx, gy);
 
+      // Calculate source coordinates
       const srcX = x - dx;
       const srcY = y - dy;
 
-      const pixel = sampleBilinear(imageData, srcX, srcY);
+      // Sample and set pixel
+      const pixel = sampleBicubic(imageData, srcX, srcY);
       setPixel(output, x, y, pixel);
     }
   }
@@ -53,41 +57,96 @@ function deformImage(
   return output;
 }
 
-function sampleBilinear(
+function createDisplacementGrid(
+  displacements: Vector[][],
+  i: number,
+  j: number,
+  component: "dx" | "dy"
+): number[][] {
+  const grid: number[][] = [];
+  for (let dj = -1; dj <= 2; dj++) {
+    const row: number[] = [];
+    for (let di = -1; di <= 2; di++) {
+      const ci = clamp(i + di, 0, displacements[0].length - 1);
+      const cj = clamp(j + dj, 0, displacements.length - 1);
+      row.push(displacements[cj][ci][component]);
+    }
+    grid.push(row);
+  }
+  return grid;
+}
+
+function bicubicInterpolate(
+  values: number[][],
+  tx: number,
+  ty: number
+): number {
+  // Interpolate rows first
+  const rowResults = values.map((row) => cubicInterpolate(row, tx));
+  return cubicInterpolate(rowResults, ty);
+}
+
+function cubicInterpolate(values: number[], t: number): number {
+  const t2 = t * t;
+  const t3 = t2 * t;
+  return (
+    0.5 *
+    ((-values[0] + 3 * values[1] - 3 * values[2] + values[3]) * t3 +
+      (2 * values[0] - 5 * values[1] + 4 * values[2] - values[3]) * t2 +
+      (-values[0] + values[2]) * t +
+      2 * values[1])
+  );
+}
+
+function sampleBicubic(
   imageData: ImageData,
   x: number,
   y: number
 ): Uint8ClampedArray {
-  // Return transparent pixel if coordinates are outside the image
   if (x < 0 || x >= imageData.width || y < 0 || y >= imageData.height) {
     return new Uint8ClampedArray([0, 0, 0, 0]);
   }
 
-  const x0 = Math.floor(x);
-  const y0 = Math.floor(y);
-  const x1 = Math.min(imageData.width - 1, x0 + 1);
-  const y1 = Math.min(imageData.height - 1, y0 + 1);
+  const x0 = Math.floor(x) - 1;
+  const y0 = Math.floor(y) - 1;
+  const valuesR: number[][] = [];
+  const valuesG: number[][] = [];
+  const valuesB: number[][] = [];
+  const valuesA: number[][] = [];
 
-  const fx = x - x0;
-  const fy = y - y0;
-
-  const i00 = (y0 * imageData.width + x0) * 4;
-  const i10 = (y0 * imageData.width + x1) * 4;
-  const i01 = (y1 * imageData.width + x0) * 4;
-  const i11 = (y1 * imageData.width + x1) * 4;
-
-  const result = new Uint8ClampedArray(4);
-  for (let c = 0; c < 4; c++) {
-    const v00 = imageData.data[i00 + c];
-    const v10 = imageData.data[i10 + c];
-    const v01 = imageData.data[i01 + c];
-    const v11 = imageData.data[i11 + c];
-
-    result[c] = Math.round(
-      (1 - fy) * ((1 - fx) * v00 + fx * v10) + fy * ((1 - fx) * v01 + fx * v11)
-    );
+  for (let j = 0; j < 4; j++) {
+    const rowR: number[] = [];
+    const rowG: number[] = [];
+    const rowB: number[] = [];
+    const rowA: number[] = [];
+    for (let i = 0; i < 4; i++) {
+      const xi = clamp(x0 + i, 0, imageData.width - 1);
+      const yj = clamp(y0 + j, 0, imageData.height - 1);
+      const idx = (yj * imageData.width + xi) * 4;
+      rowR.push(imageData.data[idx]);
+      rowG.push(imageData.data[idx + 1]);
+      rowB.push(imageData.data[idx + 2]);
+      rowA.push(imageData.data[idx + 3]);
+    }
+    valuesR.push(rowR);
+    valuesG.push(rowG);
+    valuesB.push(rowB);
+    valuesA.push(rowA);
   }
-  return result;
+
+  const fx = x - Math.floor(x);
+  const fy = y - Math.floor(y);
+
+  return new Uint8ClampedArray([
+    bicubicInterpolate(valuesR, fx, fy),
+    bicubicInterpolate(valuesG, fx, fy),
+    bicubicInterpolate(valuesB, fx, fy),
+    bicubicInterpolate(valuesA, fx, fy),
+  ]);
+}
+
+function clamp(value: number, min: number, max: number): number {
+  return Math.max(min, Math.min(value, max));
 }
 
 function createOriginalGrid(
@@ -126,19 +185,6 @@ function calculateDisplacements(
     displacements.push(row);
   }
   return displacements;
-}
-
-function bilinearInterpolate(
-  v00: number,
-  v10: number,
-  v01: number,
-  v11: number,
-  gx: number,
-  gy: number
-): number {
-  return (
-    (1 - gy) * ((1 - gx) * v00 + gx * v10) + gy * ((1 - gx) * v01 + gx * v11)
-  );
 }
 
 function setPixel(
