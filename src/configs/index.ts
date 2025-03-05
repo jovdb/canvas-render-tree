@@ -9,9 +9,10 @@ export function addRendererConfig(
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   rendererConfig: ItemConfigFn<any>
 ) {
-  if (configs[name as RenderItemName]) {
-    throw new Error(`Renderer config for '${name}' already exists`);
-  }
+  // Disabled for hot module reloading
+  // if (configs[name as RenderItemName]) {
+  //   throw new Error(`Renderer config for '${name}' already exists`);
+  // }
   configs[name as RenderItemName] = rendererConfig;
 }
 

@@ -6,9 +6,10 @@ import { capTree } from "./cap";
 import { bevel1Tree } from "./bevel";
 import { convolutionSamplesTree } from "./convolution-kernel";
 import { displacementTree } from "./displacement";
-import { bSplinePointsTree } from "./spline-warp";
+import { bSplinePointsTree } from "./spline-points";
 import { uvTree } from "./uv";
 import { perspectiveTree } from "./perspective";
+import { bSplineGridsTree } from "./spline-grid";
 
 export const samples = {
   wood: {
@@ -40,7 +41,11 @@ export const samples = {
   //   name: "Mesh Warp",
   //   tree: meshWarpTree,
   // },
-  splineWarp: {
+  bSplineGrid: {
+    name: "B-Spline Grid",
+    tree: bSplineGridsTree,
+  },
+  bSplinePoints: {
     name: "B-Spline Points",
     tree: bSplinePointsTree,
   },
