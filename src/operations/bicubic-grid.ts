@@ -56,8 +56,26 @@ function deformImage(
       const srcX = x - dx;
       const srcY = y - dy;
 
-      // Sample and set pixel
-      const pixel = sampleBicubic(imageData, srcX, srcY);
+      // Calculate transparency at edges
+      const edgeSubPixelSize = 2;
+      const coverage = calculatePixelTransparency(
+        srcX,
+        srcY,
+        width,
+        height,
+        edgeSubPixelSize
+      );
+
+      // Sample source pixel
+      const pixel =
+        coverage > 0
+          ? sampleBicubic(imageData, srcX, srcY)
+          // ? sampleRound(imageData, srcX, srcY)
+          : new Uint8ClampedArray([0, 0, 0, 0]);
+
+      // Apply edge anti-aliasing
+      pixel[3] = Math.round(pixel[3] * coverage);
+
       setPixel(output, x, y, pixel);
     }
   }
@@ -106,15 +124,28 @@ function cubicInterpolate(values: number[], t: number): number {
   );
 }
 
+// pixelated
+function sampleRound(imageData: ImageData, x: number, y: number) {
+  if (x < 0 || x >= imageData.width || y < 0 || y >= imageData.height) {
+    return new Uint8ClampedArray([0, 0, 0, 0]);
+  }
+
+  const rx = Math.round(x);
+  const ry = Math.round(y);
+
+  return new Uint8ClampedArray([
+    imageData.data[(ry * imageData.width + rx) * 4],
+    imageData.data[(ry * imageData.width + rx) * 4 + 1],
+    imageData.data[(ry * imageData.width + rx) * 4 + 2],
+    imageData.data[(ry * imageData.width + rx) * 4 + 3],
+  ]);
+}
+
 function sampleBicubic(
   imageData: ImageData,
   x: number,
   y: number
 ): Uint8ClampedArray {
-  if (x < 0 || x >= imageData.width || y < 0 || y >= imageData.height) {
-    return new Uint8ClampedArray([0, 0, 0, 0]);
-  }
-
   const x0 = Math.floor(x) - 1;
   const y0 = Math.floor(y) - 1;
   const valuesR: number[][] = [];
@@ -145,30 +176,51 @@ function sampleBicubic(
   const fx = x - Math.floor(x);
   const fy = y - Math.floor(y);
 
-  // Calculate coverage for anti-aliased edges
-  const coverage = calculateCoverage(x, y, imageData.width, imageData.height);
-
   return new Uint8ClampedArray([
     bicubicInterpolate(valuesR, fx, fy),
     bicubicInterpolate(valuesG, fx, fy),
     bicubicInterpolate(valuesB, fx, fy),
-    Math.round(bicubicInterpolate(valuesA, fx, fy) * coverage),
+    bicubicInterpolate(valuesA, fx, fy),
   ]);
 }
 
-function calculateCoverage(
+function calculatePixelTransparency(
   x: number,
   y: number,
   width: number,
-  height: number
+  height: number,
+  margin = 1
 ): number {
-  // Invented this code myself, probably wrong
-  // Check fraction of pixel that is add the edge to determine the transparency
-  const top = clamp(y, 0, 1) || 1;
-  const bottom = clamp(1 - (y - height + 1), 0, 1) || 1;
-  const left = clamp(x, 0, 1) || 1;
-  const right = clamp(1 - (x - width + 1), 0, 1) || 1;
-  return left * right * top * bottom;
+  // Horizontal coverage (left/right edges)
+  const left = x < 0 ? smoothstep(-margin, 0, x) : 1;
+  const right = x > width ? 1 - smoothstep(width, width + margin, x) : 1;
+  const horizontal = left * right;
+
+  // Vertical coverage (top/bottom edges)
+  const top = y < 0 ? smoothstep(-margin, 0, y) : 1;
+  const bottom = y > height ? 1 - smoothstep(height, height + margin, y) : 1;
+  const vertical = top * bottom;
+
+  return horizontal * vertical;
+}
+
+/**
+ * @returns
+ * value ≤ startRange: 0
+ * value >= endRange: 1
+ * in range: Smooth transition between 0 and 1
+ */
+function smoothstep(
+  startRange: number,
+  endRange: number,
+  value: number
+): number {
+  const t = Math.max(
+    0,
+    Math.min(1, (value - startRange) / (endRange - startRange))
+  );
+  // Cubic polynomial
+  return t * t * (3 - 2 * t);
 }
 
 function clamp(value: number, min: number, max: number): number {
