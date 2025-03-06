@@ -145,12 +145,30 @@ function sampleBicubic(
   const fx = x - Math.floor(x);
   const fy = y - Math.floor(y);
 
+  // Calculate coverage for anti-aliased edges
+  const coverage = calculateCoverage(x, y, imageData.width, imageData.height);
+
   return new Uint8ClampedArray([
     bicubicInterpolate(valuesR, fx, fy),
     bicubicInterpolate(valuesG, fx, fy),
     bicubicInterpolate(valuesB, fx, fy),
-    bicubicInterpolate(valuesA, fx, fy),
+    Math.round(bicubicInterpolate(valuesA, fx, fy) * coverage),
   ]);
+}
+
+function calculateCoverage(
+  x: number,
+  y: number,
+  width: number,
+  height: number
+): number {
+  // Invented this code myself, probably wrong
+  // Check fraction of pixel that is add the edge to determine the transparency
+  const top = clamp(y, 0, 1) || 1;
+  const bottom = clamp(1 - (y - height + 1), 0, 1) || 1;
+  const left = clamp(x, 0, 1) || 1;
+  const right = clamp(1 - (x - width + 1), 0, 1) || 1;
+  return left * right * top * bottom;
 }
 
 function clamp(value: number, min: number, max: number): number {
