@@ -10,6 +10,7 @@ import { bSplinePointsTree } from "./spline-points";
 import { uvTree } from "./uv";
 import { perspectiveTree } from "./perspective";
 import { bicubicGridTree } from "./bicubic-grid";
+import { pillowTree } from "./pillow";
 
 export const samples = {
   wood: {
@@ -27,6 +28,10 @@ export const samples = {
   cap: {
     name: "Cap",
     tree: capTree,
+  },
+  pillow: {
+    name: "Pillow",
+    tree: pillowTree,
   },
   bevel: {
     name: "Bevel",

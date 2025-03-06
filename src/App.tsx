@@ -48,7 +48,7 @@ function App() {
   const [selectedItems] = useState<IRenderItem[]>([]);
   const [editIndex, setEditIndex] = useState<TreeIndex | undefined>();
 
-  const [sampleKey, setSampleKey] = useState<keyof typeof samples>("bicubicGrid");
+  const [sampleKey, setSampleKey] = useState<keyof typeof samples>("pillow");
 
   const [workTree, setWorkTree] = useState<IRenderItem[]>([]);
 
