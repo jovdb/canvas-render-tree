@@ -13,14 +13,22 @@ interface Vector {
 
 function deformImage(
   imageData: ImageData,
+  /** Normalized control points */
   controlPoints: Point[][]
 ): ImageData {
   const { width, height } = imageData;
   const rows = controlPoints.length;
   const cols = controlPoints[0].length;
 
-  const originalGrid = createOriginalGrid(width, height, rows, cols);
-  const displacements = calculateDisplacements(originalGrid, controlPoints);
+  const originalGrid = createOriginalGrid(rows, cols, width, height);
+  const destinationGrid = JSON.parse(JSON.stringify(controlPoints));
+  for (let j = 0; j < rows; j++) {
+    for (let i = 0; i < cols; i++) {
+      destinationGrid[j][i].x *= width;
+      destinationGrid[j][i].y *= height;
+    }
+  }
+  const displacements = calculateDisplacements(originalGrid, destinationGrid);
   const output = new ImageData(width, height);
 
   const gridWidth = width / (cols - 1);
@@ -149,11 +157,11 @@ function clamp(value: number, min: number, max: number): number {
   return Math.max(min, Math.min(value, max));
 }
 
-function createOriginalGrid(
-  width: number,
-  height: number,
+export function createOriginalGrid(
   rows: number,
-  cols: number
+  cols: number,
+  width = 1,
+  height = 1
 ): Point[][] {
   const grid: Point[][] = [];
   for (let j = 0; j < rows; j++) {
@@ -211,22 +219,34 @@ function drawControlPointDisplacement(
   ctx.strokeStyle = "#fff8";
   ctx.lineWidth = 2;
   ctx.beginPath();
-  ctx.moveTo(point1.x, point1.y);
-  ctx.lineTo(point2.x, point2.y);
+  ctx.moveTo(point1.x * ctx.canvas.width, point1.y * ctx.canvas.height);
+  ctx.lineTo(point2.x * ctx.canvas.width, point2.y * ctx.canvas.height);
   ctx.stroke();
   ctx.restore();
 
   ctx.fillStyle = "red";
   ctx.strokeStyle = "#000a";
   ctx.beginPath();
-  ctx.arc(point1.x, point1.y, radius, 0, Math.PI * 2); // Draw circle at control point
+  ctx.arc(
+    point1.x * ctx.canvas.width,
+    point1.y * ctx.canvas.height,
+    radius,
+    0,
+    Math.PI * 2
+  ); // Draw circle at control point
   ctx.fill();
   ctx.stroke();
 
   ctx.fillStyle = "green";
   ctx.strokeStyle = "#000a";
   ctx.beginPath();
-  ctx.arc(point2.x, point2.y, radius, 0, Math.PI * 2); // Draw circle at control point
+  ctx.arc(
+    point2.x * ctx.canvas.width,
+    point2.y * ctx.canvas.height,
+    radius,
+    0,
+    Math.PI * 2
+  ); // Draw circle at control point
   ctx.fill();
   ctx.stroke();
   ctx.stroke();
@@ -234,14 +254,16 @@ function drawControlPointDisplacement(
   ctx.restore(); // Restore original canvas state
 }
 export interface IBSplineGridConfig {
+  /** Normalized controlPoints */
+  controlsPoints: Point[][];
   debug?: boolean;
 }
 
 export const bSplineGrid = (
-  config?: IBSplineGridConfig
+  config: IBSplineGridConfig
 ): IRenderItem<IBSplineGridConfig> => ({
   name: "bspline-grid",
-  config: config || {},
+  config: config,
 });
 
 export const draw: ItemDrawFn<IBSplineGridConfig> = (
@@ -253,43 +275,21 @@ export const draw: ItemDrawFn<IBSplineGridConfig> = (
   drawPrev?.(ctx);
   if (drawChildren) ctx.save();
 
-  const deformationGrid = createOriginalGrid(
-    ctx.canvas.width,
-    ctx.canvas.height,
-    5,
-    5
-  );
-  deformationGrid[0][1].x += 50;
-  deformationGrid[0][1].y += 20;
-
-  deformationGrid[2][2].x -= 20;
-  deformationGrid[2][2].y -= 10;
-
-  for (let j = 0; j < deformationGrid.length; j++) {
-    for (let i = 0; i < deformationGrid[j].length; i++) {
-      deformationGrid[i][j].x += Math.random() * 30 - 15;
-      deformationGrid[i][j].y += Math.random() * 30 - 15;
-    }
-  }
-
   const imageData = ctx.getImageData(0, 0, ctx.canvas.width, ctx.canvas.height);
-  const newImageData = deformImage(imageData, deformationGrid);
+  const newImageData = deformImage(imageData, config.controlsPoints);
   ctx.putImageData(newImageData, 0, 0);
 
   if (config?.debug) {
-    const originalGrid = createOriginalGrid(
-      ctx.canvas.width,
-      ctx.canvas.height,
-      5,
-      5
-    );
+    const rows = config.controlsPoints.length;
+    const cols = config.controlsPoints[0].length;
+    const originalGrid = createOriginalGrid(rows, cols);
 
-    for (let j = 0; j < deformationGrid.length; j++) {
-      for (let i = 0; i < deformationGrid[j].length; i++) {
+    for (let j = 0; j < rows; j++) {
+      for (let i = 0; i < cols; i++) {
         drawControlPointDisplacement(
           ctx,
           originalGrid[j][i],
-          deformationGrid[j][i]
+          config.controlsPoints[j][i]
         );
       }
     }
