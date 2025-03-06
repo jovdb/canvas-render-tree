@@ -19,7 +19,7 @@ import { bSplinePoints } from "./bspline-points";
 import { uvMap } from "./uv-map";
 import { cyl } from "./cyl";
 import { perspective } from "./perspective";
-import { bSplineGrid } from "./bspline-grid";
+import { bicubicGrid } from "./bicubic-grid";
 
 export const operations = {
   drawImage,
@@ -38,7 +38,7 @@ export const operations = {
   invert,
   repaint,
   bSplinePoints,
-  bSplineGrid,
+  bicubicGrid: bicubicGrid,
   displacement,
   uvMap,
   cyl,

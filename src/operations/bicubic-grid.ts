@@ -253,20 +253,20 @@ function drawControlPointDisplacement(
 
   ctx.restore(); // Restore original canvas state
 }
-export interface IBSplineGridConfig {
+export interface IBicubicGridConfig {
   /** Normalized controlPoints */
   controlsPoints: Point[][];
   debug?: boolean;
 }
 
-export const bSplineGrid = (
-  config: IBSplineGridConfig
-): IRenderItem<IBSplineGridConfig> => ({
+export const bicubicGrid = (
+  config: IBicubicGridConfig
+): IRenderItem<IBicubicGridConfig> => ({
   name: "bspline-grid",
   config: config,
 });
 
-export const draw: ItemDrawFn<IBSplineGridConfig> = (
+export const draw: ItemDrawFn<IBicubicGridConfig> = (
   ctx,
   drawPrev,
   config,

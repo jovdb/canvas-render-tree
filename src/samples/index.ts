@@ -9,7 +9,7 @@ import { displacementTree } from "./displacement";
 import { bSplinePointsTree } from "./spline-points";
 import { uvTree } from "./uv";
 import { perspectiveTree } from "./perspective";
-import { bSplineGridsTree } from "./spline-grid";
+import { bicubicGridTree } from "./bicubic-grid";
 
 export const samples = {
   wood: {
@@ -41,9 +41,9 @@ export const samples = {
   //   name: "Mesh Warp",
   //   tree: meshWarpTree,
   // },
-  bSplineGrid: {
-    name: "B-Spline Grid",
-    tree: bSplineGridsTree,
+  bicubicGrid: {
+    name: "Bicubic Grid",
+    tree: bicubicGridTree,
   },
   bSplinePoints: {
     name: "B-Spline Points",
