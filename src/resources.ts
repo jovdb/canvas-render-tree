@@ -46,7 +46,6 @@ export const availableImages = {
   woodEngraved: "./hout-engraved.jpg",
   noise: "./noise.jpg",
   glass: "./glass.jpg",
-  glassText: "./glass-text.png",
   text: "./text.png",
   gold: "gold.jpg",
   goldBack: "foil-back.jpg",
@@ -55,8 +54,10 @@ export const availableImages = {
   displacementMap1: "displacement-map1.png",
   displacementMap2: "displacement-map2.png",
   homer: "homer.png",
+  mona: "mona.jpg",
   checkerboard: "checkerboard.png",
   pillow: "pillow.webp",
+  pillow2: "pillow-2.jpg",
   uvMap1: "uv-map1.png",
   uvMap2: "uv-map2.png",
 };

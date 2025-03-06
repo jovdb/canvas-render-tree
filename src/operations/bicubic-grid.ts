@@ -70,8 +70,8 @@ function deformImage(
       const pixel =
         coverage > 0
           ? sampleBicubic(imageData, srcX, srcY)
-          // ? sampleRound(imageData, srcX, srcY)
-          : new Uint8ClampedArray([0, 0, 0, 0]);
+          : // ? sampleRound(imageData, srcX, srcY)
+            new Uint8ClampedArray([0, 0, 0, 0]);
 
       // Apply edge anti-aliasing
       pixel[3] = Math.round(pixel[3] * coverage);
@@ -286,7 +286,7 @@ function drawControlPointDisplacement(
   // Draw grid lines
   ctx.save();
   ctx.globalCompositeOperation = "difference";
-  ctx.strokeStyle = "#fff8";
+  ctx.strokeStyle = "#bbbb";
   ctx.lineWidth = 2;
   ctx.beginPath();
   ctx.moveTo(point1.x * ctx.canvas.width, point1.y * ctx.canvas.height);
@@ -332,7 +332,7 @@ export interface IBicubicGridConfig {
 export const bicubicGrid = (
   config: IBicubicGridConfig
 ): IRenderItem<IBicubicGridConfig> => ({
-  name: "bspline-grid",
+  name: "bicubicGrid",
   config: config,
 });
 
@@ -369,6 +369,6 @@ export const draw: ItemDrawFn<IBicubicGridConfig> = (
   if (drawChildren) ctx.restore();
 };
 
-addRenderer("bspline-grid", {
+addRenderer("bicubicGrid", {
   draw,
 });

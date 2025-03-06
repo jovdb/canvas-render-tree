@@ -11,6 +11,7 @@ import { uvTree } from "./uv";
 import { perspectiveTree } from "./perspective";
 import { bicubicGridTree } from "./bicubic-grid";
 import { pillowTree } from "./pillow";
+import { pillow2Tree } from "./pillow2";
 
 export const samples = {
   wood: {
@@ -32,6 +33,10 @@ export const samples = {
   pillow: {
     name: "Pillow",
     tree: pillowTree,
+  },
+  pillow2: {
+    name: "Pillow 2",
+    tree: pillow2Tree,
   },
   bevel: {
     name: "Bevel",

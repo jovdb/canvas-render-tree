@@ -17,7 +17,13 @@ export function capTree() {
   const tree: RenderTree = [
     operations.fillColor("#ff0000"),
     operations.blend("destination-in", [
-      operations.drawImage({ imageUrl: availableImages.glassText }),
+      operations.drawText({
+        text: "Kelly",
+        fontSize: 80,
+        x: 152,
+        y: 220,
+        isBold: true,
+      }),
     ]),
     operations.bevel({}),
     operations.blend("multiply"),

@@ -38,7 +38,7 @@ export const operations = {
   invert,
   repaint,
   bSplinePoints,
-  bicubicGrid: bicubicGrid,
+  bicubicGrid,
   displacement,
   uvMap,
   cyl,

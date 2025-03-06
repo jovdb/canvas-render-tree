@@ -8,6 +8,8 @@ export interface IDrawTextConfig {
   foregroundColor?: string;
   fontSize?: number;
   fontFamilyName?: string;
+  isBold?: boolean;
+  isItalic?: boolean;
 }
 
 /** draw Text on a canvas */
@@ -22,12 +24,16 @@ export const draw: ItemDrawFn<IDrawTextConfig> = (ctx, drawPrev, config) => {
     foregroundColor = "#000",
     fontSize = 16,
     fontFamilyName = "Arial",
+    isBold = false,
+    isItalic = false,
     x = 0,
     y = 0,
   } = config;
   drawPrev?.(ctx);
   ctx.fillStyle = foregroundColor;
-  ctx.font = `${fontSize}px '${fontFamilyName}'`;
+  ctx.font = `${isBold ? "bold" : ""} ${
+    isItalic ? "italic" : ""
+  }${fontSize}px '${fontFamilyName}'`;
   ctx.fillText(text, x, y);
 };
 

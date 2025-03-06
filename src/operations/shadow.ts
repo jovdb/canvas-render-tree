@@ -2,11 +2,12 @@ import { getContext2d, IRenderItem, ItemDrawFn, RenderTree } from "../canvas";
 import { addRenderer } from "../renderers";
 
 export interface IShadowConfig {
-  type: "outer" | "inner";
-  shadowBlur: number;
-  shadowOffsetX: number;
-  shadowOffsetY: number;
-  shadowColor: string;
+  type?: "outer" | "inner";
+  shadowBlur?: number;
+  shadowOffsetX?: number;
+  shadowOffsetY?: number;
+  shadowColor?: string;
+  onlyShadow?: boolean;
 }
 
 /**
@@ -34,6 +35,7 @@ export const draw: ItemDrawFn<IShadowConfig> = (
     shadowOffsetX = 5,
     shadowOffsetY = 5,
     shadowColor = "#0008",
+    onlyShadow = false,
   } = config;
 
   // drawChildren?.(ctx);
@@ -51,38 +53,56 @@ export const draw: ItemDrawFn<IShadowConfig> = (
     drawChildren?.(ctx);
     return;
   } else if (type === "inner") {
-    // Create shadow in a new layer
+    // How to draw inner canvas:
+    // - 1. create an invert image of the transparency
+    // - 2. apply shadow on the invert image
+    // - 3. draw it over the image
+
+    // Data for inner shadow
+    // Store in imagedata so only called once (if complex inner renderings)
+    const dataCanvas = document.createElement("canvas");
+    dataCanvas.width = ctx.canvas.width;
+    dataCanvas.height = ctx.canvas.height;
+    const tempCtx = getContext2d(dataCanvas, "tempCtx");
+    if (drawChildren) drawChildren?.(tempCtx);
+    else drawPrev?.(tempCtx);
+
+    // 1. Create an image with transparent area for the shadow
+    const invertedImageCanvas = document.createElement("canvas");
+    invertedImageCanvas.width = ctx.canvas.width;
+    invertedImageCanvas.height = ctx.canvas.height;
+    const invertedImageCtx = getContext2d(
+      invertedImageCanvas,
+      "invertedImageCtx"
+    );
+
+    invertedImageCtx.fillStyle = "#ffff"; // TODO: improve, color is visible at the edges
+    invertedImageCtx.fillRect(0, 0, ctx.canvas.width, ctx.canvas.height);
+    invertedImageCtx.globalCompositeOperation = "xor";
+    invertedImageCtx.drawImage(dataCanvas, 0, 0);
+
+    // 2. Draw as image onto new layer with shadow
     const shadowCanvas = document.createElement("canvas");
     shadowCanvas.width = ctx.canvas.width;
     shadowCanvas.height = ctx.canvas.height;
-    const shadowCtx = getContext2d(shadowCanvas, "shaowCtx");
-
-    // invert transparency: Create an image with transparent area for the shadow
-    shadowCtx.fillStyle = "white"; // color doesn't matter because it will be later removed with mask
-    shadowCtx.fillRect(0, 0, ctx.canvas.width, ctx.canvas.height);
-    shadowCtx.globalCompositeOperation = "xor";
-    if (drawChildren) drawChildren?.(shadowCtx);
-    else drawPrev?.(shadowCtx);
-
-    // Create mask in a new layer
-    const maskedCanvas = document.createElement("canvas");
-    maskedCanvas.width = ctx.canvas.width;
-    maskedCanvas.height = ctx.canvas.height;
-    const maskedCtx = getContext2d(maskedCanvas, "maskedCtx");
+    const shadowCtx = getContext2d(shadowCanvas, "shadowCanvas");
 
     // Mask to get only the shadows
-    maskedCtx.save();
-    apply(maskedCtx);
-    maskedCtx.drawImage(shadowCtx.canvas, 0, 0);
-    maskedCtx.restore();
-    maskedCtx.globalCompositeOperation = "destination-out";
-    maskedCtx.drawImage(shadowCtx.canvas, 0, 0);
+    shadowCtx.save();
+    apply(shadowCtx);
+    shadowCtx.drawImage(invertedImageCtx.canvas, 0, 0);
+    shadowCtx.restore();
+    // Apply inverted image as mask
+    shadowCtx.globalCompositeOperation = "destination-out";
+    shadowCtx.drawImage(invertedImageCtx.canvas, 0, 0);
 
+    // 3. Draw shadow on top
     ctx.save();
-    if (drawChildren) drawChildren?.(ctx);
-    else drawPrev?.(ctx);
-
-    ctx.drawImage(maskedCtx.canvas, 0, 0); // Add masked shadow on top
+    drawPrev?.(ctx);
+    if (!onlyShadow) {
+      ctx.drawImage(dataCanvas, 0, 0);
+    }
+    ctx.drawImage(shadowCanvas, 0, 0); // Add masked shadow on top
     ctx.restore();
   }
 };
