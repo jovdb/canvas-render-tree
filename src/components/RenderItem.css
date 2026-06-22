@@ -3,11 +3,11 @@
   margin: 2px 0;
   border-radius: 3px;
   border: 2px solid #fff;
-  width: 100%;
 
   background-color: transparent;
-  display: block;
+  display: flex;
   text-align: left;
+  align-items: center;
 }
 
 .render-item--selectable:hover {
@@ -23,7 +23,17 @@
   border: 2px solid #44f;
   background: #ddf;
 }
+
 .render-item--selectable.render-item--selected:hover {
   border: 2px solid #44f;
   background: #ccf;
+}
+
+.render-item__visibility {
+  margin-right: 0.25rem;
+  display: flex;
+}
+
+.render-item__name {
+  flex-grow: 1;
 }

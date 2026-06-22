@@ -23,14 +23,21 @@ export function selectIndex(tree: IRenderItem[], index: TreeIndex) {
 
 function filterTree(
   items: readonly IRenderItem[] | undefined,
-  selectedItems: readonly IRenderItem[]
+  visibleIndexes: readonly TreeIndex[],
+  parentTreeIndexes: TreeIndex = []
 ) {
   const newItems: IRenderItem[] = [];
 
-  items?.forEach((item) => {
-    const children = filterTree(item.children, selectedItems);
+  items?.forEach((item, index) => {
+    const treeIndex = [...parentTreeIndexes, index];
+    const children = filterTree(item.children, visibleIndexes, treeIndex);
 
-    if (selectedItems.includes(item)) {
+    if (
+      visibleIndexes.some(
+        (visibleTreeIndex) =>
+          JSON.stringify(visibleTreeIndex) === JSON.stringify(treeIndex)
+      )
+    ) {
       const clonedItem = {
         ...item,
         children,
@@ -44,27 +51,32 @@ function filterTree(
 }
 
 function App() {
-  // TODO: Show Tree, multiselect layers
-  const [selectedItems] = useState<IRenderItem[]>([]);
   const [editIndex, setEditIndex] = useState<TreeIndex | undefined>();
-
+  const [visibleIndexes, setVisibleIndexes] = useState<TreeIndex[]>([]);
   const [sampleKey, setSampleKey] = useState<keyof typeof samples>("glass");
 
+  /** Working tree is a copy of the entire sample and can be modified */
   const [workTree, setWorkTree] = useState<IRenderItem[]>([]);
 
   useEffect(() => {
     const sample = samples[sampleKey];
     const tree = sample.tree();
+
+    // Reset
     setWorkTree(tree);
+    setEditIndex([]);
+    setVisibleIndexes([]);
   }, [sampleKey]);
 
-  const selectedTree =
-    workTree && selectedItems.length
-      ? filterTree(workTree, selectedItems)
+  /** The items to render, workTree with selection filter */
+  const renderTree =
+    workTree && visibleIndexes.length
+      ? filterTree(workTree, visibleIndexes)
       : workTree ?? [];
+  // console.log(JSON.stringify(renderTree, null, 2));
 
   // Configurator
-  const editItem = selectIndex(selectedTree, editIndex ?? []);
+  const editItem = selectIndex(workTree, editIndex ?? []);
   const renderItemName = editItem?.name as RenderItemName | undefined;
   const ItemConfigurator = getRendererConfig(renderItemName) || (() => null);
 
@@ -99,7 +111,7 @@ function App() {
           ))}
         </select>
         <br />
-        <Canvas items={selectedTree ?? []} />
+        <Canvas items={renderTree ?? []} />
       </div>
 
       <div className="app__edit-panel">
@@ -107,8 +119,24 @@ function App() {
           <RenderTreePanel
             items={workTree}
             editIndex={editIndex}
+            visibleIndexes={visibleIndexes}
             onClick={(_item, treeIndex) => {
               setEditIndex(treeIndex);
+            }}
+            onVisibilityChange={(_item, treeIndex) => {
+              setVisibleIndexes((prev) => {
+                const treeItemSTring = JSON.stringify(treeIndex);
+                const isSelected = prev.some(
+                  (treeIndex) => JSON.stringify(treeIndex) === treeItemSTring
+                );
+                if (isSelected) {
+                  return prev.filter(
+                    (treeIndex) => JSON.stringify(treeIndex) !== treeItemSTring
+                  );
+                } else {
+                  return [...prev, treeIndex];
+                }
+              });
             }}
           />
         </div>

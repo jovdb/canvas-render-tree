@@ -147,5 +147,6 @@ export function getContext2d(canvas: HTMLCanvasElement, _name: string) {
 export function draw(canvasEl: HTMLCanvasElement, items: IRenderItem[]) {
   const ctx = getContext2d(canvasEl, "rootCtx");
   ctx.reset(); // clear and reset unclosed operations: globalAlpha, ...
+  ctx.globalCompositeOperation = "source-over";
   drawTree(items, "root")?.(ctx);
 }

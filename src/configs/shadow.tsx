@@ -6,9 +6,25 @@ export const ShadowConfig: ItemConfigFn<IShadowConfig> = ({
   config,
   mutateConfig,
 }) => {
-  const { shadowOffsetX = 0, shadowOffsetY = 0 } = config;
+  const { shadowOffsetX = 0, shadowOffsetY = 0, type = "outer" } = config;
   return (
     <>
+      <div>
+        Type:{" "}
+        <select
+          value={type}
+          onChange={(e) => {
+            // eslint-disable-next-line @typescript-eslint/no-explicit-any
+            const value = e.target.value as any;
+            mutateConfig((draftConfig) => {
+              draftConfig.type = value;
+            });
+          }}
+        >
+          <option value="outer">Outer</option>
+          <option value="inner">Inner</option>
+        </select>
+      </div>
       <div>
         Shadow offset X:{" "}
         <input

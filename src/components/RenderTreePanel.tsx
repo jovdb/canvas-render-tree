@@ -2,18 +2,23 @@ import { IRenderItem } from "../canvas";
 import { RenderTree, TreeIndex } from "./RenderTree";
 
 interface RenderTreePanelProps {
-  items: IRenderItem[];
+  items: readonly IRenderItem[];
   editIndex: TreeIndex | undefined;
+  visibleIndexes: readonly TreeIndex[];
   onClick?(item: IRenderItem, treeIndex: TreeIndex): void;
+  onVisibilityChange?(item: IRenderItem, treeIndex: TreeIndex): void;
 }
 
 export function RenderTreePanel({
   items,
   editIndex,
+  visibleIndexes = [],
   onClick,
+  onVisibilityChange,
 }: RenderTreePanelProps) {
   function onSave() {
     console.log(JSON.stringify(items, undefined, 2));
+    alert("Saved to console");
   }
   return (
     <>
@@ -49,7 +54,15 @@ export function RenderTreePanel({
           items={items}
           parentIndexes={[]}
           editIndex={editIndex}
+          visibleIndexes={visibleIndexes}
+          selectedItems={items.filter((item) =>
+            visibleIndexes.some(
+              (visibleIndex) =>
+                JSON.stringify(visibleIndex) === JSON.stringify(item.treeIndex)
+            )
+          )}
           onClick={onClick}
+          onVisibilityChange={onVisibilityChange}
         />
       </div>
     </>
