@@ -36,49 +36,55 @@ export function engravedWoodTree() {
     ]),
     */
 
-    operations.layer([
-      operations.drawImage({ imageUrl: availableImages.wood }),
-      operations.fillColor("#0001"), // Make darker inside
-      operations.blend("multiply", [
-        operations.drawImage({ imageUrl: availableImages.noise }), // Add
-      ]),
-      operations.blend("destination-in", [
-        operations.drawImage({ imageUrl: availableImages.text }),
-      ]),
-    ]),
-    operations.shadow({
-      type: "inner",
-      shadowBlur: 2,
-      shadowOffsetX: 2,
-      shadowOffsetY: 2,
-      shadowColor: "#0004",
-    }),
-    operations.shadow({
-      type: "inner",
-      shadowBlur: 1,
-      shadowOffsetX: -1,
-      shadowOffsetY: -1,
-      shadowColor: "#fff8",
-    }),
-
     // Draw image behind text
-    operations.blend("destination-atop", [
-      operations.drawImage({ imageUrl: availableImages.wood }),
+    // operations.blend("destination-atop", [
+    operations.drawImage({ imageUrl: availableImages.wood }),
+    operations.shadow(
+      {
+        type: "inner",
+        shadowBlur: 2,
+        shadowOffsetX: 2,
+        shadowOffsetY: 2,
+        shadowColor: "#0004",
+      },
+      [
+        operations.shadow(
+          {
+            type: "inner",
+            shadowBlur: 1,
+            shadowOffsetX: -1,
+            shadowOffsetY: -1,
+            shadowColor: "#fff8",
+          },
+          [
+            operations.drawImage({ imageUrl: availableImages.wood }),
+            operations.fillColor("#0001"), // Make darker inside
+            operations.blend("multiply", [
+              operations.drawImage({ imageUrl: availableImages.noise }), // Add
+            ]),
+            operations.blend("destination-in", [
+              operations.drawImage({ imageUrl: availableImages.text }),
+            ]),
+            //
 
-      /*
-      operations.layer([
-        operations.drawImage({ imageUrl: availableImages.wood }),
-        operations.fillColor('#0002'), // Make darker inside
-        operations.blend('multiply', [
-          operations.drawImage({ imageUrl: availableImages.noise }), // Add
+            /*
+        operations.layer([
+          operations.drawImage({ imageUrl: availableImages.wood }),
+          operations.fillColor('#0002'), // Make darker inside
+          operations.blend('multiply', [
+            operations.drawImage({ imageUrl: availableImages.noise }), // Add
+          ]),
         ]),
-      ]),
-      operations.mask([
-        operations.drawImage({ imageUrl: availableImages.text }),
-      ])
-      */
-      //]),
-    ]),
+        operations.mask([
+          operations.drawImage({ imageUrl: availableImages.text }),
+        ])
+        */
+            //]),
+          ],
+        ),
+      ],
+    ),
+    // ]),
   ];
   return tree;
 }

@@ -11,12 +11,12 @@ export interface IShadowConfig {
 }
 
 /**
- * Add shadow last painted item, use a layer to appy on all
+ * Add shadow last painted item, use a layer to apply on all
  * Tip: Use a child layer to apply shadow once on complete image
  */
 export const shadow = (
   config: IShadowConfig,
-  children?: RenderTree
+  children?: RenderTree,
 ): IRenderItem => ({
   name: "shadow",
   config,
@@ -27,7 +27,7 @@ export const draw: ItemDrawFn<IShadowConfig> = (
   ctx,
   drawPrev,
   config,
-  drawChildren
+  drawChildren,
 ) => {
   const {
     type = "outer",
@@ -47,6 +47,10 @@ export const draw: ItemDrawFn<IShadowConfig> = (
     // ctx.filter = `drop-shadow(${shadowOffsetX}px ${shadowOffsetY}px ${shadowBlur}px ${shadowColor})`
   }
 
+  if (!drawChildren) {
+    throw new Error("shadow requires children");
+  }
+
   if (type === "outer") {
     drawPrev?.(ctx);
     apply(ctx);
@@ -64,8 +68,8 @@ export const draw: ItemDrawFn<IShadowConfig> = (
     dataCanvas.width = ctx.canvas.width;
     dataCanvas.height = ctx.canvas.height;
     const tempCtx = getContext2d(dataCanvas, "tempCtx");
-    if (drawChildren) drawChildren?.(tempCtx);
-    else drawPrev?.(tempCtx);
+
+    drawChildren?.(tempCtx);
 
     // 1. Create an image with transparent area for the shadow
     const invertedImageCanvas = document.createElement("canvas");
@@ -73,7 +77,7 @@ export const draw: ItemDrawFn<IShadowConfig> = (
     invertedImageCanvas.height = ctx.canvas.height;
     const invertedImageCtx = getContext2d(
       invertedImageCanvas,
-      "invertedImageCtx"
+      "invertedImageCtx",
     );
 
     invertedImageCtx.fillStyle = "#ffff"; // TODO: improve, color is visible at the edges

@@ -13,11 +13,16 @@ import { bicubicGridTree } from "./bicubic-grid";
 import { pillowTree } from "./pillow";
 import { pillow2Tree } from "./pillow2";
 import { opacityTree } from "./opacity";
+import { shadowTree } from "./shadow";
 
 export const samples = {
   opacity: {
     name: "Opacity",
     tree: opacityTree,
+  },
+  shadow: {
+    name: "Shadow",
+    tree: shadowTree,
   },
   wood: {
     name: "Engraved wood",
