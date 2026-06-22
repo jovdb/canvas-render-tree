@@ -20,7 +20,7 @@ export function pillowTree() {
 
   // Center
   deformationGrid[1][0].x += 0.3;
-  
+
   deformationGrid[1][2].x -= 0.3;
 
   // Bottom
@@ -34,13 +34,14 @@ export function pillowTree() {
 
   const tree: IRenderItem[] = [
     operations.drawImage({ imageUrl: availableImages.pillow }),
-    operations.blend("multiply"),
-    operations.layer([
-      operations.drawImage({ imageUrl: availableImages.parrot }),
-      operations.bicubicGrid({
-        controlsPoints: deformationGrid,
-        // debug: true,
-      }),
+    operations.blend("multiply", [
+      operations.layer([
+        operations.drawImage({ imageUrl: availableImages.parrot }),
+        operations.bicubicGrid({
+          controlsPoints: deformationGrid,
+          // debug: true,
+        }),
+      ]),
     ]),
   ];
   return tree;

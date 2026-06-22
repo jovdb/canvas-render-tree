@@ -8,7 +8,7 @@ export interface IBlendConfig {
 export const blend = (
   blendMode: GlobalCompositeOperation,
   /** When passed, only the children will be blended */
-  children?: RenderTree | undefined
+  children?: RenderTree | undefined,
 ): IRenderItem<IBlendConfig> => ({
   name: "blend",
   config: { blendMode },
@@ -19,13 +19,16 @@ export const draw: ItemDrawFn<IBlendConfig> = (
   ctx,
   drawPrev,
   config,
-  drawChildren
+  drawChildren,
 ) => {
   drawPrev?.(ctx);
-  if (drawChildren) ctx.save();
+  ctx.save();
   ctx.globalCompositeOperation = config.blendMode;
-  drawChildren?.(ctx);
-  if (drawChildren) ctx.restore();
+  if (!drawChildren) {
+    throw new Error("blend requires children to blend");
+  }
+  drawChildren(ctx);
+  ctx.restore();
 };
 
 addRenderer("blend", {

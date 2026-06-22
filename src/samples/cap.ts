@@ -26,8 +26,9 @@ export function capTree() {
       }),
     ]),
     operations.bevel({}),
-    operations.blend("multiply"),
-    operations.drawImage({ imageUrl: availableImages.cap }),
+    operations.blend("multiply", [
+      operations.drawImage({ imageUrl: availableImages.cap }),
+    ]),
   ];
 
   return tree;

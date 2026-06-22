@@ -8,8 +8,9 @@ export function goldFoilTree() {
 
     operations.layer([
       operations.drawImage({ imageUrl: availableImages.gold }),
-      operations.blend("destination-in"),
-      operations.drawImage({ imageUrl: availableImages.goldFoil }),
+      operations.blend("destination-in", [
+        operations.drawImage({ imageUrl: availableImages.goldFoil }),
+      ]),
     ]),
 
     operations.shadow({

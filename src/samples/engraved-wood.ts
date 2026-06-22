@@ -39,10 +39,12 @@ export function engravedWoodTree() {
     operations.layer([
       operations.drawImage({ imageUrl: availableImages.wood }),
       operations.fillColor("#0001"), // Make darker inside
-      operations.blend("multiply"),
-      operations.drawImage({ imageUrl: availableImages.noise }), // Add
-      operations.blend("destination-in"),
-      operations.drawImage({ imageUrl: availableImages.text }),
+      operations.blend("multiply", [
+        operations.drawImage({ imageUrl: availableImages.noise }), // Add
+      ]),
+      operations.blend("destination-in", [
+        operations.drawImage({ imageUrl: availableImages.text }),
+      ]),
     ]),
     operations.shadow({
       type: "inner",
@@ -60,10 +62,10 @@ export function engravedWoodTree() {
     }),
 
     // Draw image behind text
-    operations.blend("destination-atop"),
-    operations.drawImage({ imageUrl: availableImages.wood }),
+    operations.blend("destination-atop", [
+      operations.drawImage({ imageUrl: availableImages.wood }),
 
-    /*
+      /*
       operations.layer([
         operations.drawImage({ imageUrl: availableImages.wood }),
         operations.fillColor('#0002'), // Make darker inside
@@ -75,7 +77,8 @@ export function engravedWoodTree() {
         operations.drawImage({ imageUrl: availableImages.text }),
       ])
       */
-    //]),
+      //]),
+    ]),
   ];
   return tree;
 }
