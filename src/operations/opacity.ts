@@ -8,7 +8,7 @@ export interface IOpacityConfig {
 export const opacity = (
   opacity: number,
   /** When passed, only the children will have opacity */
-  children?: RenderTree | undefined
+  children?: RenderTree | undefined,
 ): IRenderItem<IOpacityConfig> => ({
   name: "opacity",
   config: { opacity },
@@ -19,13 +19,16 @@ export const draw: ItemDrawFn<IOpacityConfig> = (
   ctx,
   drawPrev,
   config,
-  drawChildren
+  drawChildren,
 ) => {
   drawPrev?.(ctx);
-  if (drawChildren) ctx.save();
+  ctx.save();
   ctx.globalAlpha = config.opacity;
+  if (!drawChildren) {
+    throw new Error("opacity requires children");
+  }
   drawChildren?.(ctx);
-  if (drawChildren) ctx.restore();
+  ctx.restore();
 };
 
 addRenderer("opacity", {
