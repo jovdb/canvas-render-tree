@@ -1,6 +1,22 @@
 import React from "react";
 import { renderers } from "./renderers";
 
+// drawText: No input
+// opacity: input
+// uvmap: input + uvmap renders
+//
+export interface OperationRenderArg {
+  description: string;
+  required: boolean;
+}
+
+export interface OperationSchema<TOperationName extends string> {
+  name: TOperationName;
+  description?: string;
+  input?: OperationRenderArg | undefined;
+  renderArgs?: OperationRenderArg[];
+}
+
 type DrawFn = (ctx: CanvasRenderingContext2D) => void;
 
 export type ItemDrawFn<TConfig = unknown> = (

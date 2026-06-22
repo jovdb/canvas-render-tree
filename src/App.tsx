@@ -1,14 +1,14 @@
 import "./App.css";
 
-import { IRenderItem } from "./canvas";
+import { IRenderItem, OperationSchema } from "./canvas";
 import { Canvas } from "./components/Canvas";
-import { useEffect, useState, useTransition } from "react";
+import { useEffect, useMemo, useState, useTransition } from "react";
 import { samples } from "./samples";
 import { produce } from "immer";
 import { RenderTreePanel } from "./components/RenderTreePanel";
 import { TreeIndex } from "./components/RenderTree";
 import { getRendererConfig } from "./configs";
-import { RenderItemName } from "./operations";
+import { RenderItemName, schemas } from "./operations";
 import "./configs/load";
 
 export function selectIndex(tree: IRenderItem[], index: TreeIndex) {
@@ -89,6 +89,13 @@ function App() {
     startTransition(() => setWorkTree(newTree));
   };
 
+  const schema = useMemo(() => {
+    if (!editItem) return undefined;
+    return (schemas as unknown as any)[editItem.name] as
+      | OperationSchema<RenderItemName>
+      | undefined;
+  }, [editItem]);
+
   return (
     <div className="app">
       <div className="app__preview">
@@ -140,13 +147,16 @@ function App() {
             }}
           />
         </div>
-        <div className="app__render-item-details">
-          <h3>Details</h3>
-          {editItem?.description && (
+        <div className="app__render-item-info">
+          <h3>Info</h3>
+          {schema?.description && (
             <div style={{ marginBottom: "1rem" }}>
-              <strong>Description:</strong> {editItem?.description}
+              <strong>Description:</strong> {schema?.description}
             </div>
           )}
+        </div>
+        <div className="app__render-item-details">
+          <h3>Details</h3>
           <ItemConfigurator
             config={editItem?.config as IRenderItem<unknown>}
             mutateConfig={onConfigChange}

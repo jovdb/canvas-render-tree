@@ -1,9 +1,21 @@
-import { IRenderItem, ItemDrawFn, RenderTree } from "../canvas";
+import {
+  IRenderItem,
+  ItemDrawFn,
+  OperationSchema,
+  RenderTree,
+} from "../canvas";
 import { addRenderer } from "../renderers";
 
 export interface IOpacityConfig {
   opacity: number;
 }
+
+export const opacitySchema: OperationSchema<"opacity"> = {
+  name: "opacity",
+  description: "Draw each child with the given opacity",
+  input: undefined,
+  renderArgs: [],
+};
 
 export const opacity = (
   opacity: number,
@@ -11,7 +23,6 @@ export const opacity = (
   children?: RenderTree | undefined,
 ): IRenderItem<IOpacityConfig> => ({
   name: "opacity",
-  description: "Draw each child with opacity",
   config: { opacity },
   children,
 });
