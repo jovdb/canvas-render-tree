@@ -11,6 +11,7 @@ export const blend = (
   children?: RenderTree | undefined,
 ): IRenderItem<IBlendConfig> => ({
   name: "blend",
+  description: "Draw each child with specified blend mode",
   config: { blendMode },
   children,
 });

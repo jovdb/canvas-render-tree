@@ -5,7 +5,7 @@ import { useQuery } from "@tanstack/react-query";
 export function Canvas({ items }: { items: IRenderItem[] }) {
   const canvasRef = useRef<HTMLCanvasElement>(null);
 
-  const { isFetching } = useQuery({
+  const { isFetching, error} = useQuery({
     queryKey: ["canvas", items],
     queryFn: async () => {
       if (!canvasRef.current) return;
@@ -18,6 +18,7 @@ export function Canvas({ items }: { items: IRenderItem[] }) {
     <>
       <canvas ref={canvasRef} width="500" height="500" className="canvas" />
       {isFetching && <div>Loading...</div>}
+      {error && <div style={{ color: "red" }}>Error: {(error as Error).message}</div>}
     </>
   );
 }

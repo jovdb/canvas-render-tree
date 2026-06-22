@@ -24,7 +24,7 @@ export function selectIndex(tree: IRenderItem[], index: TreeIndex) {
 function filterTree(
   items: readonly IRenderItem[] | undefined,
   visibleIndexes: readonly TreeIndex[],
-  parentTreeIndexes: TreeIndex = []
+  parentTreeIndexes: TreeIndex = [],
 ) {
   const newItems: IRenderItem[] = [];
 
@@ -35,7 +35,7 @@ function filterTree(
     if (
       visibleIndexes.some(
         (visibleTreeIndex) =>
-          JSON.stringify(visibleTreeIndex) === JSON.stringify(treeIndex)
+          JSON.stringify(visibleTreeIndex) === JSON.stringify(treeIndex),
       )
     ) {
       const clonedItem = {
@@ -72,7 +72,7 @@ function App() {
   const renderTree =
     workTree && visibleIndexes.length
       ? filterTree(workTree, visibleIndexes)
-      : workTree ?? [];
+      : (workTree ?? []);
   // console.log(JSON.stringify(renderTree, null, 2));
 
   // Configurator
@@ -127,11 +127,11 @@ function App() {
               setVisibleIndexes((prev) => {
                 const treeItemSTring = JSON.stringify(treeIndex);
                 const isSelected = prev.some(
-                  (treeIndex) => JSON.stringify(treeIndex) === treeItemSTring
+                  (treeIndex) => JSON.stringify(treeIndex) === treeItemSTring,
                 );
                 if (isSelected) {
                   return prev.filter(
-                    (treeIndex) => JSON.stringify(treeIndex) !== treeItemSTring
+                    (treeIndex) => JSON.stringify(treeIndex) !== treeItemSTring,
                   );
                 } else {
                   return [...prev, treeIndex];
@@ -142,6 +142,11 @@ function App() {
         </div>
         <div className="app__render-item-details">
           <h3>Details</h3>
+          {editItem?.description && (
+            <div style={{ marginBottom: "1rem" }}>
+              <strong>Description:</strong> {editItem?.description}
+            </div>
+          )}
           <ItemConfigurator
             config={editItem?.config as IRenderItem<unknown>}
             mutateConfig={onConfigChange}

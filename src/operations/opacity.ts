@@ -11,6 +11,7 @@ export const opacity = (
   children?: RenderTree | undefined,
 ): IRenderItem<IOpacityConfig> => ({
   name: "opacity",
+  description: "Draw each child with opacity",
   config: { opacity },
   children,
 });

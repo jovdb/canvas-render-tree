@@ -17,7 +17,7 @@ export type ItemDrawFn<TConfig = unknown> = (
   /**
    * Method that draws the children of this render item
    */
-  drawChildren: DrawFn | undefined
+  drawChildren: DrawFn | undefined,
 ) => void;
 
 /**
@@ -26,7 +26,7 @@ export type ItemDrawFn<TConfig = unknown> = (
  */
 export type ItemLoadFn<TConfig = unknown> = (
   /** Config of the node */
-  config: TConfig
+  config: TConfig,
 ) => Promise<void> | undefined;
 
 export interface IItemRenderer<TConfig = unknown> {
@@ -48,6 +48,9 @@ export interface IRenderItem<TConfig = unknown> {
   /** Node name */
   name: string;
 
+  /** Description of the node */
+  description?: string;
+
   /** Optional Configuration of the node */
   config?: TConfig;
 
@@ -60,36 +63,39 @@ export type RenderTree = IRenderItem<any>[];
 export type Drawable = HTMLImageElement | HTMLCanvasElement;
 
 function drawTree(items: RenderTree | undefined, _name = "") {
-  return items?.reduce((prev, item) => {
-    return (ctx) => {
-      //if (name) console.group(name, items?.length ?? 0);
-      try {
-        // eslint-disable-next-line @typescript-eslint/no-explicit-any
-        const renderer = (renderers as any)[item.name] as IItemRenderer;
-        if (renderer?.draw) {
-          renderer.draw(
-            ctx,
-            prev,
-            item.config,
-            item.children
-              ? (ctx: CanvasRenderingContext2D) =>
-                  drawTree(item.children, `${item.name}-children`)?.(ctx)
-              : undefined
-          );
-        } else {
-          // Some items don't have a render function, but add a child render tree
-          // throw new Error(`Missing render function for item '${item.name}'`);
-          // correct default implementation or better throw
-          prev?.(ctx);
-          if (item.children) {
-            drawTree(item.children, `${item.name}-children`)?.(ctx);
+  return items?.reduce(
+    (prev, item) => {
+      return (ctx) => {
+        //if (name) console.group(name, items?.length ?? 0);
+        try {
+          // eslint-disable-next-line @typescript-eslint/no-explicit-any
+          const renderer = (renderers as any)[item.name] as IItemRenderer;
+          if (renderer?.draw) {
+            renderer.draw(
+              ctx,
+              prev,
+              item.config,
+              item.children
+                ? (ctx: CanvasRenderingContext2D) =>
+                    drawTree(item.children, `${item.name}-children`)?.(ctx)
+                : undefined,
+            );
+          } else {
+            // Some items don't have a render function, but add a child render tree
+            // throw new Error(`Missing render function for item '${item.name}'`);
+            // correct default implementation or better throw
+            prev?.(ctx);
+            if (item.children) {
+              drawTree(item.children, `${item.name}-children`)?.(ctx);
+            }
           }
+        } finally {
+          //console.groupEnd();
         }
-      } finally {
-        //console.groupEnd();
-      }
-    };
-  }, undefined as unknown as DrawFn | undefined);
+      };
+    },
+    undefined as unknown as DrawFn | undefined,
+  );
 }
 
 export function loadTree(items: RenderTree | undefined) {
