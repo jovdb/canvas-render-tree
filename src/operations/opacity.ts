@@ -13,18 +13,21 @@ export interface IOpacityConfig {
 export const opacitySchema: OperationSchema<"opacity"> = {
   name: "opacity",
   description: "Draw each child with the given opacity",
-  input: undefined,
+  input: {
+    description: "This will be drawn with the given opacity",
+    required: true,
+  },
   renderArgs: [],
 };
 
 export const opacity = (
   opacity: number,
   /** When passed, only the children will have opacity */
-  children?: RenderTree | undefined,
+  input?: RenderTree | undefined,
 ): IRenderItem<IOpacityConfig> => ({
   name: "opacity",
   config: { opacity },
-  children,
+  input,
 });
 
 export const draw: ItemDrawFn<IOpacityConfig> = (
@@ -36,9 +39,6 @@ export const draw: ItemDrawFn<IOpacityConfig> = (
   drawPrev?.(ctx);
   ctx.save();
   ctx.globalAlpha = config.opacity;
-  if (!drawInput) {
-    throw new Error("opacity requires children");
-  }
   drawInput?.(ctx);
   ctx.restore();
 };

@@ -47,10 +47,6 @@ export const draw: ItemDrawFn<IShadowConfig> = (
     // ctx.filter = `drop-shadow(${shadowOffsetX}px ${shadowOffsetY}px ${shadowBlur}px ${shadowColor})`
   }
 
-  if (!drawInput) {
-    throw new Error("shadow requires children");
-  }
-
   if (type === "outer") {
     drawPrev?.(ctx);
     apply(ctx);

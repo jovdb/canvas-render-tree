@@ -5,7 +5,7 @@ import { drawText } from "./draw-text";
 import { fillColor } from "./fill-color";
 import { layer } from "./layer";
 import { mask } from "./mask";
-import { opacity, opacitySchema } from "./opacity";
+import { opacity } from "./opacity";
 import { shadow } from "./shadow";
 import { blur } from "./blur";
 import { saturation } from "./saturation";
@@ -46,7 +46,3 @@ export const operations = {
 };
 
 export type RenderItemName = keyof typeof operations;
-
-export const schemas = {
-  opacity: opacitySchema,
-};

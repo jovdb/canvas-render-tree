@@ -8,8 +8,9 @@ import { produce } from "immer";
 import { RenderTreePanel } from "./components/RenderTreePanel";
 import { TreeIndex } from "./components/RenderTree";
 import { getRendererConfig } from "./configs";
-import { RenderItemName, schemas } from "./operations";
+import { RenderItemName } from "./operations";
 import "./configs/load";
+import { schemas } from "./shemas";
 
 export function selectIndex(tree: IRenderItem[], index: TreeIndex) {
   if (index.length === 0) return undefined;
@@ -17,8 +18,12 @@ export function selectIndex(tree: IRenderItem[], index: TreeIndex) {
 
   const [nextIndex, ...restIndex] = index;
   const restTree = tree[nextIndex];
-  if (!restTree || !restTree.children) return undefined;
-  return selectIndex(restTree.children, restIndex);
+  const items = [
+    ...(restTree.args ? restTree.args.flat() : []),
+    ...(restTree.input ? restTree.input : []),
+  ];
+  if (!restTree || !items) return undefined;
+  return selectIndex(items, restIndex);
 }
 
 function filterTree(
@@ -30,7 +35,11 @@ function filterTree(
 
   items?.forEach((item, index) => {
     const treeIndex = [...parentTreeIndexes, index];
-    const children = filterTree(item.children, visibleIndexes, treeIndex);
+    const items = [
+      ...(item.args ? item.args.flat() : []),
+      ...(item.input ? item.input : []),
+    ];
+    const children = filterTree(items, visibleIndexes, treeIndex);
 
     if (
       visibleIndexes.some(

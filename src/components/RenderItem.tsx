@@ -64,7 +64,10 @@ export function RenderItem({
         </div>
       </div>
       <RenderTree
-        items={item.children}
+        items={[
+          ...(item.args ? item.args.flat() : []),
+          ...(item.input ? item.input : []),
+        ]}
         selectedItems={selectedItems}
         visibleIndexes={visibleIndexes}
         parentIndexes={treeIndex}

@@ -24,9 +24,6 @@ export const draw: ItemDrawFn<IBlendConfig> = (
   drawPrev?.(ctx);
   ctx.save();
   ctx.globalCompositeOperation = config.blendMode;
-  if (!drawChildren) {
-    throw new Error("blend requires children to blend");
-  }
   drawChildren(ctx);
   ctx.restore();
 };

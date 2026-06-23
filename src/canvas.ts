@@ -1,22 +1,6 @@
 import React from "react";
 import { renderers } from "./renderers";
 
-// drawText: No input
-// opacity: input
-// uvmap: input + uvmap renders
-//
-export interface OperationRenderArg {
-  description: string;
-  required: boolean;
-}
-
-export interface OperationSchema<TOperationName extends string> {
-  name: TOperationName;
-  description?: string;
-  input?: OperationRenderArg | undefined;
-  renderArgs?: OperationRenderArg[];
-}
-
 type DrawFn = (ctx: CanvasRenderingContext2D) => void;
 
 export type ItemDrawFn<TConfig = unknown> = (
@@ -34,7 +18,6 @@ export type ItemDrawFn<TConfig = unknown> = (
    * Method that draws the input for this render item
    */
   drawInput: DrawFn | undefined,
-
   /**
    * Method that draws args for the operation
    */
@@ -69,13 +52,15 @@ export interface IRenderItem<TConfig = unknown> {
   /** Node name */
   name: string;
 
-  /** Description of the node */
-  description?: string;
-
   /** Optional Configuration of the node */
   config?: TConfig;
 
+  // Temporary: remove
   children?: RenderTree | undefined;
+
+  input?: RenderTree | undefined;
+
+  args?: RenderTree[] | undefined;
 }
 
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
@@ -96,9 +81,15 @@ function drawTree(items: RenderTree | undefined, _name = "") {
               ctx,
               prev,
               item.config,
-              item.children
+              item.input
                 ? (ctx: CanvasRenderingContext2D) =>
-                    drawTree(item.children, `${item.name}-children`)?.(ctx)
+                    drawTree(item.input, `${item.name}-children`)?.(ctx)
+                : undefined,
+              item.args
+                ? item.args.map(
+                    (arg, index) => (ctx: CanvasRenderingContext2D) =>
+                      drawTree(arg, `${item.name}-arg-${index}`)?.(ctx),
+                  )
                 : undefined,
             );
           } else {
@@ -106,9 +97,9 @@ function drawTree(items: RenderTree | undefined, _name = "") {
             // throw new Error(`Missing render function for item '${item.name}'`);
             // correct default implementation or better throw
             prev?.(ctx);
-            if (item.children) {
-              drawTree(item.children, `${item.name}-children`)?.(ctx);
-            }
+            //if (item.children) {
+            //  drawTree(item.children, `${item.name}-children`)?.(ctx);
+            //}
           }
         } finally {
           //console.groupEnd();
@@ -134,8 +125,11 @@ export function loadTree(items: RenderTree | undefined) {
         }
       }
 
-      if (item.children) {
-        loadTreeInner(item.children);
+      if (item.input) {
+        loadTreeInner(item.input);
+      }
+      if (item.args) {
+        loadTreeInner(item.args);
       }
     });
   }

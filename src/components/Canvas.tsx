@@ -1,6 +1,7 @@
 import { useRef } from "react";
 import { draw, IRenderItem, loadTree } from "../canvas";
 import { useQuery } from "@tanstack/react-query";
+import { validateSchemas } from "../shemas";
 
 export function Canvas({ items }: { items: IRenderItem[] }) {
   const canvasRef = useRef<HTMLCanvasElement>(null);
@@ -9,6 +10,7 @@ export function Canvas({ items }: { items: IRenderItem[] }) {
     queryKey: ["canvas", items],
     queryFn: async () => {
       if (!canvasRef.current) return;
+      validateSchemas(items);
       await loadTree(items);
       draw(canvasRef.current, items);
       return null;
