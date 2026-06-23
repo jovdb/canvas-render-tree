@@ -23,7 +23,7 @@ function interpolateColor(
 
 function manipulateImageData(
   sourceContext: CanvasRenderingContext2D,
-  uvMapImageContext: CanvasRenderingContext2D
+  uvMapImageContext: CanvasRenderingContext2D,
 ) {
   // Create an offscreen canvas
   const destinationCanvas = document.createElement("canvas");
@@ -36,7 +36,7 @@ function manipulateImageData(
     0,
     0,
     destWidth,
-    destHeight
+    destHeight,
   );
 
   const sourceWidth = sourceContext.canvas.width;
@@ -45,7 +45,7 @@ function manipulateImageData(
     0,
     0,
     sourceWidth,
-    sourceHeight
+    sourceHeight,
   );
 
   const uvMapWidth = uvMapImageContext.canvas.width;
@@ -54,7 +54,7 @@ function manipulateImageData(
     0,
     0,
     uvMapWidth,
-    uvMapHeight
+    uvMapHeight,
   );
 
   // Define identity texture map colors
@@ -134,10 +134,10 @@ export const draw: ItemDrawFn<undefined> = (
   ctx,
   drawPrev,
   _config,
-  drawChildren
+  drawInput,
 ) => {
   drawPrev?.(ctx);
-  if (drawChildren) ctx.save();
+  if (drawInput) ctx.save();
 
   // Create an offscreen canvas
   const uvCanvas = document.createElement("canvas");
@@ -145,12 +145,12 @@ export const draw: ItemDrawFn<undefined> = (
   uvCanvas.height = ctx.canvas.height;
   const uvCtx = getContext2d(uvCanvas, "uvMap");
 
-  drawChildren?.(uvCtx);
+  drawInput?.(uvCtx);
 
   const imageData = manipulateImageData(ctx, uvCtx);
   //const imageData = createUVMapImageData(ctx.canvas.width, ctx.canvas.height);
   ctx.putImageData(imageData, 0, 0);
-  if (drawChildren) ctx.restore();
+  if (drawInput) ctx.restore();
   return this;
 };
 

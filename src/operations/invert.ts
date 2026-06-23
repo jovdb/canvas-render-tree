@@ -6,13 +6,13 @@ export const invert = (children: RenderTree): IRenderItem<undefined> => ({
   children,
 });
 
-export const draw: ItemDrawFn = (ctx, drawPrev, _config, drawChildren) => {
+export const draw: ItemDrawFn = (ctx, drawPrev, _config, drawInput) => {
   function apply() {
     const imageData = ctx.getImageData(
       0,
       0,
       ctx.canvas.width,
-      ctx.canvas.height
+      ctx.canvas.height,
     );
     const data = imageData.data;
 
@@ -31,10 +31,10 @@ export const draw: ItemDrawFn = (ctx, drawPrev, _config, drawChildren) => {
   }
 
   drawPrev?.(ctx);
-  if (drawChildren) ctx.save();
+  if (drawInput) ctx.save();
   apply();
-  drawChildren?.(ctx);
-  if (drawChildren) ctx.restore();
+  drawInput?.(ctx);
+  if (drawInput) ctx.restore();
 
   drawPrev?.(ctx);
 };

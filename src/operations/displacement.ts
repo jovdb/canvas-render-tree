@@ -15,13 +15,13 @@ import { addRenderer } from "../renderers";
 function applyDisplacementMap(
   srcCtx: CanvasRenderingContext2D,
   displacementCtx: CanvasRenderingContext2D,
-  strength = 10
+  strength = 10,
 ) {
   const srcImageData = srcCtx.getImageData(
     0,
     0,
     srcCtx.canvas.width,
-    srcCtx.canvas.height
+    srcCtx.canvas.height,
   );
   const srcPixels = srcImageData.data;
 
@@ -29,7 +29,7 @@ function applyDisplacementMap(
     0,
     0,
     displacementCtx.canvas.width,
-    displacementCtx.canvas.height
+    displacementCtx.canvas.height,
   );
   const displacementPixels = displacementImageData.data;
 
@@ -42,7 +42,7 @@ function applyDisplacementMap(
     0,
     0,
     destinationContext.canvas.width,
-    destinationContext.canvas.height
+    destinationContext.canvas.height,
   );
 
   for (let y = 0; y < srcCtx.canvas.height; y++) {
@@ -85,7 +85,7 @@ export interface IDisplacementConfig {
 
 export const displacement = (
   strength: number,
-  displacement: RenderTree
+  displacement: RenderTree,
 ): IRenderItem => ({
   name: "displacement",
   config: { strength },
@@ -96,11 +96,11 @@ export const draw: ItemDrawFn<IDisplacementConfig> = (
   ctx,
   drawPrev,
   config,
-  drawChildren
+  drawInput,
 ) => {
   const { strength } = config;
   drawPrev?.(ctx);
-  if (drawChildren) ctx.save();
+  if (drawInput) ctx.save();
 
   // Create an offscreen canvas
   const displacementCanvas = document.createElement("canvas");
@@ -108,12 +108,12 @@ export const draw: ItemDrawFn<IDisplacementConfig> = (
   displacementCanvas.height = ctx.canvas.height;
   const displacementCtx = getContext2d(displacementCanvas, "displacementCtx");
 
-  drawChildren?.(displacementCtx);
+  drawInput?.(displacementCtx);
 
   const imageData = applyDisplacementMap(ctx, displacementCtx, strength);
   ctx.putImageData(imageData, 0, 0);
 
-  if (drawChildren) ctx.restore();
+  if (drawInput) ctx.restore();
   return this;
 };
 

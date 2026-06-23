@@ -58,8 +58,8 @@ export function RenderTreePanel({
           selectedItems={items.filter((item) =>
             visibleIndexes.some(
               (visibleIndex) =>
-                JSON.stringify(visibleIndex) === JSON.stringify(item.treeIndex)
-            )
+                JSON.stringify(visibleIndex) === JSON.stringify(item),
+            ),
           )}
           onClick={onClick}
           onVisibilityChange={onVisibilityChange}

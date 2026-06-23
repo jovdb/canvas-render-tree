@@ -7,7 +7,7 @@ const configs: Partial<Record<RenderItemName, ItemConfigFn<any>>> = {} as const;
 export function addRendererConfig(
   name: RenderItemName,
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  rendererConfig: ItemConfigFn<any>
+  rendererConfig: ItemConfigFn<any>,
 ) {
   // Disabled for hot module reloading
   // if (configs[name as RenderItemName]) {
@@ -17,7 +17,7 @@ export function addRendererConfig(
 }
 
 export function getRendererConfig(
-  name: RenderItemName | undefined
+  name: RenderItemName | undefined,
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
 ): ItemConfigFn<any> | undefined {
   return configs[name as RenderItemName];

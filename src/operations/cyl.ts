@@ -7,7 +7,7 @@ export interface IOpacityConfig {
 
 export const cyl = (
   /** When passed, only the children will have opacity */
-  children?: RenderTree | undefined
+  children?: RenderTree | undefined,
 ): IRenderItem<IOpacityConfig> => ({
   name: "cyl",
   config: undefined,
@@ -31,7 +31,7 @@ interface ControlPoints {
 function drawCylinder(
   imageData: ImageData,
   controlPoints: ControlPoints,
-  color: [number, number, number, number] = [0, 0, 255, 255]
+  color: [number, number, number, number] = [0, 0, 255, 255],
 ): void {
   const width = imageData.width;
   const height = imageData.height;
@@ -62,7 +62,7 @@ function drawCylinder(
   function setPixel(
     x: number,
     y: number,
-    color: [number, number, number, number]
+    color: [number, number, number, number],
   ) {
     if (x < 0 || x >= width || y < 0 || y >= height) {
       return; // Out of bounds
@@ -152,11 +152,11 @@ function drawCylinder(
 export const draw: ItemDrawFn<IOpacityConfig> = (
   ctx,
   drawPrev,
-  _nameconfig,
-  drawChildren
+  _config,
+  drawInput,
 ) => {
   drawPrev?.(ctx);
-  if (drawChildren) ctx.save();
+  if (drawInput) ctx.save();
 
   const controlPoints: ControlPoints = {
     topCenter: { x: 0, y: -50, z: 0 },
@@ -170,8 +170,8 @@ export const draw: ItemDrawFn<IOpacityConfig> = (
 
   ctx.putImageData(imageData, 0, 0);
 
-  drawChildren?.(ctx);
-  if (drawChildren) ctx.restore();
+  drawInput?.(ctx);
+  if (drawInput) ctx.restore();
 };
 
 addRenderer("cyl", {

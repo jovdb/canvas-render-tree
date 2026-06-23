@@ -7,14 +7,14 @@ export interface IPerspectiveConfig {
     topLeft: Point,
     topRight: Point,
     bottomRight: Point,
-    bottomLeft: Point
+    bottomLeft: Point,
   ];
 }
 
 export const perspective = (
   config: IPerspectiveConfig,
   /** When passed, only the children will have opacity */
-  children?: RenderTree | undefined
+  children?: RenderTree | undefined,
 ): IRenderItem<IPerspectiveConfig> => ({
   name: "perspective",
   config,
@@ -34,7 +34,7 @@ function perspectiveTransform(
   sourceImageData: ImageData,
   destinationImageData: ImageData,
   srcPoints: Point[], // Four corners of the source quad
-  destPoints: Point[] // Four corners of the destination quad
+  destPoints: Point[], // Four corners of the destination quad
 ): void {
   const width = sourceImageData.width;
   const height = sourceImageData.height;
@@ -44,12 +44,12 @@ function perspectiveTransform(
   if (destWidth !== width || destHeight !== height) {
     //For simplicity dest and src have the same size
     throw new Error(
-      "Source and destination image data must have the same dimensions."
+      "Source and destination image data must have the same dimensions.",
     );
   }
   if (srcPoints.length !== 4 || destPoints.length !== 4) {
     throw new Error(
-      "Both source and destination points must have exactly 4 points (corners)."
+      "Both source and destination points must have exactly 4 points (corners).",
     );
   }
 
@@ -131,7 +131,7 @@ function perspectiveTransform(
 // Get the perspective transformation matrix (3x3 homography matrix)
 function getPerspectiveTransform(
   srcPoints: Point[],
-  destPoints: Point[]
+  destPoints: Point[],
 ): number[] {
   // Based on the OpenCV implementation and Direct Linear Transform (DLT)
   const a = [];
@@ -257,10 +257,10 @@ export const draw: ItemDrawFn<IPerspectiveConfig> = (
   ctx,
   drawPrev,
   config,
-  drawChildren
+  drawInput,
 ) => {
   drawPrev?.(ctx);
-  if (drawChildren) ctx.save();
+  if (drawInput) ctx.save();
 
   const { width, height } = ctx.canvas;
   const destinationImageData = new ImageData(width, height);
@@ -299,13 +299,13 @@ export const draw: ItemDrawFn<IPerspectiveConfig> = (
     sourceImageData,
     destinationImageData,
     srcPoints,
-    destPoints
+    destPoints,
   );
 
   ctx.putImageData(destinationImageData, 0, 0);
 
-  drawChildren?.(ctx);
-  if (drawChildren) ctx.restore();
+  drawInput?.(ctx);
+  if (drawInput) ctx.restore();
 };
 
 addRenderer("perspective", {

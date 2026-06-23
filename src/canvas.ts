@@ -31,9 +31,14 @@ export type ItemDrawFn<TConfig = unknown> = (
   config: TConfig,
 
   /**
-   * Method that draws the children of this render item
+   * Method that draws the input for this render item
    */
-  drawChildren: DrawFn | undefined,
+  drawInput: DrawFn | undefined,
+
+  /**
+   * Method that draws args for the operation
+   */
+  drawArgs?: DrawFn[] | undefined,
 ) => void;
 
 /**

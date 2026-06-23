@@ -13,7 +13,7 @@ export function pipe<TIn, TOut, T1, T2, T3, T4, T5, T6, T7, T8, T9>(
   fn7: OneArgFn<T6, T7>,
   fn8: OneArgFn<T7, T8>,
   fn9: OneArgFn<T8, T9>,
-  fn10: OneArgFn<T9, TOut>
+  fn10: OneArgFn<T9, TOut>,
 ): TOut;
 /** Execute a chain functions on a start value */
 export function pipe<TIn, TOut, T1, T2, T3, T4, T5, T6, T7, T8>(
@@ -26,7 +26,7 @@ export function pipe<TIn, TOut, T1, T2, T3, T4, T5, T6, T7, T8>(
   fn6: OneArgFn<T5, T6>,
   fn7: OneArgFn<T6, T7>,
   fn8: OneArgFn<T7, T8>,
-  fn9: OneArgFn<T8, TOut>
+  fn9: OneArgFn<T8, TOut>,
 ): TOut;
 /** Execute a chain functions on a start value */
 
@@ -39,7 +39,7 @@ export function pipe<TIn, TOut, T1, T2, T3, T4, T5, T6, T7>(
   fn5: OneArgFn<T4, T5>,
   fn6: OneArgFn<T5, T6>,
   fn7: OneArgFn<T6, T7>,
-  fn8: OneArgFn<T7, TOut>
+  fn8: OneArgFn<T7, TOut>,
 ): TOut;
 /** Execute a chain functions on a start value */
 
@@ -51,7 +51,7 @@ export function pipe<TIn, TOut, T1, T2, T3, T4, T5, T6>(
   fn4: OneArgFn<T3, T4>,
   fn5: OneArgFn<T4, T5>,
   fn6: OneArgFn<T5, T6>,
-  fn7: OneArgFn<T6, TOut>
+  fn7: OneArgFn<T6, TOut>,
 ): TOut;
 /** Execute a chain functions on a start value */
 
@@ -62,7 +62,7 @@ export function pipe<TIn, TOut, T1, T2, T3, T4, T5>(
   fn3: OneArgFn<T2, T3>,
   fn4: OneArgFn<T3, T4>,
   fn5: OneArgFn<T4, T5>,
-  fn6: OneArgFn<T5, TOut>
+  fn6: OneArgFn<T5, TOut>,
 ): TOut;
 /** Execute a chain functions on a start value */
 
@@ -72,7 +72,7 @@ export function pipe<TIn, TOut, T1, T2, T3, T4>(
   fn2: OneArgFn<T1, T2>,
   fn3: OneArgFn<T2, T3>,
   fn4: OneArgFn<T3, T4>,
-  fn5: OneArgFn<T4, TOut>
+  fn5: OneArgFn<T4, TOut>,
 ): TOut;
 /** Execute a chain functions on a start value */
 
@@ -81,7 +81,7 @@ export function pipe<TIn, TOut, T1, T2, T3>(
   fn1: OneArgFn<TIn, T1>,
   fn2: OneArgFn<T1, T2>,
   fn3: OneArgFn<T2, T3>,
-  fn4: OneArgFn<T3, TOut>
+  fn4: OneArgFn<T3, TOut>,
 ): TOut;
 /** Execute a chain functions on a start value */
 
@@ -89,13 +89,13 @@ export function pipe<TIn, TOut, T1, T2>(
   start: TIn,
   fn1: OneArgFn<TIn, T1>,
   fn2: OneArgFn<T1, T2>,
-  fn3: OneArgFn<T2, TOut>
+  fn3: OneArgFn<T2, TOut>,
 ): TOut;
 /** Execute a chain functions on a start value */
 export function pipe<TIn, TOut, T1>(
   start: TIn,
   fn1: OneArgFn<TIn, T1>,
-  fn2: OneArgFn<T1, TOut>
+  fn2: OneArgFn<T1, TOut>,
 ): TOut;
 /** Execute a chain functions on a start value */
 export function pipe<TIn, TOut>(start: TIn, fn1: OneArgFn<TIn, TOut>): TOut;

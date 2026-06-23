@@ -51,7 +51,7 @@ function applyKernel(
   imageData: ImageData,
   kernel: number[][],
   /** Extra factor to multiply */
-  multiply = 1
+  multiply = 1,
 ) {
   const width = imageData.width;
   const height = imageData.height;
@@ -108,7 +108,7 @@ interface IConvolveConfig {
  * You can wrap it in a new layer to control the input image to target
  */
 export const convolve = (
-  config: IConvolveConfig
+  config: IConvolveConfig,
 ): IRenderItem<IConvolveConfig> => ({
   name: "convolve",
   config,
@@ -127,7 +127,7 @@ export const draw: ItemDrawFn<IConvolveConfig> = (ctx, drawPrev, config) => {
       0,
       0,
       ctx.canvas.width,
-      ctx.canvas.height
+      ctx.canvas.height,
     );
     return applyKernel(imageData, kernel, multiply);
   }

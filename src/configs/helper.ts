@@ -2,11 +2,11 @@
 export function mutateProp<
   TConfig extends object,
   TPropName extends keyof TConfig,
-  TType extends TConfig[TPropName]
+  TType extends TConfig[TPropName],
 >(
   config: TConfig,
   propName: TPropName,
-  mutateConfig: (mutate: (config: Pick<TConfig, TPropName>) => void) => void
+  mutateConfig: (mutate: (config: Pick<TConfig, TPropName>) => void) => void,
 ) {
   return [
     config[propName],

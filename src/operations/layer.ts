@@ -10,7 +10,7 @@ export const layer = (children: RenderTree): IRenderItem => ({
   children,
 });
 
-export const draw: ItemDrawFn = (ctx, drawPrev, _config, drawChildren) => {
+export const draw: ItemDrawFn = (ctx, drawPrev, _config, drawInput) => {
   drawPrev?.(ctx);
 
   // Create an offscreen canvas
@@ -20,7 +20,7 @@ export const draw: ItemDrawFn = (ctx, drawPrev, _config, drawChildren) => {
   const childCtx = getContext2d(canvas, "layerCtx");
 
   // Draw children on the offscreen canvas
-  drawChildren?.(childCtx);
+  drawInput?.(childCtx);
 
   // Draw new children context on the parent context
   ctx.drawImage(canvas, 0, 0, ctx.canvas.width, ctx.canvas.height);

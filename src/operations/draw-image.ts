@@ -35,7 +35,7 @@ export const draw: ItemDrawFn<IDrawImageConfig> = (ctx, drawPrev, config) => {
       targetRect ? targetRect[0] : 0,
       targetRect ? targetRect[1] : 0,
       targetRect ? targetRect[2] : ctx.canvas.width,
-      targetRect ? targetRect[3] : ctx.canvas.height
+      targetRect ? targetRect[3] : ctx.canvas.height,
     );
   }
 };

@@ -54,13 +54,13 @@ function blendColors(color1: RGBA, color2: RGBA): RGBA {
 
   // Calculate the resulting color components
   const outR = Math.round(
-    (r1 * alpha1 + r2 * alpha2 * (1 - alpha1)) / outAlpha
+    (r1 * alpha1 + r2 * alpha2 * (1 - alpha1)) / outAlpha,
   );
   const outG = Math.round(
-    (g1 * alpha1 + g2 * alpha2 * (1 - alpha1)) / outAlpha
+    (g1 * alpha1 + g2 * alpha2 * (1 - alpha1)) / outAlpha,
   );
   const outB = Math.round(
-    (b1 * alpha1 + b2 * alpha2 * (1 - alpha1)) / outAlpha
+    (b1 * alpha1 + b2 * alpha2 * (1 - alpha1)) / outAlpha,
   );
 
   // Return the blended color as an RGBA byte array
@@ -72,7 +72,7 @@ function getPixelValue(
   imageData: ImageData,
   x: number,
   y: number,
-  kernel: number[][]
+  kernel: number[][],
 ) {
   const width = imageData.width;
   const height = imageData.height;
@@ -123,7 +123,7 @@ export interface IBevelConfig {
  * You can wrap it in a new layer to control bevel
  */
 export const bevel = (
-  config: IBevelConfig = {}
+  config: IBevelConfig = {},
 ): IRenderItem<IBevelConfig> => ({
   name: "bevel",
   config,
@@ -142,7 +142,7 @@ export const draw: ItemDrawFn<IBevelConfig> = (ctx, drawPrev, config) => {
   const highlightKernel = gaussianBlurKernel(
     Math.round(bevelSize * 0.8),
     bevelSize * 0.3,
-    -0.5
+    -0.5,
   );
 
   const shadowKernel = gaussianBlurKernel(bevelSize, bevelSize / 3, 0.5);

@@ -67,7 +67,7 @@ export interface ISaturationConfig {
 /** Pass 0 for grayscale */
 export const saturation = (
   config: ISaturationConfig = {},
-  children: RenderTree
+  children: RenderTree,
 ): IRenderItem<ISaturationConfig> => ({
   name: "saturation",
   config,
@@ -78,7 +78,7 @@ export const draw: ItemDrawFn<ISaturationConfig> = (
   ctx,
   drawPrev,
   config,
-  drawChildren
+  drawInput,
 ) => {
   const { factor = 0 } = config;
 
@@ -87,7 +87,7 @@ export const draw: ItemDrawFn<ISaturationConfig> = (
       0,
       0,
       ctx.canvas.width,
-      ctx.canvas.height
+      ctx.canvas.height,
     );
     const data = imageData.data;
 
@@ -115,10 +115,10 @@ export const draw: ItemDrawFn<ISaturationConfig> = (
   }
 
   drawPrev?.(ctx);
-  if (drawChildren) ctx.save();
+  if (drawInput) ctx.save();
   apply();
-  drawChildren?.(ctx);
-  if (drawChildren) ctx.restore();
+  drawInput?.(ctx);
+  if (drawInput) ctx.restore();
 };
 
 addRenderer("saturation", {

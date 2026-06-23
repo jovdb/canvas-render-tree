@@ -4,13 +4,15 @@ export function loadImageAsync(url: string) {
     image.onload = () => resolve(image);
     image.onerror = () =>
       reject(
-        new Error(`Error loading image: '${url ? url.substring(0, 100) : url}'`)
+        new Error(
+          `Error loading image: '${url ? url.substring(0, 100) : url}'`,
+        ),
       );
     image.onabort = () =>
       reject(
         new Error(
-          `Loading image aborted: '${url ? url.substring(0, 100) : url}'`
-        )
+          `Loading image aborted: '${url ? url.substring(0, 100) : url}'`,
+        ),
       );
     image.src = url;
   });

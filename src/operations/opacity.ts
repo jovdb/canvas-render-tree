@@ -31,15 +31,15 @@ export const draw: ItemDrawFn<IOpacityConfig> = (
   ctx,
   drawPrev,
   config,
-  drawChildren,
+  drawInput,
 ) => {
   drawPrev?.(ctx);
   ctx.save();
   ctx.globalAlpha = config.opacity;
-  if (!drawChildren) {
+  if (!drawInput) {
     throw new Error("opacity requires children");
   }
-  drawChildren?.(ctx);
+  drawInput?.(ctx);
   ctx.restore();
 };
 

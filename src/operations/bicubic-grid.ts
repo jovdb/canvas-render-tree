@@ -14,7 +14,7 @@ interface Vector {
 function deformImage(
   imageData: ImageData,
   /** Normalized control points */
-  controlPoints: Point[][]
+  controlPoints: Point[][],
 ): ImageData {
   const { width, height } = imageData;
   const rows = controlPoints.length;
@@ -63,7 +63,7 @@ function deformImage(
         srcY,
         width,
         height,
-        edgeSubPixelSize
+        edgeSubPixelSize,
       );
 
       // Sample source pixel
@@ -87,7 +87,7 @@ function createDisplacementGrid(
   displacements: Vector[][],
   i: number,
   j: number,
-  component: "dx" | "dy"
+  component: "dx" | "dy",
 ): number[][] {
   const grid: number[][] = [];
   for (let dj = -1; dj <= 2; dj++) {
@@ -105,7 +105,7 @@ function createDisplacementGrid(
 function bicubicInterpolate(
   values: number[][],
   tx: number,
-  ty: number
+  ty: number,
 ): number {
   // Interpolate rows first
   const rowResults = values.map((row) => cubicInterpolate(row, tx));
@@ -125,6 +125,7 @@ function cubicInterpolate(values: number[], t: number): number {
 }
 
 // pixelated
+/*
 function sampleRound(imageData: ImageData, x: number, y: number) {
   if (x < 0 || x >= imageData.width || y < 0 || y >= imageData.height) {
     return new Uint8ClampedArray([0, 0, 0, 0]);
@@ -140,11 +141,12 @@ function sampleRound(imageData: ImageData, x: number, y: number) {
     imageData.data[(ry * imageData.width + rx) * 4 + 3],
   ]);
 }
+*/
 
 function sampleBicubic(
   imageData: ImageData,
   x: number,
-  y: number
+  y: number,
 ): Uint8ClampedArray {
   const x0 = Math.floor(x) - 1;
   const y0 = Math.floor(y) - 1;
@@ -189,7 +191,7 @@ function calculatePixelTransparency(
   y: number,
   width: number,
   height: number,
-  margin = 1
+  margin = 1,
 ): number {
   // Horizontal coverage (left/right edges)
   const left = x < 0 ? smoothstep(-margin, 0, x) : 1;
@@ -213,11 +215,11 @@ function calculatePixelTransparency(
 function smoothstep(
   startRange: number,
   endRange: number,
-  value: number
+  value: number,
 ): number {
   const t = Math.max(
     0,
-    Math.min(1, (value - startRange) / (endRange - startRange))
+    Math.min(1, (value - startRange) / (endRange - startRange)),
   );
   // Cubic polynomial
   return t * t * (3 - 2 * t);
@@ -231,7 +233,7 @@ export function createOriginalGrid(
   rows: number,
   cols: number,
   width = 1,
-  height = 1
+  height = 1,
 ): Point[][] {
   const grid: Point[][] = [];
   for (let j = 0; j < rows; j++) {
@@ -249,7 +251,7 @@ export function createOriginalGrid(
 
 function calculateDisplacements(
   original: Point[][],
-  deformed: Point[][]
+  deformed: Point[][],
 ): Vector[][] {
   const displacements: Vector[][] = [];
   for (let j = 0; j < original.length; j++) {
@@ -269,7 +271,7 @@ function setPixel(
   imageData: ImageData,
   x: number,
   y: number,
-  pixel: Uint8ClampedArray
+  pixel: Uint8ClampedArray,
 ) {
   const i = (y * imageData.width + x) * 4;
   imageData.data.set(pixel, i);
@@ -279,7 +281,7 @@ function drawControlPointDisplacement(
   ctx: CanvasRenderingContext2D,
   point1: Point,
   point2: Point,
-  radius = 5
+  radius = 5,
 ) {
   ctx.save(); // Save current canvas state
 
@@ -302,7 +304,7 @@ function drawControlPointDisplacement(
     point1.y * ctx.canvas.height,
     radius,
     0,
-    Math.PI * 2
+    Math.PI * 2,
   ); // Draw circle at control point
   ctx.fill();
   ctx.stroke();
@@ -315,7 +317,7 @@ function drawControlPointDisplacement(
     point2.y * ctx.canvas.height,
     radius,
     0,
-    Math.PI * 2
+    Math.PI * 2,
   ); // Draw circle at control point
   ctx.fill();
   ctx.stroke();
@@ -330,7 +332,7 @@ export interface IBicubicGridConfig {
 }
 
 export const bicubicGrid = (
-  config: IBicubicGridConfig
+  config: IBicubicGridConfig,
 ): IRenderItem<IBicubicGridConfig> => ({
   name: "bicubicGrid",
   config: config,
@@ -340,10 +342,10 @@ export const draw: ItemDrawFn<IBicubicGridConfig> = (
   ctx,
   drawPrev,
   config,
-  drawChildren
+  drawInput,
 ) => {
   drawPrev?.(ctx);
-  if (drawChildren) ctx.save();
+  if (drawInput) ctx.save();
 
   const imageData = ctx.getImageData(0, 0, ctx.canvas.width, ctx.canvas.height);
   const newImageData = deformImage(imageData, config.controlsPoints);
@@ -359,14 +361,14 @@ export const draw: ItemDrawFn<IBicubicGridConfig> = (
         drawControlPointDisplacement(
           ctx,
           originalGrid[j][i],
-          config.controlsPoints[j][i]
+          config.controlsPoints[j][i],
         );
       }
     }
   }
 
-  drawChildren?.(ctx);
-  if (drawChildren) ctx.restore();
+  drawInput?.(ctx);
+  if (drawInput) ctx.restore();
 };
 
 addRenderer("bicubicGrid", {

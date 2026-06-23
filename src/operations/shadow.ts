@@ -27,7 +27,7 @@ export const draw: ItemDrawFn<IShadowConfig> = (
   ctx,
   drawPrev,
   config,
-  drawChildren,
+  drawInput,
 ) => {
   const {
     type = "outer",
@@ -47,14 +47,14 @@ export const draw: ItemDrawFn<IShadowConfig> = (
     // ctx.filter = `drop-shadow(${shadowOffsetX}px ${shadowOffsetY}px ${shadowBlur}px ${shadowColor})`
   }
 
-  if (!drawChildren) {
+  if (!drawInput) {
     throw new Error("shadow requires children");
   }
 
   if (type === "outer") {
     drawPrev?.(ctx);
     apply(ctx);
-    drawChildren?.(ctx);
+    drawInput?.(ctx);
     return;
   } else if (type === "inner") {
     // How to draw inner canvas:
@@ -69,7 +69,7 @@ export const draw: ItemDrawFn<IShadowConfig> = (
     dataCanvas.height = ctx.canvas.height;
     const tempCtx = getContext2d(dataCanvas, "tempCtx");
 
-    drawChildren?.(tempCtx);
+    drawInput?.(tempCtx);
 
     // 1. Create an image with transparent area for the shadow
     const invertedImageCanvas = document.createElement("canvas");

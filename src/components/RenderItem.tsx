@@ -15,7 +15,7 @@ export function RenderItem({
 }: {
   item: IRenderItem;
   selectedItems?: readonly IRenderItem[];
-  visibleIndexes?: TreeIndex[];
+  visibleIndexes?: readonly TreeIndex[];
   /** Tree index of this item */
   treeIndex: TreeIndex;
   /** Tree index of the item selected for editing */
@@ -25,9 +25,12 @@ export function RenderItem({
 }) {
   // const isSelected = selectedItems.includes(item);
   const isSelected = treeIndex.join() === editIndex?.join();
-  const isVisible = !visibleIndexes?.length || visibleIndexes.some(
-    (visibleIndex) => JSON.stringify(visibleIndex) === JSON.stringify(treeIndex)
-  );
+  const isVisible =
+    !visibleIndexes?.length ||
+    visibleIndexes.some(
+      (visibleIndex) =>
+        JSON.stringify(visibleIndex) === JSON.stringify(treeIndex),
+    );
   return (
     <>
       <div
@@ -39,8 +42,8 @@ export function RenderItem({
       >
         <span
           className="render-item__visibility"
-          onClick={(e) => {
-           // e.stopPropagation();
+          onClick={() => {
+            // e.stopPropagation();
             onVisibilityChange?.(item, treeIndex);
             onClick?.(item, treeIndex);
           }}

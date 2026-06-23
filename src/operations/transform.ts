@@ -11,7 +11,7 @@ export interface ITransformConfig {
 
 export const transform = (
   config: ITransformConfig,
-  children: RenderTree
+  children: RenderTree,
 ): IRenderItem => ({
   name: "transform",
   config,
@@ -22,7 +22,7 @@ export const draw: ItemDrawFn<ITransformConfig> = (
   ctx,
   drawPrev,
   config,
-  drawChildren
+  drawInput,
 ) => {
   const {
     translateX,
@@ -43,10 +43,10 @@ export const draw: ItemDrawFn<ITransformConfig> = (
   }
 
   drawPrev?.(ctx);
-  if (drawChildren) ctx.save();
+  if (drawInput) ctx.save();
   apply();
-  drawChildren?.(ctx);
-  if (drawChildren) ctx.restore();
+  drawInput?.(ctx);
+  if (drawInput) ctx.restore();
 };
 
 addRenderer("transform", {

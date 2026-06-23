@@ -74,7 +74,7 @@ export function embossKernel() {
   ];
 }
 
-/** Horizontal Edge detection */  
+/** Horizontal Edge detection */
 export function sobelHKernel() {
   return [
     [-1 / 8, 0, 1 / 8],

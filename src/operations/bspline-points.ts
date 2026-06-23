@@ -11,14 +11,14 @@ const math = {
 
   multiply: (
     a: number[][] | number[],
-    b: number[][] | number[]
+    b: number[][] | number[],
   ): number[] | number[][] => {
     // Handle matrix-vector multiplication
     if (Array.isArray(a[0]) && !Array.isArray(b[0])) {
       const matrix = a as number[][];
       const vector = b as number[];
       return matrix.map((row) =>
-        row.reduce((sum, val, i) => sum + val * (vector[i] || 0), 0)
+        row.reduce((sum, val, i) => sum + val * (vector[i] || 0), 0),
       );
     }
 
@@ -28,8 +28,8 @@ const math = {
       const bMat = math.transpose(b as number[][]);
       return aMat.map((row) =>
         bMat.map((col) =>
-          row.reduce((sum, val, i) => sum + val * (col[i] || 0), 0)
-        )
+          row.reduce((sum, val, i) => sum + val * (col[i] || 0), 0),
+        ),
       );
     }
 
@@ -106,7 +106,7 @@ class BSplinePointsWarper {
   constructor(
     imageWidth: number,
     imageHeight: number,
-    gridDensity: number = 10
+    gridDensity: number = 10,
   ) {
     this.gridWidth = Math.ceil(imageWidth / gridDensity) + 3;
     this.gridHeight = Math.ceil(imageHeight / gridDensity) + 3;
@@ -117,7 +117,7 @@ class BSplinePointsWarper {
 
   private createControlGrid(): Vector[][] {
     return Array.from({ length: this.gridHeight }, () =>
-      Array.from({ length: this.gridWidth }, () => ({ dx: 0, dy: 0 }))
+      Array.from({ length: this.gridWidth }, () => ({ dx: 0, dy: 0 })),
     );
   }
 
@@ -130,7 +130,7 @@ class BSplinePointsWarper {
 
   private getWeights(
     x: number,
-    y: number
+    y: number,
   ): { indices: [number, number][]; weights: number[] } {
     const gridX = Math.floor(x / this.cellSizeX);
     const gridY = Math.floor(y / this.cellSizeY);
@@ -159,7 +159,7 @@ class BSplinePointsWarper {
   public solveCorrespondences(
     pointsA: Point[],
     pointsB: Point[],
-    lambda: number = 0.1
+    lambda: number = 0.1,
   ) {
     // Build linear system
     const A: number[][] = [];
@@ -209,7 +209,8 @@ class BSplinePointsWarper {
     const At = math.transpose(A);
     const AtA = math.multiply(At, A);
     const Atb = math.multiply(At, b);
-    return math.lusolve(AtA, Atb) as number[];
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    return math.lusolve(AtA as any, Atb as any) as number[];
   }
 
   public warpImage(source: ImageData): ImageData {
@@ -246,7 +247,7 @@ class BSplinePointsWarper {
   private bicubicInterpolate(
     image: ImageData,
     srcX: number,
-    srcY: number
+    srcY: number,
   ): Uint8ClampedArray {
     const x0 = Math.floor(srcX);
     const y0 = Math.floor(srcY);
@@ -315,7 +316,7 @@ function drawControlPoint(
   ctx: CanvasRenderingContext2D,
   point1: Point,
   point2: Point,
-  radius = 5
+  radius = 5,
 ) {
   ctx.save(); // Save current canvas state
 
@@ -345,7 +346,7 @@ function drawControlPoint(
 }
 
 export const bSplinePoints = (
-  config: IBSplinePointsConfig = {}
+  config: IBSplinePointsConfig = {},
 ): IRenderItem => ({
   name: "bSplinePoints",
   config,
@@ -355,23 +356,23 @@ export const draw: ItemDrawFn<IBSplinePointsConfig> = (
   ctx,
   drawPrev,
   config,
-  drawChildren
+  drawInput,
 ) => {
   drawPrev?.(ctx);
-  if (drawChildren) ctx.save();
-  drawChildren?.(ctx);
+  if (drawInput) ctx.save();
+  drawInput?.(ctx);
 
   const originalData = ctx.getImageData(
     0,
     0,
     ctx.canvas.width,
-    ctx.canvas.height
+    ctx.canvas.height,
   );
 
   const warper = new BSplinePointsWarper(
     ctx.canvas.width,
     ctx.canvas.height,
-    20
+    20,
   );
 
   // Define correspondences
@@ -399,7 +400,7 @@ export const draw: ItemDrawFn<IBSplinePointsConfig> = (
     drawControlPoint(ctx, pointsB[index], pointsA[index]);
   });
 
-  if (drawChildren) ctx.restore();
+  if (drawInput) ctx.restore();
 };
 
 addRenderer("bSplinePoints", {

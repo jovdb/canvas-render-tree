@@ -25,4 +25,3 @@ export function withCache<TResult>(options: {
     } as TFn;
   };
 }
-
