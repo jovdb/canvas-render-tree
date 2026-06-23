@@ -358,7 +358,9 @@ export const draw: ItemDrawFn<IBSplinePointsConfig> = (
   config,
   drawInput,
 ) => {
+  // first draw previous items
   drawPrev?.(ctx);
+
   if (drawInput) ctx.save();
   drawInput?.(ctx);
 

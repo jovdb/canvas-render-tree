@@ -13,7 +13,9 @@ export const fillColor = (color = "#FFF"): IRenderItem<IFillColorConfig> => ({
 });
 
 export const draw: ItemDrawFn<IFillColorConfig> = (ctx, drawPrev, config) => {
+  // first draw previous items
   drawPrev?.(ctx);
+
   ctx.fillStyle = config.color;
   ctx.fillRect(0, 0, ctx.canvas.width, ctx.canvas.height);
 };

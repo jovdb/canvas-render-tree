@@ -344,7 +344,9 @@ export const draw: ItemDrawFn<IBicubicGridConfig> = (
   config,
   drawInput,
 ) => {
+  // first draw previous items
   drawPrev?.(ctx);
+
   if (drawInput) ctx.save();
 
   const imageData = ctx.getImageData(0, 0, ctx.canvas.width, ctx.canvas.height);

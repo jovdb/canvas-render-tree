@@ -35,9 +35,11 @@ export const blur = (config: IBlurConfig = {}): IRenderItem<IBlurConfig> => ({
 });
 
 export const draw: ItemDrawFn<IBlurConfig> = (ctx, drawPrev, config) => {
+  // first draw previous items
+  drawPrev?.(ctx);
+
   const { radius = 5, sigma = 2 } = config;
 
-  drawPrev?.(ctx);
   const imageData = ctx.getImageData(0, 0, ctx.canvas.width, ctx.canvas.height);
   const data = imageData.data;
   const width = imageData.width;

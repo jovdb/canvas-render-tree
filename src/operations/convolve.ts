@@ -115,13 +115,16 @@ export const convolve = (
 });
 
 export const draw: ItemDrawFn<IConvolveConfig> = (ctx, drawPrev, config) => {
+  // first draw previous items
+  drawPrev?.(ctx);
+
   const {
     kernel,
     debugKernel = false,
     normalize = false,
     multiply = 1,
   } = config;
-  drawPrev?.(ctx);
+
   function getBevelData() {
     const imageData = ctx.getImageData(
       0,

@@ -24,6 +24,9 @@ export const draw: ItemDrawFn<ITransformConfig> = (
   config,
   drawInput,
 ) => {
+  // first draw previous items
+  drawPrev?.(ctx);
+
   const {
     translateX,
     translateY,
@@ -42,7 +45,6 @@ export const draw: ItemDrawFn<ITransformConfig> = (
       ctx.translate(translateX ?? 0, translateY ?? 0);
   }
 
-  drawPrev?.(ctx);
   if (drawInput) ctx.save();
   apply();
   drawInput?.(ctx);

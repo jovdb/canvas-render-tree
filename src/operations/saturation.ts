@@ -80,6 +80,9 @@ export const draw: ItemDrawFn<ISaturationConfig> = (
   config,
   drawInput,
 ) => {
+  // first draw previous items
+  drawPrev?.(ctx);
+
   const { factor = 0 } = config;
 
   function apply() {
@@ -114,7 +117,6 @@ export const draw: ItemDrawFn<ISaturationConfig> = (
     ctx.putImageData(imageData, 0, 0);
   }
 
-  drawPrev?.(ctx);
   if (drawInput) ctx.save();
   apply();
   drawInput?.(ctx);

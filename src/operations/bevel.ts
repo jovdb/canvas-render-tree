@@ -147,7 +147,9 @@ export const draw: ItemDrawFn<IBevelConfig> = (ctx, drawPrev, config) => {
 
   const shadowKernel = gaussianBlurKernel(bevelSize, bevelSize / 3, 0.5);
 
+  // first draw previous items
   drawPrev?.(ctx);
+
   if (debugKernel) {
     drawKernel(ctx, highlightKernel);
     return;

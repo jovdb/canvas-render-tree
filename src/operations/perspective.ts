@@ -259,7 +259,9 @@ export const draw: ItemDrawFn<IPerspectiveConfig> = (
   config,
   drawInput,
 ) => {
+  // first draw previous items
   drawPrev?.(ctx);
+
   if (drawInput) ctx.save();
 
   const { width, height } = ctx.canvas;

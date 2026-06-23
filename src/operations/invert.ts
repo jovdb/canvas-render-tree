@@ -7,6 +7,9 @@ export const invert = (input: RenderTree): IRenderItem<undefined> => ({
 });
 
 export const draw: ItemDrawFn = (ctx, drawPrev, _config, drawInput) => {
+  // first draw previous items
+  drawPrev?.(ctx);
+
   function apply() {
     const imageData = ctx.getImageData(
       0,
@@ -30,7 +33,6 @@ export const draw: ItemDrawFn = (ctx, drawPrev, _config, drawInput) => {
     ctx.putImageData(imageData, 0, 0);
   }
 
-  drawPrev?.(ctx);
   if (drawInput) ctx.save();
   apply();
   drawInput?.(ctx);

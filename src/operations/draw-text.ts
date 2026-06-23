@@ -19,6 +19,9 @@ export const drawText = (config: IDrawTextConfig): IRenderItem => ({
 });
 
 export const draw: ItemDrawFn<IDrawTextConfig> = (ctx, drawPrev, config) => {
+  // first draw previous items
+  drawPrev?.(ctx);
+
   const {
     text,
     foregroundColor = "#000",
@@ -29,7 +32,7 @@ export const draw: ItemDrawFn<IDrawTextConfig> = (ctx, drawPrev, config) => {
     x = 0,
     y = 0,
   } = config;
-  drawPrev?.(ctx);
+
   ctx.fillStyle = foregroundColor;
   ctx.font = `${isBold ? "bold" : ""} ${
     isItalic ? "italic" : ""

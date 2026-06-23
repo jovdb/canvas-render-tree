@@ -136,7 +136,9 @@ export const draw: ItemDrawFn<undefined> = (
   _config,
   drawInput,
 ) => {
+  // first draw previous items
   drawPrev?.(ctx);
+
   if (drawInput) ctx.save();
 
   // Create an offscreen canvas

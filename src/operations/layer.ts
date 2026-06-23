@@ -11,6 +11,7 @@ export const layer = (input: RenderTree): IRenderItem => ({
 });
 
 export const draw: ItemDrawFn = (ctx, drawPrev, _config, drawInput) => {
+  // first draw previous items
   drawPrev?.(ctx);
 
   // Create an offscreen canvas

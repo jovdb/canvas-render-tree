@@ -155,7 +155,9 @@ export const draw: ItemDrawFn<IOpacityConfig> = (
   _config,
   drawInput,
 ) => {
+  // first draw previous items
   drawPrev?.(ctx);
+
   if (drawInput) ctx.save();
 
   const controlPoints: ControlPoints = {

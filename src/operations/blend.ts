@@ -21,7 +21,9 @@ export const draw: ItemDrawFn<IBlendConfig> = (
   config,
   drawChildren,
 ) => {
+  // first draw previous items
   drawPrev?.(ctx);
+
   ctx.save();
   ctx.globalCompositeOperation = config.blendMode;
   drawChildren(ctx);

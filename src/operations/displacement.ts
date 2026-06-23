@@ -98,8 +98,10 @@ export const draw: ItemDrawFn<IDisplacementConfig> = (
   config,
   drawInput,
 ) => {
-  const { strength } = config;
+  // first draw previous items
   drawPrev?.(ctx);
+
+  const { strength } = config;
   if (drawInput) ctx.save();
 
   // Create an offscreen canvas

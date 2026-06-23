@@ -25,9 +25,10 @@ const imageCache = new Map<
 >();
 
 export const draw: ItemDrawFn<IDrawImageConfig> = (ctx, drawPrev, config) => {
-  const { imageUrl, sourceRect, targetRect } = config;
-
+  // first draw previous items
   drawPrev?.(ctx);
+
+  const { imageUrl, sourceRect, targetRect } = config;
 
   const image = imageCache.get(imageUrl);
   if (image instanceof HTMLImageElement) {
