@@ -21,13 +21,14 @@
 
 .app__render-tree {
   flex-grow: 1;
-  height: 50%;
+  height: 40%;
   padding: 0.5rem;
   overflow-y: auto;
 }
 
 .app__render-item-info,
-.app__render-item-details {
+.app__render-item-details,
+.app__render-item-json {
   flex-grow: 1;
   border-top: 1px solid #888;
   padding: 0.5rem;
@@ -39,7 +40,13 @@
 }
 
 .app__render-item-details {
-  height: 30%;
+  height: 15%;
+  overflow-y: auto;
+}
+
+.app__render-item-json {
+  height: 25%;
+  overflow-y: auto;
 }
 
 .canvas {

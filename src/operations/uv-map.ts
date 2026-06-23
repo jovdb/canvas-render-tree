@@ -124,9 +124,9 @@ function createUVMapImageData(width: number, height: number): ImageData {
 }
 */
 
-export const uvMap = (strength: number, uv: RenderTree): IRenderItem => ({
+export const uvMap = (uv: RenderTree): IRenderItem => ({
   name: "uvMap",
-  config: { strength },
+  config: {},
   input: uv,
 });
 

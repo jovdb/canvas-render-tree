@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useState } from "react";
 import { ItemConfigFn } from "../canvas";
 import { RenderItemName } from "../operations";
 
@@ -23,23 +23,21 @@ export function getRendererConfig(
 ): ItemConfigFn<any> | undefined {
   if (!name) return undefined;
   const configComponent = configs[name as RenderItemName];
-  return configComponent ?? JsonConfig;
+  return configComponent;
 }
 
-export const JsonConfig: ItemConfigFn<object> = ({ config, mutateConfig }) => {
-  const [value, setValue] = useState(JSON.stringify(config, null, 2));
+export const JsonConfig: ItemConfigFn<unknown> = ({ config, mutateConfig }) => {
   const [error, setError] = useState("");
-
   return (
     <form
       onSubmit={(e) => {
         e.preventDefault();
         // Get value of textarea
-        const value = (e.target as HTMLFormElement).elements.namedItem(
+        const textAreaEl = (e.target as HTMLFormElement).elements.namedItem(
           "json",
         ) as HTMLTextAreaElement;
         try {
-          const parsed = JSON.parse(value.value);
+          const parsed = JSON.parse(textAreaEl.value);
           mutateConfig((config) => Object.assign(config, parsed));
           setError("");
         } catch (err) {
@@ -48,7 +46,6 @@ export const JsonConfig: ItemConfigFn<object> = ({ config, mutateConfig }) => {
         }
       }}
     >
-      <strong>JSON:</strong>{" "}
       <button type="submit" style={{ marginBottom: "10px" }}>
         Update
       </button>
@@ -56,11 +53,8 @@ export const JsonConfig: ItemConfigFn<object> = ({ config, mutateConfig }) => {
       <span style={{ color: "red" }}>{error}</span>
       <textarea
         name="json"
-        style={{ fontFamily: "monospace", width: "100%", height: "200px" }}
-        value={value}
-        onChange={(e) => {
-          setValue(e.target.value);
-        }}
+        style={{ fontFamily: "monospace", width: "100%", height: "150px" }}
+        defaultValue={JSON.stringify(config, null, 2)}
       />
     </form>
   );

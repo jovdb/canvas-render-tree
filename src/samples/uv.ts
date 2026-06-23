@@ -5,7 +5,7 @@ import { availableImages } from "../resources";
 export function uvTree() {
   const tree: IRenderItem[] = [
     operations.drawImage({ imageUrl: availableImages.checkerboard }),
-    operations.uvMap(20, [
+    operations.uvMap([
       operations.drawImage({ imageUrl: availableImages.uvMap2 }),
     ]),
   ];

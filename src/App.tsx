@@ -1,16 +1,16 @@
 import "./App.css";
 
-import { IRenderItem, OperationSchema } from "./canvas";
+import { IRenderItem } from "./canvas";
 import { Canvas } from "./components/Canvas";
 import { useEffect, useMemo, useState, useTransition } from "react";
 import { samples } from "./samples";
 import { produce } from "immer";
 import { RenderTreePanel } from "./components/RenderTreePanel";
 import { TreeIndex } from "./components/RenderTree";
-import { getRendererConfig } from "./configs";
+import { getRendererConfig, JsonConfig } from "./configs";
 import { RenderItemName } from "./operations";
 import "./configs/load";
-import { schemas } from "./shemas";
+import { schemas, OperationSchema } from "./shemas";
 
 export function selectIndex(tree: IRenderItem[], index: TreeIndex) {
   if (index.length === 0) return undefined;
@@ -170,6 +170,16 @@ function App() {
             config={editItem?.config as IRenderItem<unknown>}
             mutateConfig={onConfigChange}
           />
+        </div>
+        <div className="app__render-item-json">
+          <h3>JSON</h3>
+          {editItem && (
+            <JsonConfig
+              key={JSON.stringify(editItem?.config)}
+              config={editItem?.config as IRenderItem<unknown>}
+              mutateConfig={onConfigChange}
+            />
+          )}
         </div>
       </div>
     </div>

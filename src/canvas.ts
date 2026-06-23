@@ -56,7 +56,7 @@ export interface IRenderItem<TConfig = unknown> {
   config?: TConfig;
 
   // Temporary: remove
-  input?: RenderTree | undefined;
+  children?: RenderTree | undefined;
 
   input?: RenderTree | undefined;
 
@@ -129,7 +129,8 @@ export function loadTree(items: RenderTree | undefined) {
         loadTreeInner(item.input);
       }
       if (item.args) {
-        loadTreeInner(item.args);
+        // TODO
+        // // loadTreeInner(item.args);
       }
     });
   }

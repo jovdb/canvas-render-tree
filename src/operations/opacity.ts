@@ -1,10 +1,6 @@
-import {
-  IRenderItem,
-  ItemDrawFn,
-  OperationSchema,
-  RenderTree,
-} from "../canvas";
+import { IRenderItem, ItemDrawFn, RenderTree } from "../canvas";
 import { addRenderer } from "../renderers";
+import { OperationSchema } from "../shemas";
 
 export interface IOpacityConfig {
   opacity: number;
