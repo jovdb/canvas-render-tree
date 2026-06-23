@@ -1,3 +1,5 @@
+import { uvMap } from "./operations/uv-map";
+
 export function loadImageAsync(url: string) {
   return new Promise<HTMLImageElement>((resolve, reject) => {
     const image = document.createElement("img");
@@ -60,6 +62,12 @@ export const availableImages = {
   checkerboard: "checkerboard.png",
   pillow: "pillow.webp",
   pillow2: "pillow-2.jpg",
+  testbeeld: "testbeeld.jpg",
   uvMap1: "uv-map1.png",
   uvMap2: "uv-map2.png",
+  uvMap3: "uv-map3.png",
+  uvMap4: "uv-map4.png",
+  uvMap5: "uv-map5.png",
+  uvMap6: "uv-map6.png",
+  uvMap7: "uv-map7.png",
 };
