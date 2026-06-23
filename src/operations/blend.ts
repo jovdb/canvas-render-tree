@@ -8,11 +8,11 @@ export interface IBlendConfig {
 export const blend = (
   blendMode: GlobalCompositeOperation,
   /** When passed, only the children will be blended */
-  children?: RenderTree | undefined,
+  input?: RenderTree | undefined,
 ): IRenderItem<IBlendConfig> => ({
   name: "blend",
   config: { blendMode },
-  children,
+  input,
 });
 
 export const draw: ItemDrawFn<IBlendConfig> = (

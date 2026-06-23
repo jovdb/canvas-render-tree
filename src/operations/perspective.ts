@@ -14,11 +14,11 @@ export interface IPerspectiveConfig {
 export const perspective = (
   config: IPerspectiveConfig,
   /** When passed, only the children will have opacity */
-  children?: RenderTree | undefined,
+  input?: RenderTree | undefined,
 ): IRenderItem<IPerspectiveConfig> => ({
   name: "perspective",
   config,
-  children,
+  input,
 });
 interface Point {
   x: number;

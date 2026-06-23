@@ -127,7 +127,7 @@ function createUVMapImageData(width: number, height: number): ImageData {
 export const uvMap = (strength: number, uv: RenderTree): IRenderItem => ({
   name: "uvMap",
   config: { strength },
-  children: uv,
+  input: uv,
 });
 
 export const draw: ItemDrawFn<undefined> = (

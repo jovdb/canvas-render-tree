@@ -67,11 +67,11 @@ export interface ISaturationConfig {
 /** Pass 0 for grayscale */
 export const saturation = (
   config: ISaturationConfig = {},
-  children: RenderTree,
+  input: RenderTree,
 ): IRenderItem<ISaturationConfig> => ({
   name: "saturation",
   config,
-  children,
+  input,
 });
 
 export const draw: ItemDrawFn<ISaturationConfig> = (

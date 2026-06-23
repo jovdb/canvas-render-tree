@@ -13,7 +13,7 @@ export const repaint = (
   repaintWith: [IRenderItem],
 ): IRenderItem => ({
   name: "repaint",
-  children: [blend("source-in", repaintWith)],
+  input: [blend("source-in", repaintWith)],
 });
 
 addRenderer("repaint", {

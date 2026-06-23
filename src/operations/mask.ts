@@ -17,7 +17,7 @@ import { blend } from "./blend";
  */
 export const mask = (mask?: RenderTree | undefined): IRenderItem => ({
   name: "mask",
-  children: [blend("destination-in", mask)],
+  input: [blend("destination-in", mask)],
 });
 
 addRenderer("mask", {

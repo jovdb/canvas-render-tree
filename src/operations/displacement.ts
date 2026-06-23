@@ -89,7 +89,7 @@ export const displacement = (
 ): IRenderItem => ({
   name: "displacement",
   config: { strength },
-  children: displacement,
+  input: displacement,
 });
 
 export const draw: ItemDrawFn<IDisplacementConfig> = (

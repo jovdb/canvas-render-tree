@@ -56,7 +56,7 @@ export interface IRenderItem<TConfig = unknown> {
   config?: TConfig;
 
   // Temporary: remove
-  children?: RenderTree | undefined;
+  input?: RenderTree | undefined;
 
   input?: RenderTree | undefined;
 

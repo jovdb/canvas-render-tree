@@ -14,10 +14,9 @@ export const opacitySchema: OperationSchema<"opacity"> = {
   name: "opacity",
   description: "Draw each child with the given opacity",
   input: {
-    description: "This will be drawn with the given opacity",
     required: true,
   },
-  renderArgs: [],
+  args: [],
 };
 
 export const opacity = (

@@ -7,11 +7,11 @@ export interface IOpacityConfig {
 
 export const cyl = (
   /** When passed, only the children will have opacity */
-  children?: RenderTree | undefined,
+  input?: RenderTree | undefined,
 ): IRenderItem<IOpacityConfig> => ({
   name: "cyl",
   config: undefined,
-  children,
+  input,
 });
 
 interface Point3D {

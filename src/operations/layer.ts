@@ -5,9 +5,9 @@ import { addRenderer } from "../renderers";
  * Draw children on a new render layer
  * This can be useful to scope input
  */
-export const layer = (children: RenderTree): IRenderItem => ({
+export const layer = (input: RenderTree): IRenderItem => ({
   name: "layer",
-  children,
+  input,
 });
 
 export const draw: ItemDrawFn = (ctx, drawPrev, _config, drawInput) => {

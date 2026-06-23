@@ -11,11 +11,11 @@ export interface ITransformConfig {
 
 export const transform = (
   config: ITransformConfig,
-  children: RenderTree,
+  input: RenderTree,
 ): IRenderItem => ({
   name: "transform",
   config,
-  children,
+  input,
 });
 
 export const draw: ItemDrawFn<ITransformConfig> = (
