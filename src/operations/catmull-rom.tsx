@@ -1,6 +1,7 @@
 import { IRenderItem, ItemDrawFn } from "../canvas";
 import { addRendererOverlay, ItemOverlayFn } from "../overlays";
 import { addRenderer } from "../renderers";
+import React from "react";
 
 export interface ControlPointConfig {
   row: number;
@@ -38,6 +39,46 @@ export interface Point {
   x: number;
   y: number;
 }
+
+// Reusable ControlPoint component for overlays
+export interface ControlPointProps {
+  left: number; // Normalized x position (0-1)
+  top: number; // Normalized y position (0-1)
+  radius?: number; // Radius in pixels
+  borderWidth?: number; // Border width in pixels
+  color?: string; // Color of the control point
+  outer?: boolean;
+}
+
+export const ControlPoint: React.FC<ControlPointProps> = ({
+  left,
+  top,
+  radius = 4,
+  borderWidth = 2,
+  color = "blue",
+  outer = true,
+}) => {
+  const diameter = radius * 2;
+  return (
+    <div
+      style={{
+        position: "absolute",
+        left: `${left * 100}%`,
+        top: `${top * 100}%`,
+        width: outer
+          ? `${diameter}px`
+          : `calc(${diameter}px - ${borderWidth * 2}px)`,
+        height: outer
+          ? `${diameter}px`
+          : `calc(${diameter}px - ${borderWidth * 2}px)`,
+        borderRadius: "50%",
+        backgroundColor: outer ? "transparent" : color,
+        border: outer ? `${borderWidth}px solid ${color}` : undefined,
+        transform: "translate(-50%, -50%)",
+      }}
+    />
+  );
+};
 
 /**
  * 1D Catmull-Rom Interpolation helper
@@ -302,15 +343,40 @@ addRenderer("catmullRom", {
   draw,
 });
 
-export const CatmullRomOverlay: ItemOverlayFn<ICatmullRomConfig> = () => {
+export const CatmullRomOverlay: ItemOverlayFn<ICatmullRomConfig> = ({
+  config,
+}) => {
+  const rows = config?.gridRows || 4;
+  const cols = config?.gridCols || 4;
+
+  const dots = [];
+  for (let r = 0; r < rows; r++) {
+    for (let c = 0; c < cols; c++) {
+      const left = c / (cols - 1);
+      const top = r / (rows - 1);
+      dots.push(
+        <ControlPoint
+          key={`dot-${r}-${c}`}
+          left={left}
+          top={top}
+          radius={4}
+          borderWidth={2}
+          color="blue"
+        />,
+      );
+    }
+  }
+
   return (
     <div
       style={{
-        backgroundColor: "rgba(0, 0, 255, 0.1)",
+        position: "relative",
         width: "100%",
         height: "100%",
       }}
-    ></div>
+    >
+      {dots}
+    </div>
   );
 };
 
