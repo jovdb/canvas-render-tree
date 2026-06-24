@@ -5,7 +5,9 @@ import { addRenderer } from "../renderers";
 export interface ControlPointConfig {
   row: number;
   col: number;
+  /** Normalized x displacement (0-1), where 0 is left edge and 1 is right edge */
   dx: number;
+  /** Normalized y displacement (0-1), where 0 is top edge and 1 is bottom edge */
   dy: number;
 }
 
@@ -264,13 +266,14 @@ export const draw: ItemDrawFn<ICatmullRomConfig> = (
   }
 
   // Apply control point configurations from config
+  // dx and dy are normalized (0-1), where 0 is left/top and 1 is right/bottom
   if (config?.controlPoints) {
     for (const cpConfig of config.controlPoints) {
       const row = cpConfig.row;
       const col = cpConfig.col;
       if (row >= 0 && row < rows && col >= 0 && col < cols) {
-        destGrid[row][col].x += cpConfig.dx;
-        destGrid[row][col].y += cpConfig.dy;
+        destGrid[row][col].x += cpConfig.dx * w;
+        destGrid[row][col].y += cpConfig.dy * h;
       }
     }
   }

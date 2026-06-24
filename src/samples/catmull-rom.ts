@@ -12,8 +12,8 @@ export function catmullRomTree() {
         {
           col: 1,
           row: 1,
-          dx: 40,
-          dy: 50,
+          dx: 0.2,
+          dy: 0.1,
         },
       ],
     }),
