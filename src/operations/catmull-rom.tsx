@@ -2,22 +2,32 @@ import { IRenderItem, ItemDrawFn } from "../canvas";
 import { addRendererOverlay, ItemOverlayFn } from "../overlays";
 import { addRenderer } from "../renderers";
 
+export interface ControlPointConfig {
+  row: number;
+  col: number;
+  dx: number;
+  dy: number;
+}
+
 export interface ICatmullRomConfig {
   gridRows?: number;
   gridCols?: number;
   strength?: number;
+  controlPoints?: ControlPointConfig[];
 }
 
-export const catmullRom = (
-  rows = 3,
-  cols = 3,
+export const catmullRom = ({
+  gridRows = 3,
+  gridCols = 3,
   strength = 10,
-): IRenderItem<ICatmullRomConfig> => ({
+  controlPoints = [],
+}: ICatmullRomConfig): IRenderItem<ICatmullRomConfig> => ({
   name: "catmullRom",
   config: {
     strength,
-    gridRows: rows,
-    gridCols: cols,
+    gridRows,
+    gridCols,
+    controlPoints,
   },
 });
 
@@ -25,12 +35,6 @@ export const catmullRom = (
 export interface Point {
   x: number;
   y: number;
-}
-
-export interface IBSplinePointsConfig {
-  strength?: number; // Maps to your lambda/interpolation factor if needed
-  gridRows?: number; // e.g., 4
-  gridCols?: number; // e.g., 4
 }
 
 /**
@@ -219,7 +223,7 @@ function drawControlPoint(
 /**
  * Core Draw Function Replacement Execution
  */
-export const draw: ItemDrawFn<IBSplinePointsConfig> = (
+export const draw: ItemDrawFn<ICatmullRomConfig> = (
   ctx,
   drawPrev,
   config,
@@ -259,16 +263,16 @@ export const draw: ItemDrawFn<IBSplinePointsConfig> = (
     }
   }
 
-  // --- Test Data Manipulations ---
-  // Let's warp two intersections in the middle rows dynamically to test the engine
-  if (rows > 2 && cols > 2) {
-    // Push the point at row 1, col 1 downwards-right
-    destGrid[1][1].x += 40;
-    destGrid[1][1].y += 50;
-
-    // Push the point at row 2, col 1 upwards-left
-    destGrid[2][1].x -= 30;
-    destGrid[2][1].y -= 40;
+  // Apply control point configurations from config
+  if (config?.controlPoints) {
+    for (const cpConfig of config.controlPoints) {
+      const row = cpConfig.row;
+      const col = cpConfig.col;
+      if (row >= 0 && row < rows && col >= 0 && col < cols) {
+        destGrid[row][col].x += cpConfig.dx;
+        destGrid[row][col].y += cpConfig.dy;
+      }
+    }
   }
 
   // Process the pixel warp structure via Catmull-Rom
@@ -295,7 +299,7 @@ addRenderer("catmullRom", {
   draw,
 });
 
-export const CattmullRomOverlay: ItemOverlayFn<ICatmullRomConfig> = () => {
+export const CatmullRomOverlay: ItemOverlayFn<ICatmullRomConfig> = () => {
   return (
     <div
       style={{
@@ -307,4 +311,4 @@ export const CattmullRomOverlay: ItemOverlayFn<ICatmullRomConfig> = () => {
   );
 };
 
-addRendererOverlay("catmullRom", CattmullRomOverlay);
+addRendererOverlay("catmullRom", CatmullRomOverlay);
