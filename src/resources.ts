@@ -1,5 +1,3 @@
-import { uvMap } from "./operations/uv-map";
-
 export function loadImageAsync(url: string) {
   return new Promise<HTMLImageElement>((resolve, reject) => {
     const image = document.createElement("img");

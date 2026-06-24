@@ -105,6 +105,10 @@ function App() {
       | undefined;
   }, [editItem]);
 
+  const sampleGroups = Object.values(samples)
+    .map((sample) => sample.type)
+    .filter((value, index, self) => self.indexOf(value) === index);
+
   return (
     <div className="app">
       <div className="app__preview">
@@ -117,13 +121,21 @@ function App() {
           }}
           style={{ marginBottom: "1rem" }}
         >
-          {Object.keys(samples).map((key) => (
-            <option key={key} value={key}>
-              {
-                // eslint-disable-next-line @typescript-eslint/no-explicit-any
-                ((samples as any)[key] as unknown as IRenderItem).name
-              }
-            </option>
+          {sampleGroups.map((group) => (
+            <optgroup label={group}>
+              {Object.keys(samples)
+                .filter((key) => samples[key].type === group)
+                .map((key) => {
+                  return (
+                    <option key={key} value={key}>
+                      {
+                        // eslint-disable-next-line @typescript-eslint/no-explicit-any
+                        ((samples as any)[key] as unknown as IRenderItem).name
+                      }
+                    </option>
+                  );
+                })}
+            </optgroup>
           ))}
         </select>
         <br />

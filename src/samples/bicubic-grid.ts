@@ -17,7 +17,7 @@ export function bicubicGridTree() {
   }
 
   const tree: IRenderItem[] = [
-    operations.drawImage({ imageUrl: availableImages.checkerboard }),
+    operations.drawImage({ imageUrl: availableImages.testbeeld }),
     operations.bicubicGrid({
       controlsPoints: deformationGrid,
       debug: true,

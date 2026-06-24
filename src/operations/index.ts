@@ -20,6 +20,7 @@ import { uvMap } from "./uv-map";
 import { cyl } from "./cyl";
 import { perspective } from "./perspective";
 import { bicubicGrid } from "./bicubic-grid";
+import { catmullRom } from "./catmull-rom";
 
 export const operations = {
   drawImage,
@@ -43,6 +44,7 @@ export const operations = {
   uvMap,
   cyl,
   perspective,
+  catmullRom,
 };
 
 export type RenderItemName = keyof typeof operations;

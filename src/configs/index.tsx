@@ -38,7 +38,11 @@ export const JsonConfig: ItemConfigFn<unknown> = ({ config, mutateConfig }) => {
         ) as HTMLTextAreaElement;
         try {
           const parsed = JSON.parse(textAreaEl.value);
-          mutateConfig((config) => Object.assign(config, parsed));
+          mutateConfig((config) =>
+            config !== null && typeof config === "object"
+              ? Object.assign(config, parsed)
+              : config,
+          );
           setError("");
         } catch (err) {
           console.error("Invalid JSON", err);
