@@ -48,6 +48,8 @@ export interface ControlPointProps {
   borderWidth?: number; // Border width in pixels
   color?: string; // Color of the control point
   outer?: boolean;
+  onMouseDown?: (e: React.MouseEvent) => void;
+  draggable?: boolean;
 }
 
 export const ControlPoint: React.FC<ControlPointProps> = ({
@@ -57,24 +59,25 @@ export const ControlPoint: React.FC<ControlPointProps> = ({
   borderWidth = 2,
   color = "blue",
   outer = true,
+  onMouseDown,
+  draggable = false,
 }) => {
   const diameter = radius * 2;
   return (
     <div
+      onMouseDown={onMouseDown}
       style={{
         position: "absolute",
         left: `${left * 100}%`,
         top: `${top * 100}%`,
-        width: outer
-          ? `${diameter}px`
-          : `calc(${diameter}px - ${borderWidth * 2}px)`,
-        height: outer
-          ? `${diameter}px`
-          : `calc(${diameter}px - ${borderWidth * 2}px)`,
+        width: outer ? `${diameter}px` : `calc(${diameter}px - 1px)`,
+        height: outer ? `${diameter}px` : `calc(${diameter}px - 1px)`,
         borderRadius: "50%",
         backgroundColor: outer ? "transparent" : color,
         border: outer ? `${borderWidth}px solid ${color}` : undefined,
         transform: "translate(-50%, -50%)",
+        cursor: draggable ? "move" : undefined,
+        userSelect: "none",
       }}
     />
   );
@@ -244,25 +247,6 @@ class CatmullRomGridWarper {
     return targetData;
   }
 }
-
-// Dummy helper matching your interface to draw handles
-function drawControlPoint(
-  ctx: CanvasRenderingContext2D,
-  current: Point,
-  origin: Point,
-) {
-  ctx.beginPath();
-  ctx.arc(current.x, current.y, 5, 0, 2 * Math.PI);
-  ctx.fillStyle = "#00ff00";
-  ctx.fill();
-
-  ctx.beginPath();
-  ctx.moveTo(origin.x, origin.y);
-  ctx.lineTo(current.x, current.y);
-  ctx.strokeStyle = "rgba(0, 255, 0, 0.5)";
-  ctx.stroke();
-}
-
 /**
  * Core Draw Function Replacement Execution
  */
@@ -323,19 +307,6 @@ export const draw: ItemDrawFn<ICatmullRomConfig> = (
   const warpedData = warper.warpImage(originalData, sourceGrid, destGrid);
   ctx.putImageData(warpedData, 0, 0);
 
-  // Draw control points overlay lines showing displacement
-  for (let r = 0; r < rows; r++) {
-    for (let c = 0; c < cols; c++) {
-      // Only draw indicators for handles that actually shifted
-      if (
-        sourceGrid[r][c].x !== destGrid[r][c].x ||
-        sourceGrid[r][c].y !== destGrid[r][c].y
-      ) {
-        drawControlPoint(ctx, destGrid[r][c], sourceGrid[r][c]);
-      }
-    }
-  }
-
   if (drawInput) ctx.restore();
 };
 
@@ -345,11 +316,74 @@ addRenderer("catmullRom", {
 
 export const CatmullRomOverlay: ItemOverlayFn<ICatmullRomConfig> = ({
   config,
+  mutateConfig,
 }) => {
   const rows = config?.gridRows || 4;
   const cols = config?.gridCols || 4;
+  const [draggedPoint, setDraggedPoint] = React.useState<{
+    row: number;
+    col: number;
+  } | null>(null);
+
+  const handleMouseDown =
+    (row: number, col: number) => (e: React.MouseEvent) => {
+      e.preventDefault();
+      setDraggedPoint({ row, col });
+    };
+
+  const handleMouseMove = (e: React.MouseEvent<HTMLDivElement>) => {
+    if (draggedPoint === null) return;
+
+    const rect = e.currentTarget.getBoundingClientRect();
+    const x = e.clientX - rect.left;
+    const y = e.clientY - rect.top;
+
+    const normalizedX = x / rect.width;
+    const normalizedY = y / rect.height;
+
+    const baseLeft = draggedPoint.col / (cols - 1);
+    const baseTop = draggedPoint.row / (rows - 1);
+
+    const newDx = normalizedX - baseLeft;
+    const newDy = normalizedY - baseTop;
+
+    mutateConfig((newConfig: ICatmullRomConfig) => {
+      const newControlPoints = [...(newConfig.controlPoints || [])];
+      const existingIndex = newControlPoints.findIndex(
+        (cp) => cp.row === draggedPoint.row && cp.col === draggedPoint.col,
+      );
+
+      if (existingIndex >= 0) {
+        // Update existing control point
+        newControlPoints[existingIndex] = {
+          ...newControlPoints[existingIndex],
+          dx: newDx,
+          dy: newDy,
+        };
+      } else {
+        // Create new control point
+        newControlPoints.push({
+          row: draggedPoint.row,
+          col: draggedPoint.col,
+          dx: newDx,
+          dy: newDy,
+        });
+      }
+      newConfig.controlPoints = newControlPoints;
+    });
+  };
+
+  const handleMouseUp = () => {
+    setDraggedPoint(null);
+  };
+
+  const handleMouseLeave = () => {
+    setDraggedPoint(null);
+  };
 
   const dots = [];
+
+  // Draw all grid points
   for (let r = 0; r < rows; r++) {
     for (let c = 0; c < cols; c++) {
       const left = c / (cols - 1);
@@ -359,9 +393,49 @@ export const CatmullRomOverlay: ItemOverlayFn<ICatmullRomConfig> = ({
           key={`dot-${r}-${c}`}
           left={left}
           top={top}
-          radius={4}
-          borderWidth={2}
           color="blue"
+        />,
+      );
+    }
+  }
+
+  // Draw control points (configured or at base position) in green (draggable)
+  // Find which grid points have configured control points
+  const controlPointIndices: Record<string, number> = {};
+  if (config?.controlPoints) {
+    for (let i = 0; i < config.controlPoints.length; i++) {
+      const cp = config.controlPoints[i];
+      controlPointIndices[`${cp.row}-${cp.col}`] = i;
+    }
+  }
+
+  // For each grid point, draw a green control point
+  for (let r = 0; r < rows; r++) {
+    for (let c = 0; c < cols; c++) {
+      const key = `${r}-${c}`;
+      const cpIndex = controlPointIndices[key];
+      let left: number, top: number;
+
+      if (cpIndex !== undefined) {
+        // Configured control point - use its dx/dy
+        const cp = config!.controlPoints![cpIndex];
+        left = cp.col / (cols - 1) + cp.dx;
+        top = cp.row / (rows - 1) + cp.dy;
+      } else {
+        // Not configured - use base position (dx=0, dy=0)
+        left = c / (cols - 1);
+        top = r / (rows - 1);
+      }
+
+      dots.push(
+        <ControlPoint
+          key={`cp-${r}-${c}`}
+          left={left}
+          top={top}
+          color="green"
+          outer={false}
+          draggable={true}
+          onMouseDown={handleMouseDown(r, c)}
         />,
       );
     }
@@ -373,7 +447,11 @@ export const CatmullRomOverlay: ItemOverlayFn<ICatmullRomConfig> = ({
         position: "relative",
         width: "100%",
         height: "100%",
+        backgroundColor: "rgba(255,255,255,0.4)",
       }}
+      onMouseMove={handleMouseMove}
+      onMouseUp={handleMouseUp}
+      onMouseLeave={handleMouseLeave}
     >
       {dots}
     </div>
