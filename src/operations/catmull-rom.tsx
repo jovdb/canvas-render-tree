@@ -1,16 +1,19 @@
 import { IRenderItem, ItemDrawFn } from "../canvas";
+import { addRendererOverlay, ItemOverlayFn } from "../overlays";
 import { addRenderer } from "../renderers";
 
-export interface IFillColorConfig {
-  color: string;
+export interface ICatmullRomConfig {
+  gridRows?: number;
+  gridCols?: number;
+  strength?: number;
 }
 
 export const catmullRom = (
   rows = 3,
   cols = 3,
   strength = 10,
-): IRenderItem<IBSplinePointsConfig> => ({
-  name: "catmull-rom",
+): IRenderItem<ICatmullRomConfig> => ({
+  name: "catmullRom",
   config: {
     strength,
     gridRows: rows,
@@ -73,7 +76,7 @@ class CatmullRomGridWarper {
    */
   public warpImage(
     sourceData: ImageData,
-    sourceGrid: Point[][],
+    _sourceGrid: Point[][],
     destGrid: Point[][],
   ): ImageData {
     const targetData = new ImageData(this.width, this.height);
@@ -288,6 +291,20 @@ export const draw: ItemDrawFn<IBSplinePointsConfig> = (
   if (drawInput) ctx.restore();
 };
 
-addRenderer("catmull-rom", {
+addRenderer("catmullRom", {
   draw,
 });
+
+export const CattmullRomOverlay: ItemOverlayFn<ICatmullRomConfig> = () => {
+  return (
+    <div
+      style={{
+        backgroundColor: "rgba(0, 0, 255, 0.1)",
+        width: "100%",
+        height: "100%",
+      }}
+    ></div>
+  );
+};
+
+addRendererOverlay("catmullRom", CattmullRomOverlay);

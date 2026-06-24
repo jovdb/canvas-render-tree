@@ -1,6 +1,7 @@
 import "./App.css";
 
 import { IRenderItem } from "./canvas";
+import { AppOverlay } from "./components/AppOverlay";
 import { Canvas } from "./components/Canvas";
 import { useEffect, useMemo, useState, useTransition } from "react";
 import { samples } from "./samples";
@@ -11,6 +12,7 @@ import { getRendererConfig, JsonConfig } from "./configs";
 import { RenderItemName } from "./operations";
 import "./configs/load";
 import { schemas, OperationSchema } from "./shemas";
+import { getRendererOverlay } from "./overlays";
 
 export function selectIndex(tree: IRenderItem[], index: TreeIndex) {
   if (index.length === 0) return undefined;
@@ -89,6 +91,8 @@ function App() {
   const renderItemName = editItem?.name as RenderItemName | undefined;
   const ItemConfigurator = getRendererConfig(renderItemName) || (() => null);
 
+  const RendererOverlay = getRendererOverlay(renderItemName);
+
   const [_isPending, startTransition] = useTransition();
   const onConfigChange = (mutate: (config: unknown) => void) => {
     const newTree = produce(workTree, (draftTree) => {
@@ -124,7 +128,10 @@ function App() {
           {sampleGroups.map((group) => (
             <optgroup label={group}>
               {Object.keys(samples)
-                .filter((key) => samples[key].type === group)
+                .filter(
+                  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+                  (key) => (samples as any)[key]?.type === group,
+                )
                 .map((key) => {
                   return (
                     <option key={key} value={key}>
@@ -139,7 +146,17 @@ function App() {
           ))}
         </select>
         <br />
-        <Canvas items={renderTree ?? []} />
+        <div className="app__canvas">
+          <Canvas items={renderTree ?? []} />
+          <AppOverlay>
+            {RendererOverlay && (
+              <RendererOverlay
+                config={editItem?.config ?? {}}
+                mutateConfig={onConfigChange}
+              />
+            )}
+          </AppOverlay>
+        </div>
       </div>
 
       <div className="app__edit-panel">

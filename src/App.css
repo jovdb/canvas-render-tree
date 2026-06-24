@@ -49,9 +49,15 @@
   overflow-y: auto;
 }
 
+.app__canvas {
+  position: relative;
+  width: 500px;
+  height: 500px;
+}
+
 .canvas {
+  position: absolute;
   border: 1px solid #888;
   aspect-ratio: 1;
   width: 100%;
-  max-width: 500px;
 }
