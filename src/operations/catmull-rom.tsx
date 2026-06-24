@@ -27,44 +27,38 @@ export const catmullRom = ({
   controlPoints = [],
 }: ICatmullRomConfig): IRenderItem<ICatmullRomConfig> => ({
   name: "catmullRom",
-  config: {
-    strength,
-    gridRows,
-    gridCols,
-    controlPoints,
-  },
+  config: { strength, gridRows, gridCols, controlPoints },
 });
 
-// Define internal structural types
+// ============================================================================
+// Types
+// ============================================================================
+
 export interface Point {
   x: number;
   y: number;
 }
 
-/**
- * 1D Catmull-Rom Interpolation helper
- * p0, p1, p2, p3 are control values. t is the fractional distance between p1 and p2 [0, 1].
- */
-function catmullRom2(
-  p0: number,
-  p1: number,
-  p2: number,
-  p3: number,
-  t: number,
-): number {
-  const t2 = t * t;
-  const t3 = t2 * t;
-  return (
-    0.5 *
-    (2 * p1 +
-      (-p0 + p2) * t +
-      (2 * p0 - 5 * p1 + 4 * p2 - p3) * t2 +
-      (-p0 + 3 * p1 - 3 * p2 + p3) * t3)
-  );
-}
+// ============================================================================
+// Catmull-Rom Interpolation
+// ============================================================================
 
 /**
- * Class handling the 2D grid deformation using Catmull-Rom Splines
+ * 1D Catmull-Rom interpolation
+ * p0-p3 are control values, t is fractional distance between p1 and p2 [0, 1]
+ */
+function catmullRom2(p0: number, p1: number, p2: number, p3: number, t: number): number {
+  const t2 = t * t;
+  const t3 = t2 * t;
+  return 0.5 * (2 * p1 + (-p0 + p2) * t + (2 * p0 - 5 * p1 + 4 * p2 - p3) * t2 + (-p0 + 3 * p1 - 3 * p2 + p3) * t3);
+}
+
+// ============================================================================
+// Grid Warper
+// ============================================================================
+
+/**
+ * Handles 2D grid deformation using Catmull-Rom splines
  */
 class CatmullRomGridWarper {
   private width: number;
@@ -80,11 +74,10 @@ class CatmullRomGridWarper {
   }
 
   /**
-   * Warps the source image data based on a source grid and deformed destination grid
+   * Warps the source image based on the deformed destination grid
    */
   public warpImage(
     sourceData: ImageData,
-    _sourceGrid: Point[][],
     destGrid: Point[][],
   ): ImageData {
     const targetData = new ImageData(this.width, this.height);
@@ -205,9 +198,10 @@ class CatmullRomGridWarper {
     return targetData;
   }
 }
-/**
- * Core Draw Function Replacement Execution
- */
+// ============================================================================
+// Draw Function
+// ============================================================================
+
 export const draw: ItemDrawFn<ICatmullRomConfig> = (
   ctx,
   drawPrev,
@@ -225,13 +219,13 @@ export const draw: ItemDrawFn<ICatmullRomConfig> = (
 
   const originalData = ctx.getImageData(0, 0, w, h);
 
-  // Define grid resolution (e.g., a 4x4 matrix of interactive control points)
+  // Get grid resolution from config (defaults to 4x4)
   const rows = config?.gridRows || 4;
   const cols = config?.gridCols || 4;
 
   const warper = new CatmullRomGridWarper(w, h, rows, cols);
 
-  // Initialize reference grids
+  // Initialize grids: source (unchanged) and destination (will be deformed)
   const sourceGrid: Point[][] = [];
   const destGrid: Point[][] = [];
 
@@ -248,21 +242,20 @@ export const draw: ItemDrawFn<ICatmullRomConfig> = (
     }
   }
 
-  // Apply control point configurations from config
+  // Apply configured control point offsets to destination grid
   // dx and dy are normalized (0-1), where 0 is left/top and 1 is right/bottom
   if (config?.controlPoints) {
     for (const cpConfig of config.controlPoints) {
-      const row = cpConfig.row;
-      const col = cpConfig.col;
+      const { row, col, dx, dy } = cpConfig;
       if (row >= 0 && row < rows && col >= 0 && col < cols) {
-        destGrid[row][col].x += cpConfig.dx * w;
-        destGrid[row][col].y += cpConfig.dy * h;
+        destGrid[row][col].x += dx * w;
+        destGrid[row][col].y += dy * h;
       }
     }
   }
 
   // Process the pixel warp structure via Catmull-Rom
-  const warpedData = warper.warpImage(originalData, sourceGrid, destGrid);
+  const warpedData = warper.warpImage(originalData, destGrid);
   ctx.putImageData(warpedData, 0, 0);
 
   if (drawInput) ctx.restore();
@@ -272,22 +265,22 @@ addRenderer("catmullRom", {
   draw,
 });
 
+// ============================================================================
+// Overlay Component
+// ============================================================================
+
 export const CatmullRomOverlay: ItemOverlayFn<ICatmullRomConfig> = ({
   config,
   mutateConfig,
 }) => {
   const rows = config?.gridRows || 4;
   const cols = config?.gridCols || 4;
-  const [draggedPoint, setDraggedPoint] = React.useState<{
-    row: number;
-    col: number;
-  } | null>(null);
+  const [draggedPoint, setDraggedPoint] = React.useState<{ row: number; col: number } | null>(null);
 
-  const handleMouseDown =
-    (row: number, col: number) => (e: React.MouseEvent) => {
-      e.preventDefault();
-      setDraggedPoint({ row, col });
-    };
+  const handleMouseDown = (row: number, col: number) => (e: React.MouseEvent) => {
+    e.preventDefault();
+    setDraggedPoint({ row, col });
+  };
 
   const handleMouseMove = (e: React.MouseEvent<HTMLDivElement>) => {
     if (draggedPoint === null) return;
@@ -308,7 +301,7 @@ export const CatmullRomOverlay: ItemOverlayFn<ICatmullRomConfig> = ({
     mutateConfig((newConfig: ICatmullRomConfig) => {
       const newControlPoints = [...(newConfig.controlPoints || [])];
       const existingIndex = newControlPoints.findIndex(
-        (cp) => cp.row === draggedPoint.row && cp.col === draggedPoint.col,
+        (cp) => cp.row === draggedPoint.row && cp.col === draggedPoint.col
       );
 
       if (existingIndex >= 0) {
@@ -341,60 +334,44 @@ export const CatmullRomOverlay: ItemOverlayFn<ICatmullRomConfig> = ({
 
   const dots = [];
 
-  // Draw all grid points
+  // Build map of configured control points for quick lookup
+  const controlPointMap: Record<string, ControlPointConfig> = {};
+  if (config?.controlPoints) {
+    for (const cp of config.controlPoints) {
+      controlPointMap[`${cp.row}-${cp.col}`] = cp;
+    }
+  }
+
+  // Draw all grid points and control points
   for (let r = 0; r < rows; r++) {
     for (let c = 0; c < cols; c++) {
-      const left = c / (cols - 1);
-      const top = r / (rows - 1);
+      const baseLeft = c / (cols - 1);
+      const baseTop = r / (rows - 1);
+      const cp = controlPointMap[`${r}-${c}`];
+
+      // Blue grid point (outer circle)
       dots.push(
         <ControlPoint
           key={`dot-${r}-${c}`}
-          left={left}
-          top={top}
+          left={baseLeft}
+          top={baseTop}
           color="blue"
-        />,
+        />
       );
-    }
-  }
 
-  // Draw control points (configured or at base position) in green (draggable)
-  // Find which grid points have configured control points
-  const controlPointIndices: Record<string, number> = {};
-  if (config?.controlPoints) {
-    for (let i = 0; i < config.controlPoints.length; i++) {
-      const cp = config.controlPoints[i];
-      controlPointIndices[`${cp.row}-${cp.col}`] = i;
-    }
-  }
-
-  // For each grid point, draw a green control point
-  for (let r = 0; r < rows; r++) {
-    for (let c = 0; c < cols; c++) {
-      const key = `${r}-${c}`;
-      const cpIndex = controlPointIndices[key];
-      let left: number, top: number;
-
-      if (cpIndex !== undefined) {
-        // Configured control point - use its dx/dy
-        const cp = config!.controlPoints![cpIndex];
-        left = cp.col / (cols - 1) + cp.dx;
-        top = cp.row / (rows - 1) + cp.dy;
-      } else {
-        // Not configured - use base position (dx=0, dy=0)
-        left = c / (cols - 1);
-        top = r / (rows - 1);
-      }
-
+      // Green control point (filled circle) - either at base position or offset
+      const cpLeft = cp ? baseLeft + cp.dx : baseLeft;
+      const cpTop = cp ? baseTop + cp.dy : baseTop;
       dots.push(
         <ControlPoint
           key={`cp-${r}-${c}`}
-          left={left}
-          top={top}
+          left={cpLeft}
+          top={cpTop}
           color="green"
           outer={false}
           draggable={true}
           onMouseDown={handleMouseDown(r, c)}
-        />,
+        />
       );
     }
   }
