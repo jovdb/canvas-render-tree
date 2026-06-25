@@ -8,7 +8,7 @@ import { addRenderer } from "../renderers";
  * - Top-Right:    [255, 255, 0] (Yellow)
  * - Bottom-Left:  [0, 0, 0]     (Black)
  * - Bottom-Right: [255, 0, 0]   (Red)
- * 
+ *
  * Usage:
  * const uvMapBase64 = generateUVIdentityMap(2048);
  * console.log(uvMapBase64); // "data:image/png;base64,..."

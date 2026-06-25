@@ -47,10 +47,22 @@ export interface Point {
  * 1D Catmull-Rom interpolation
  * p0-p3 are control values, t is fractional distance between p1 and p2 [0, 1]
  */
-function catmullRom2(p0: number, p1: number, p2: number, p3: number, t: number): number {
+function catmullRom2(
+  p0: number,
+  p1: number,
+  p2: number,
+  p3: number,
+  t: number,
+): number {
   const t2 = t * t;
   const t3 = t2 * t;
-  return 0.5 * (2 * p1 + (-p0 + p2) * t + (2 * p0 - 5 * p1 + 4 * p2 - p3) * t2 + (-p0 + 3 * p1 - 3 * p2 + p3) * t3);
+  return (
+    0.5 *
+    (2 * p1 +
+      (-p0 + p2) * t +
+      (2 * p0 - 5 * p1 + 4 * p2 - p3) * t2 +
+      (-p0 + 3 * p1 - 3 * p2 + p3) * t3)
+  );
 }
 
 // ============================================================================
@@ -76,10 +88,7 @@ class CatmullRomGridWarper {
   /**
    * Warps the source image based on the deformed destination grid
    */
-  public warpImage(
-    sourceData: ImageData,
-    destGrid: Point[][],
-  ): ImageData {
+  public warpImage(sourceData: ImageData, destGrid: Point[][]): ImageData {
     const targetData = new ImageData(this.width, this.height);
     const srcPixels = new Uint32Array(sourceData.data.buffer);
     const dstPixels = new Uint32Array(targetData.data.buffer);
@@ -275,12 +284,16 @@ export const CatmullRomOverlay: ItemOverlayFn<ICatmullRomConfig> = ({
 }) => {
   const rows = config?.gridRows || 4;
   const cols = config?.gridCols || 4;
-  const [draggedPoint, setDraggedPoint] = React.useState<{ row: number; col: number } | null>(null);
+  const [draggedPoint, setDraggedPoint] = React.useState<{
+    row: number;
+    col: number;
+  } | null>(null);
 
-  const handleMouseDown = (row: number, col: number) => (e: React.MouseEvent) => {
-    e.preventDefault();
-    setDraggedPoint({ row, col });
-  };
+  const handleMouseDown =
+    (row: number, col: number) => (e: React.MouseEvent) => {
+      e.preventDefault();
+      setDraggedPoint({ row, col });
+    };
 
   const handleMouseMove = (e: React.MouseEvent<HTMLDivElement>) => {
     if (draggedPoint === null) return;
@@ -301,7 +314,7 @@ export const CatmullRomOverlay: ItemOverlayFn<ICatmullRomConfig> = ({
     mutateConfig((newConfig: ICatmullRomConfig) => {
       const newControlPoints = [...(newConfig.controlPoints || [])];
       const existingIndex = newControlPoints.findIndex(
-        (cp) => cp.row === draggedPoint.row && cp.col === draggedPoint.col
+        (cp) => cp.row === draggedPoint.row && cp.col === draggedPoint.col,
       );
 
       if (existingIndex >= 0) {
@@ -356,7 +369,7 @@ export const CatmullRomOverlay: ItemOverlayFn<ICatmullRomConfig> = ({
           left={baseLeft}
           top={baseTop}
           color="blue"
-        />
+        />,
       );
 
       // Green control point (filled circle) - either at base position or offset
@@ -371,7 +384,7 @@ export const CatmullRomOverlay: ItemOverlayFn<ICatmullRomConfig> = ({
           outer={false}
           draggable={true}
           onMouseDown={handleMouseDown(r, c)}
-        />
+        />,
       );
     }
   }
