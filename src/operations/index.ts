@@ -21,6 +21,7 @@ import { cyl } from "./cyl";
 import { perspective } from "./perspective";
 import { bicubicGrid } from "./bicubic-grid";
 import { catmullRom } from "./catmull-rom";
+import { thinPlateSplines } from "./thin-plate-splines";
 
 export const operations = {
   drawImage,
@@ -45,6 +46,7 @@ export const operations = {
   cyl,
   perspective,
   catmullRom,
+  thinPlateSplines,
 };
 
 export type RenderItemName = keyof typeof operations;
