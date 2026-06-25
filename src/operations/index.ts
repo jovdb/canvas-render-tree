@@ -22,6 +22,7 @@ import { perspective } from "./perspective";
 import { bicubicGrid } from "./bicubic-grid";
 import { catmullRom } from "./catmull-rom";
 import { thinPlateSplines } from "./thin-plate-splines";
+import { beierNeely } from "./beier-neely";
 
 export const operations = {
   drawImage,
@@ -47,6 +48,7 @@ export const operations = {
   perspective,
   catmullRom,
   thinPlateSplines,
+  beierNeely,
 };
 
 export type RenderItemName = keyof typeof operations;

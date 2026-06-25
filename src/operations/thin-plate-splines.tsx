@@ -3,8 +3,8 @@
 import { IRenderItem, ItemDrawFn } from "../canvas";
 import { addRendererOverlay, ItemOverlayFn } from "../overlays";
 import { addRenderer } from "../renderers";
-import React, { useState } from "react";
-import { ControlPoint } from "../components/ControlPoint";
+import React from "react";
+import { FreeControlPointsOverlay, FreeControlPointsConfig } from "../components/FreeControlPointsOverlay";
 
 // ============================================================================
 // Types
@@ -26,7 +26,7 @@ export interface TPSControlPoint {
   dy: number;
 }
 
-export interface IThinPlatesSplinesConfig {
+export interface IThinPlatesSplinesConfig extends FreeControlPointsConfig {
   /** Control points with source position (x,y) and displacement (dx,dy) */
   controlPoints?: TPSControlPoint[];
   /** Strength of the deformation (0-1) */
@@ -401,191 +401,79 @@ addRenderer("thinPlateSplines", {
 // Overlay Component
 // ============================================================================
 
-export const ThinPlatesSplinesOverlay: ItemOverlayFn<
-  IThinPlatesSplinesConfig
-> = ({ config, mutateConfig }) => {
-  const { controlPoints = [] } = config || {};
+export const ThinPlatesSplinesOverlay: ItemOverlayFn<IThinPlatesSplinesConfig> = (props) => {
+  // Use the reusable FreeControlPointsOverlay component
+  return <FreeControlPointsOverlay<IThinPlatesSplinesConfig> {...props} />;
+};
 
-  const [draggedIndex, setDraggedIndex] = useState<number | null>(null);
-  const [dragMode, setDragMode] = useState<"position" | "target">("target");
+addRendererOverlay("thinPlateSplines", ThinPlatesSplinesOverlay);
 
-  const handleMouseDown =
-    (index: number, mode: "position" | "target") => (e: React.MouseEvent) => {
-      e.preventDefault();
-      setDraggedIndex(index);
-      setDragMode(mode);
-    };
+// ============================================================================
+// Config Component
+// ============================================================================
 
-  const handleMouseMove = (e: React.MouseEvent<HTMLDivElement>) => {
-    if (draggedIndex === null) return;
+import { addRendererConfig, ItemConfigFn } from "../configs";
 
-    const rect = e.currentTarget.getBoundingClientRect();
-    const x = e.clientX - rect.left;
-    const y = e.clientY - rect.top;
-
-    const normalizedX = x / rect.width;
-    const normalizedY = y / rect.height;
-
-    mutateConfig((newConfig: IThinPlatesSplinesConfig) => {
-      const newControlPoints = [...(newConfig.controlPoints || [])];
-
-      if (draggedIndex >= newControlPoints.length) {
-        newControlPoints.push({ x: normalizedX, y: normalizedY, dx: 0, dy: 0 });
-      }
-
-      if (dragMode === "position") {
-        newControlPoints[draggedIndex] = {
-          ...newControlPoints[draggedIndex],
-          x: normalizedX,
-          y: normalizedY,
-        };
-      } else {
-        const cp = newControlPoints[draggedIndex];
-        newControlPoints[draggedIndex] = {
-          ...cp,
-          dx: normalizedX - cp.x,
-          dy: normalizedY - cp.y,
-        };
-      }
-
-      newConfig.controlPoints = newControlPoints;
-    });
-  };
-
-  const handleMouseUp = () => {
-    setDraggedIndex(null);
-  };
-
-  const handleMouseLeave = () => {
-    setDraggedIndex(null);
-  };
-
-  const addPoint = () => {
-    mutateConfig((newConfig: IThinPlatesSplinesConfig) => {
-      newConfig.controlPoints = [
-        ...(newConfig.controlPoints || []),
-        { x: 0.5, y: 0.5, dx: 0, dy: 0 },
-      ];
-    });
-  };
-
-  const removePoint = (index: number) => (e: React.MouseEvent) => {
-    e.preventDefault();
-    e.stopPropagation();
-    mutateConfig((newConfig: IThinPlatesSplinesConfig) => {
-      const newControlPoints = [...(newConfig.controlPoints || [])];
-      newControlPoints.splice(index, 1);
-      newConfig.controlPoints = newControlPoints;
-    });
-  };
-
-  const points = [];
-
-  for (let i = 0; i < controlPoints.length; i++) {
-    const cp = controlPoints[i];
-    const sourceX = cp.x;
-    const sourceY = cp.y;
-    const targetX = cp.x + cp.dx;
-    const targetY = cp.y + cp.dy;
-
-    points.push(
-      <ControlPoint
-        key={`src-${i}`}
-        left={sourceX}
-        top={sourceY}
-        color="blue"
-        draggable={true}
-        onMouseDown={handleMouseDown(i, "position")}
-      />,
-    );
-
-    points.push(
-      <ControlPoint
-        key={`tgt-${i}`}
-        left={targetX}
-        top={targetY}
-        color="green"
-        outer={false}
-        draggable={true}
-        onMouseDown={handleMouseDown(i, "target")}
-      />,
-    );
-
-    points.push(
-      <div
-        key={`line-${i}`}
-        style={{
-          position: "absolute",
-          left: `${sourceX * 100}%`,
-          top: `${sourceY * 100}%`,
-          width: `${Math.abs(targetX - sourceX) * 100}%`,
-          height: `${Math.abs(targetY - sourceY) * 100}%`,
-          border: "1px solid rgba(255, 255, 0, 0.5)",
-          transform: `translate(${(targetX > sourceX ? 0 : -100)}%, ${(targetY > sourceY ? 0 : -100)}%) rotate(${Math.atan2(targetY - sourceY, targetX - sourceX)}rad)`,
-          pointerEvents: "none",
-          borderRadius: "0",
-        }}
-      />,
-    );
-
-    points.push(
-      <div
-        key={`remove-${i}`}
-        onClick={removePoint(i)}
-        style={{
-          position: "absolute",
-          left: `${targetX * 100}%`,
-          top: `calc(${targetY * 100}% - 16px)`,
-          width: "20px",
-          height: "20px",
-          backgroundColor: "red",
-          borderRadius: "50%",
-          display: "flex",
-          alignItems: "center",
-          justifyContent: "center",
-          cursor: "pointer",
-          transform: "translate(-50%, -50%)",
-          fontSize: "12px",
-          color: "white",
-          userSelect: "none",
-        }}
-        title="Remove point"
-      >
-        ×
-      </div>,
-    );
-  }
+export const ThinPlatesSplinesConfig: ItemConfigFn<IThinPlatesSplinesConfig> = ({
+  config,
+  mutateConfig,
+}) => {
+  const { strength = 1.0, regularization = 0.001 } = config || {};
 
   return (
     <div
       style={{
-        position: "relative",
-        width: "100%",
-        height: "100%",
-        backgroundColor: "rgba(255,255,255,0.4)",
+        padding: "10px",
+        display: "flex",
+        flexDirection: "column",
+        gap: "10px",
       }}
-      onMouseMove={handleMouseMove}
-      onMouseUp={handleMouseUp}
-      onMouseLeave={handleMouseLeave}
     >
-      {points}
-      <button
-        onClick={addPoint}
-        style={{
-          position: "absolute",
-          bottom: "10px",
-          right: "10px",
-          padding: "5px 10px",
-          backgroundColor: "rgba(255,255,255,0.7)",
-          border: "1px solid #ccc",
-          borderRadius: "4px",
-          cursor: "pointer",
-        }}
-      >
-        + Add Point
-      </button>
+      <div>
+        <label style={{ display: "block", marginBottom: "5px" }}>
+          Strength: {strength.toFixed(2)}
+        </label>
+        <input
+          type="range"
+          min="0"
+          max="2"
+          step="0.01"
+          value={strength}
+          onChange={(e) => {
+            mutateConfig((newConfig: IThinPlatesSplinesConfig) => {
+              newConfig.strength = parseFloat(e.target.value);
+            });
+          }}
+          style={{ width: "100%" }}
+        />
+      </div>
+
+      <div>
+        <label style={{ display: "block", marginBottom: "5px" }}>
+          Regularization: {regularization.toFixed(4)}
+        </label>
+        <input
+          type="range"
+          min="0"
+          max="0.01"
+          step="0.0001"
+          value={regularization}
+          onChange={(e) => {
+            mutateConfig((newConfig: IThinPlatesSplinesConfig) => {
+              newConfig.regularization = parseFloat(e.target.value);
+            });
+          }}
+          style={{ width: "100%" }}
+        />
+      </div>
+
+      <div style={{ fontSize: "12px", color: "#666" }}>
+        <p>Click and drag blue points to move source positions.</p>
+        <p>Click and drag green points to move target positions.</p>
+        <p>Lines show the deformation direction.</p>
+      </div>
     </div>
   );
 };
 
-addRendererOverlay("thinPlateSplines", ThinPlatesSplinesOverlay);
+addRendererConfig("thinPlateSplines", ThinPlatesSplinesConfig);

@@ -68,4 +68,5 @@ export const availableImages = {
   uvMap5: "uv-map5.png",
   uvMap6: "uv-map6.png",
   uvMap7: "uv-map7.png",
+  curvy: "curvy-shirt.jpg",
 };

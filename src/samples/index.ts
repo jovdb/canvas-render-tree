@@ -16,6 +16,7 @@ import { opacityTree } from "./opacity";
 import { shadowTree } from "./shadow";
 import { catmullRomTree } from "./catmull-rom";
 import { thinPlateSpines } from "./thin-plate-splines";
+import { beierNeelyTree } from "./beier-neely";
 
 export const samples = {
   opacity: {
@@ -71,6 +72,11 @@ export const samples = {
     name: "thinPlatesSplines",
     type: "3d",
     tree: thinPlateSpines,
+  },
+  beierNeely: {
+    name: "Beier-Neely",
+    type: "3d",
+    tree: beierNeelyTree,
   },
   displacement: {
     name: "Displacement Map",
