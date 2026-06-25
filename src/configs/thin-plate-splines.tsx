@@ -1,9 +1,10 @@
 import { addRendererConfig, ItemConfigFn } from ".";
 import { IThinPlatesSplinesConfig } from "../operations/thin-plate-splines";
 
-export const ThinPlatesSplinesConfig: ItemConfigFn<
-  IThinPlatesSplinesConfig
-> = ({ config, mutateConfig }) => {
+export const ThinPlatesSplinesConfig: ItemConfigFn<IThinPlatesSplinesConfig> = ({
+  config,
+  mutateConfig,
+}) => {
   const { strength = 1.0, regularization = 0.001 } = config || {};
 
   return (
@@ -54,8 +55,8 @@ export const ThinPlatesSplinesConfig: ItemConfigFn<
       </div>
 
       <div style={{ fontSize: "12px", color: "#666" }}>
-        <p>Click and drag blue points to set source positions.</p>
-        <p>Click and drag green points to set target positions.</p>
+        <p>Click and drag blue points to move source positions.</p>
+        <p>Click and drag green points to move target positions.</p>
         <p>Lines show the deformation direction.</p>
       </div>
     </div>

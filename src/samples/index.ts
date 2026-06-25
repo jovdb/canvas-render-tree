@@ -15,6 +15,7 @@ import { pillow2Tree } from "./pillow2";
 import { opacityTree } from "./opacity";
 import { shadowTree } from "./shadow";
 import { catmullRomTree } from "./catmull-rom";
+import { thinPlateSpines } from "./thin-plate-splines";
 
 export const samples = {
   opacity: {
@@ -65,6 +66,11 @@ export const samples = {
     name: "Catmull-Rom",
     type: "3d",
     tree: catmullRomTree,
+  },
+  thinPlatesSplines: {
+    name: "thinPlatesSplines",
+    type: "3d",
+    tree: thinPlateSpines,
   },
   displacement: {
     name: "Displacement Map",

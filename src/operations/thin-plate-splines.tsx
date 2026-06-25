@@ -1,7 +1,9 @@
+// https://khanhha.github.io/posts/Thin-Plate-Splines-Warping/
+
 import { IRenderItem, ItemDrawFn } from "../canvas";
 import { addRendererOverlay, ItemOverlayFn } from "../overlays";
 import { addRenderer } from "../renderers";
-import React from "react";
+import React, { useState } from "react";
 import { ControlPoint } from "../components/ControlPoint";
 
 // ============================================================================
@@ -25,10 +27,8 @@ export interface TPSControlPoint {
 }
 
 export interface IThinPlatesSplinesConfig {
-  /** Source control points (normalized coordinates 0-1) */
-  sourcePoints?: TPSPoint[];
-  /** Target control points (normalized coordinates 0-1) - where source points should move */
-  targetPoints?: TPSPoint[];
+  /** Control points with source position (x,y) and displacement (dx,dy) */
+  controlPoints?: TPSControlPoint[];
   /** Strength of the deformation (0-1) */
   strength?: number;
   /** Regularization parameter to prevent overfitting (0 = exact interpolation) */
@@ -89,16 +89,10 @@ class ThinPlateSplinesWarper {
 
   /**
    * Compute the TPS weights by solving the linear system
-   * The system is:
-   * [ K   P ] [ w ]   [ qx ]
-   * [ P^T 0 ] [ a ] = [ qy ]
-   *
-   * Where K is the kernel matrix, P is the polynomial terms, and q is the target points
    */
   private computeWeights(): void {
     const n = this.sourcePoints.length;
 
-    // If no points or only one point, use identity transformation
     if (n === 0) {
       this.weights = { wx: [], wy: [] };
       this.affine = { a0x: 0, a1x: 1, a2x: 0, a0y: 0, a1y: 0, a2y: 1 };
@@ -123,7 +117,7 @@ class ThinPlateSplinesWarper {
       P[i] = [1, this.sourcePoints[i].x, this.sourcePoints[i].y];
     }
 
-    // Build target vectors qx and qy (n x 1)
+    // Build target vectors
     const qx: number[] = this.targetPoints.map((p) => p.x);
     const qy: number[] = this.targetPoints.map((p) => p.y);
 
@@ -133,15 +127,10 @@ class ThinPlateSplinesWarper {
     const systemY: number[][] = [];
 
     for (let i = 0; i < size; i++) {
-      systemX[i] = [];
-      systemY[i] = [];
-      for (let j = 0; j < size; j++) {
-        systemX[i][j] = 0;
-        systemY[i][j] = 0;
-      }
+      systemX[i] = new Array(size).fill(0);
+      systemY[i] = new Array(size).fill(0);
     }
 
-    // Fill the system matrix
     // Top-left: K matrix
     for (let i = 0; i < n; i++) {
       for (let j = 0; j < n; j++) {
@@ -165,9 +154,6 @@ class ThinPlateSplinesWarper {
         systemY[n + i][j] = P[j][i];
       }
     }
-
-    // Bottom-right: zeros (3 x 3)
-    // Already initialized to 0
 
     // Add regularization to K diagonal
     if (this.regularization > 0) {
@@ -207,7 +193,6 @@ class ThinPlateSplinesWarper {
   private solveSystem(A: number[][], b: number[]): number[] {
     const n = A.length;
 
-    // Make copies
     const matrix: number[][] = [];
     for (let i = 0; i < n; i++) {
       matrix[i] = [...A[i]];
@@ -216,7 +201,6 @@ class ThinPlateSplinesWarper {
 
     // Forward elimination
     for (let col = 0; col < n; col++) {
-      // Find pivot
       let maxRow = col;
       for (let row = col + 1; row < n; row++) {
         if (Math.abs(matrix[row][col]) > Math.abs(matrix[maxRow][col])) {
@@ -224,16 +208,13 @@ class ThinPlateSplinesWarper {
         }
       }
 
-      // Swap rows
       [matrix[col], matrix[maxRow]] = [matrix[maxRow], matrix[col]];
       [rhs[col], rhs[maxRow]] = [rhs[maxRow], rhs[col]];
 
-      // If pivot is zero, matrix is singular
       if (Math.abs(matrix[col][col]) < 1e-10) {
         continue;
       }
 
-      // Eliminate below
       for (let row = col + 1; row < n; row++) {
         const factor = matrix[row][col] / matrix[col][col];
         for (let c = col; c < n; c++) {
@@ -264,14 +245,12 @@ class ThinPlateSplinesWarper {
    * Apply TPS transformation to a single point
    */
   private transformPoint(x: number, y: number): { tx: number; ty: number } {
-    // If no weights computed yet, return identity
     if (!this.weights || !this.affine) {
       return { tx: x, ty: y };
     }
 
     const n = this.sourcePoints.length;
 
-    // Compute weighted sum of radial basis functions
     let sumWx = 0;
     let sumWy = 0;
 
@@ -285,7 +264,6 @@ class ThinPlateSplinesWarper {
       sumWy += this.weights.wy[i] * phiVal;
     }
 
-    // Add affine part
     const tx =
       this.affine.a0x + this.affine.a1x * x + this.affine.a2x * y + sumWx;
     const ty =
@@ -298,29 +276,23 @@ class ThinPlateSplinesWarper {
    * Warp the image using TPS transformation
    */
   public warpImage(sourceData: ImageData): ImageData {
-    // Recompute weights if points changed
     this.computeWeights();
 
     const targetData = new ImageData(this.width, this.height);
     const srcPixels = new Uint32Array(sourceData.data.buffer);
     const dstPixels = new Uint32Array(targetData.data.buffer);
 
-    // Precompute inverse mapping for better performance
-    // For each target pixel, find its source location
     for (let y = 0; y < this.height; y++) {
       const normY = y / (this.height - 1);
 
       for (let x = 0; x < this.width; x++) {
         const normX = x / (this.width - 1);
 
-        // Transform the normalized point
         const { tx, ty } = this.transformPoint(normX, normY);
 
-        // Apply strength
         const srcX = x - (tx - normX) * this.width * this.strength;
         const srcY = y - (ty - normY) * this.height * this.strength;
 
-        // Bilinear interpolation
         if (
           srcX >= 0 &&
           srcX < this.width - 1 &&
@@ -342,10 +314,7 @@ class ThinPlateSplinesWarper {
           const p01 = srcPixels[idx01];
           const p11 = srcPixels[idx11];
 
-          let r = 0,
-            g = 0,
-            b = 0,
-            a = 0;
+          let r = 0, g = 0, b = 0, a = 0;
           for (let shift = 0; shift <= 24; shift += 8) {
             const c00 = (p00 >> shift) & 0xff;
             const c10 = (p10 >> shift) & 0xff;
@@ -364,7 +333,6 @@ class ThinPlateSplinesWarper {
 
           dstPixels[y * this.width + x] = r | (g << 8) | (b << 16) | (a << 24);
         } else {
-          // Out of bounds - transparent
           dstPixels[y * this.width + x] = 0x00000000;
         }
       }
@@ -379,13 +347,12 @@ class ThinPlateSplinesWarper {
 // ============================================================================
 
 export const thinPlateSplines = ({
-  sourcePoints = [],
-  targetPoints = [],
+  controlPoints = [],
   strength = 1.0,
   regularization = 0.001,
 }: IThinPlatesSplinesConfig): IRenderItem<IThinPlatesSplinesConfig> => ({
   name: "thinPlateSplines",
-  config: { sourcePoints, targetPoints, strength, regularization },
+  config: { controlPoints, strength, regularization },
 });
 
 // ============================================================================
@@ -398,7 +365,6 @@ export const draw: ItemDrawFn<IThinPlatesSplinesConfig> = (
   config,
   drawInput,
 ) => {
-  // First draw background / previous stack items
   drawPrev?.(ctx);
 
   if (drawInput) ctx.save();
@@ -409,32 +375,17 @@ export const draw: ItemDrawFn<IThinPlatesSplinesConfig> = (
 
   const originalData = ctx.getImageData(0, 0, w, h);
 
-  // Get configuration with defaults
   const {
-    sourcePoints = [],
-    targetPoints = [],
+    controlPoints = [],
     strength = 1.0,
     regularization = 0.001,
   } = config || {};
 
-  // Convert normalized points to TPSPoint format
-  const srcPts: TPSPoint[] = sourcePoints.map((p) => ({ x: p.x, y: p.y }));
-  const tgtPts: TPSPoint[] = targetPoints.map((p) => ({ x: p.x, y: p.y }));
+  // Convert control points to source and target points
+  const srcPts: TPSPoint[] = controlPoints.map((p) => ({ x: p.x, y: p.y }));
+  const tgtPts: TPSPoint[] = controlPoints.map((p) => ({ x: p.x + p.dx, y: p.y + p.dy }));
 
-  // Ensure we have matching pairs
-  const numPoints = Math.min(srcPts.length, tgtPts.length);
-  const actualSrc = srcPts.slice(0, numPoints);
-  const actualTgt = tgtPts.slice(0, numPoints);
-
-  // Create warper and apply transformation
-  const warper = new ThinPlateSplinesWarper(
-    w,
-    h,
-    actualSrc,
-    actualTgt,
-    strength,
-    regularization,
-  );
+  const warper = new ThinPlateSplinesWarper(w, h, srcPts, tgtPts, strength, regularization);
 
   const warpedData = warper.warpImage(originalData);
   ctx.putImageData(warpedData, 0, 0);
@@ -453,20 +404,18 @@ addRenderer("thinPlateSplines", {
 export const ThinPlatesSplinesOverlay: ItemOverlayFn<
   IThinPlatesSplinesConfig
 > = ({ config, mutateConfig }) => {
-  const { sourcePoints = [], targetPoints = [] } = config || {};
+  const { controlPoints = [] } = config || {};
 
-  const [draggedIndex, setDraggedIndex] = React.useState<number | null>(null);
-  const [isSource, setIsSource] = React.useState<boolean>(true);
+  const [draggedIndex, setDraggedIndex] = useState<number | null>(null);
+  const [dragMode, setDragMode] = useState<"position" | "target">("target");
 
-  // Handle mouse down on a control point
   const handleMouseDown =
-    (index: number, source: boolean) => (e: React.MouseEvent) => {
+    (index: number, mode: "position" | "target") => (e: React.MouseEvent) => {
       e.preventDefault();
       setDraggedIndex(index);
-      setIsSource(source);
+      setDragMode(mode);
     };
 
-  // Handle mouse move to update point position
   const handleMouseMove = (e: React.MouseEvent<HTMLDivElement>) => {
     if (draggedIndex === null) return;
 
@@ -478,42 +427,28 @@ export const ThinPlatesSplinesOverlay: ItemOverlayFn<
     const normalizedY = y / rect.height;
 
     mutateConfig((newConfig: IThinPlatesSplinesConfig) => {
-      if (isSource) {
-        const newSourcePoints = [...(newConfig.sourcePoints || [])];
-        if (draggedIndex < newSourcePoints.length) {
-          newSourcePoints[draggedIndex] = { x: normalizedX, y: normalizedY };
-          newConfig.sourcePoints = newSourcePoints;
-        } else {
-          // Add new point
-          newConfig.sourcePoints = [
-            ...(newConfig.sourcePoints || []),
-            { x: normalizedX, y: normalizedY },
-          ];
-        }
-        // Ensure target point exists
-        const newTargetPoints = [...(newConfig.targetPoints || [])];
-        while (newTargetPoints.length <= draggedIndex) {
-          newTargetPoints.push({ x: normalizedX, y: normalizedY });
-        }
-        newConfig.targetPoints = newTargetPoints;
-      } else {
-        const newTargetPoints = [...(newConfig.targetPoints || [])];
-        if (draggedIndex < newTargetPoints.length) {
-          newTargetPoints[draggedIndex] = { x: normalizedX, y: normalizedY };
-          newConfig.targetPoints = newTargetPoints;
-        } else {
-          newConfig.targetPoints = [
-            ...(newConfig.targetPoints || []),
-            { x: normalizedX, y: normalizedY },
-          ];
-        }
-        // Ensure source point exists
-        const newSourcePoints = [...(newConfig.sourcePoints || [])];
-        while (newSourcePoints.length <= draggedIndex) {
-          newSourcePoints.push({ x: normalizedX, y: normalizedY });
-        }
-        newConfig.sourcePoints = newSourcePoints;
+      const newControlPoints = [...(newConfig.controlPoints || [])];
+
+      if (draggedIndex >= newControlPoints.length) {
+        newControlPoints.push({ x: normalizedX, y: normalizedY, dx: 0, dy: 0 });
       }
+
+      if (dragMode === "position") {
+        newControlPoints[draggedIndex] = {
+          ...newControlPoints[draggedIndex],
+          x: normalizedX,
+          y: normalizedY,
+        };
+      } else {
+        const cp = newControlPoints[draggedIndex];
+        newControlPoints[draggedIndex] = {
+          ...cp,
+          dx: normalizedX - cp.x,
+          dy: normalizedY - cp.y,
+        };
+      }
+
+      newConfig.controlPoints = newControlPoints;
     });
   };
 
@@ -525,94 +460,82 @@ export const ThinPlatesSplinesOverlay: ItemOverlayFn<
     setDraggedIndex(null);
   };
 
-  // Add a new point pair
   const addPoint = () => {
     mutateConfig((newConfig: IThinPlatesSplinesConfig) => {
-      newConfig.sourcePoints = [
-        ...(newConfig.sourcePoints || []),
-        { x: 0.5, y: 0.5 },
-      ];
-      newConfig.targetPoints = [
-        ...(newConfig.targetPoints || []),
-        { x: 0.5, y: 0.5 },
+      newConfig.controlPoints = [
+        ...(newConfig.controlPoints || []),
+        { x: 0.5, y: 0.5, dx: 0, dy: 0 },
       ];
     });
   };
 
-  // Remove a point pair
   const removePoint = (index: number) => (e: React.MouseEvent) => {
     e.preventDefault();
     e.stopPropagation();
     mutateConfig((newConfig: IThinPlatesSplinesConfig) => {
-      const newSourcePoints = [...(newConfig.sourcePoints || [])];
-      const newTargetPoints = [...(newConfig.targetPoints || [])];
-      newSourcePoints.splice(index, 1);
-      newTargetPoints.splice(index, 1);
-      newConfig.sourcePoints = newSourcePoints;
-      newConfig.targetPoints = newTargetPoints;
+      const newControlPoints = [...(newConfig.controlPoints || [])];
+      newControlPoints.splice(index, 1);
+      newConfig.controlPoints = newControlPoints;
     });
   };
 
-  // Build points for rendering
   const points = [];
-  const numPoints = Math.max(sourcePoints.length, targetPoints.length);
 
-  for (let i = 0; i < numPoints; i++) {
-    const src = sourcePoints[i] || { x: 0.5, y: 0.5 };
-    const tgt = targetPoints[i] || { x: 0.5, y: 0.5 };
+  for (let i = 0; i < controlPoints.length; i++) {
+    const cp = controlPoints[i];
+    const sourceX = cp.x;
+    const sourceY = cp.y;
+    const targetX = cp.x + cp.dx;
+    const targetY = cp.y + cp.dy;
 
-    // Source point (blue)
     points.push(
       <ControlPoint
         key={`src-${i}`}
-        left={src.x}
-        top={src.y}
+        left={sourceX}
+        top={sourceY}
         color="blue"
         draggable={true}
-        onMouseDown={handleMouseDown(i, true)}
+        onMouseDown={handleMouseDown(i, "position")}
       />,
     );
 
-    // Target point (green)
     points.push(
       <ControlPoint
         key={`tgt-${i}`}
-        left={tgt.x}
-        top={tgt.y}
+        left={targetX}
+        top={targetY}
         color="green"
         outer={false}
         draggable={true}
-        onMouseDown={handleMouseDown(i, false)}
+        onMouseDown={handleMouseDown(i, "target")}
       />,
     );
 
-    // Line connecting source to target
     points.push(
       <div
         key={`line-${i}`}
         style={{
           position: "absolute",
-          left: `${src.x * 100}%`,
-          top: `${src.y * 100}%`,
-          width: `${Math.abs(tgt.x - src.x) * 100}%`,
-          height: `${Math.abs(tgt.y - src.y) * 100}%`,
+          left: `${sourceX * 100}%`,
+          top: `${sourceY * 100}%`,
+          width: `${Math.abs(targetX - sourceX) * 100}%`,
+          height: `${Math.abs(targetY - sourceY) * 100}%`,
           border: "1px solid rgba(255, 255, 0, 0.5)",
-          transform: `translate(${tgt.x > src.x ? 0 : -100}%, ${tgt.y > src.y ? 0 : -100}%) rotate(${Math.atan2(tgt.y - src.y, tgt.x - src.x)}rad)`,
+          transform: `translate(${(targetX > sourceX ? 0 : -100)}%, ${(targetY > sourceY ? 0 : -100)}%) rotate(${Math.atan2(targetY - sourceY, targetX - sourceX)}rad)`,
           pointerEvents: "none",
           borderRadius: "0",
         }}
       />,
     );
 
-    // Remove button for each pair
     points.push(
       <div
         key={`remove-${i}`}
         onClick={removePoint(i)}
         style={{
           position: "absolute",
-          left: `${tgt.x * 100}%`,
-          top: `${tgt.y * 100}%`,
+          left: `${targetX * 100}%`,
+          top: `calc(${targetY * 100}% - 16px)`,
           width: "20px",
           height: "20px",
           backgroundColor: "red",
