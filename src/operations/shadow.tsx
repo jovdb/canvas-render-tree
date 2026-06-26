@@ -1,8 +1,9 @@
 import { addOperation } from ".";
 import { getContext2d, IRenderItem, ItemDrawFn, RenderTree } from "../canvas";
+import { IConfig, ItemConfigFn } from "../configs";
 import { OperationSchema } from "../schemas";
 
-export interface IShadowConfig {
+export interface IShadowConfig extends IConfig {
   type?: "outer" | "inner";
   shadowBlur?: number;
   shadowOffsetX?: number;
@@ -13,8 +14,8 @@ export interface IShadowConfig {
 
 const schema: OperationSchema<"shadow"> = {
   name: "shadow",
-  getName: (config: IShadowConfig) =>
-    `shadow: ${config.type === "outer" ? "outer" : "inner"}`,
+  getName: (config) =>
+    config ? `shadow: ${(config as IShadowConfig).type === "outer" ? "outer" : "inner"}` : "shadow",
   description: "Add shadow to the last painted item",
   input: {
     required: true,
@@ -119,10 +120,74 @@ export const draw: ItemDrawFn<IShadowConfig> = (
   }
 };
 
+export const ShadowConfig: ItemConfigFn<IShadowConfig> = ({
+  config,
+  mutateConfig,
+}) => {
+  const { shadowOffsetX = 0, shadowOffsetY = 0, type = "outer" } = config;
+  return (
+    <>
+      <div>
+        Type:{" "}
+        <select
+          value={type}
+          onChange={(e) => {
+            // eslint-disable-next-line @typescript-eslint/no-explicit-any
+            const value = e.target.value as any;
+            mutateConfig((draftConfig) => {
+              draftConfig.type = value;
+            });
+          }}
+        >
+          <option value="outer">Outer</option>
+          <option value="inner">Inner</option>
+        </select>
+      </div>
+      <div>
+        Shadow offset X:{" "}
+        <input
+          type="number"
+          min="-50"
+          max="50"
+          value={shadowOffsetX?.toString()}
+          onChange={(e) => {
+            const value = parseInt(e.target.value);
+            mutateConfig((draftConfig) => {
+              draftConfig.shadowOffsetX = value;
+            });
+          }}
+        />
+      </div>
+      <div>
+        Shadow offset Y:{" "}
+        <input
+          type="number"
+          min="-50"
+          max="50"
+          value={shadowOffsetY?.toString()}
+          onChange={(e) => {
+            const value = parseInt(e.target.value);
+            mutateConfig((draftConfig) => {
+              draftConfig.shadowOffsetY = value;
+            });
+          }}
+        />
+      </div>
+    </>
+  );
+};
+
 const operation = {
   key: "shadow",
   create,
   draw,
   schema,
+  configComponent: ShadowConfig,
 } as const;
 addOperation(operation);
+
+declare global {
+  interface IOperations {
+    [operation.key]: typeof create;
+  }
+}

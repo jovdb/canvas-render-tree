@@ -1,7 +1,8 @@
 import { IRenderItem, ItemDrawFn } from "../canvas";
+import { IConfig } from "../configs";
 import { addRenderer } from "../renderers";
 
-export interface IDrawTextConfig {
+export interface IDrawTextConfig extends IConfig {
   text: string;
   x?: number;
   y?: number;

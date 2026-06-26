@@ -1,6 +1,6 @@
 import { IRenderItem } from "../canvas";
 import { addRenderer } from "../renderers";
-import { blend } from "./blend";
+import { create } from "./blend";
 
 /**
  * Repaint pixels based on transparency
@@ -13,7 +13,7 @@ export const repaint = (
   repaintWith: [IRenderItem],
 ): IRenderItem => ({
   name: "repaint",
-  input: [blend("source-in", repaintWith)],
+  input: [create("source-in", repaintWith)],
 });
 
 addRenderer("repaint", {

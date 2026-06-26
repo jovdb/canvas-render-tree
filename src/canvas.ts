@@ -1,3 +1,4 @@
+import { IConfig } from "./configs";
 import { renderers } from "./renderers";
 
 type DrawFn = (ctx: CanvasRenderingContext2D) => void;
@@ -41,7 +42,7 @@ export interface IItemRenderer<TConfig = unknown> {
  * The data describing the render step. \
  * This will be serialized and saved
  */
-export interface IRenderItem<TConfig = object> {
+export interface IRenderItem<TConfig extends IConfig = IConfig> {
   /** Node name */
   name: string;
 
@@ -57,7 +58,7 @@ export interface IRenderItem<TConfig = object> {
 }
 
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
-export type RenderTree = IRenderItem<any>[];
+export type RenderTree = IRenderItem<IConfig>[];
 
 export type Drawable = HTMLImageElement | HTMLCanvasElement;
 

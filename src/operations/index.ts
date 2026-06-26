@@ -1,5 +1,5 @@
 import { IRenderItem, ItemDrawFn, ItemLoadFn } from "../canvas";
-import { addRendererConfig, ItemConfigFn } from "../configs";
+import { addRendererConfig, IConfig, ItemConfigFn } from "../configs";
 import { ItemOverlayFn, addRendererOverlay } from "../overlays";
 import { addRenderer } from "../renderers";
 import { OperationSchema, addSchema } from "../schemas";
@@ -7,7 +7,7 @@ import { OperationSchema, addSchema } from "../schemas";
 declare global {
   interface IOperations {
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    [key: string]: (...args: any[]) => IRenderItem<unknown>;
+    [key: string]: (...args: any[]) => IRenderItem<IConfig>;
   }
 }
 

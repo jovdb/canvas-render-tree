@@ -3,6 +3,7 @@
 // uvmap: input + uvmap renders
 
 import { IRenderItem } from "./canvas";
+import { IConfig } from "./configs";
 
 //
 export interface OperationRenderArg {
@@ -14,7 +15,8 @@ export interface OperationSchema<TOperationName extends string> {
   name: TOperationName;
 
   /** Short name to show in the block */
-  getName?: <TConfig extends object>(config: TConfig) => string;
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  getName?: (config: IConfig | undefined) => string;
 
   description?: string;
   prevAsInput?: OperationRenderArg | undefined;

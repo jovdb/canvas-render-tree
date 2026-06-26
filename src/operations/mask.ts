@@ -1,6 +1,6 @@
 import { IRenderItem, RenderTree } from "../canvas";
 import { addRenderer } from "../renderers";
-import { blend } from "./blend";
+import { create } from "./blend";
 
 /**
  * Currently only opacity layer used of mask
@@ -17,7 +17,7 @@ import { blend } from "./blend";
  */
 export const mask = (mask?: RenderTree | undefined): IRenderItem => ({
   name: "mask",
-  input: [blend("destination-in", mask)],
+  input: [create("destination-in", mask)],
 });
 
 addRenderer("mask", {

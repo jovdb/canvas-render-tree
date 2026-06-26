@@ -1,8 +1,9 @@
 import { addOperation } from ".";
 import { IRenderItem, ItemDrawFn, RenderTree } from "../canvas";
+import { IConfig } from "../configs";
 import { OperationSchema } from "../schemas";
 
-export interface IOpacityConfig {
+export interface IOpacityConfig extends IConfig {
   opacity: number;
 }
 
@@ -23,7 +24,7 @@ export const draw: ItemDrawFn<IOpacityConfig> = (
 ) => {
   // first draw previous items
   drawPrev?.(ctx);
-  
+
   ctx.save();
   ctx.globalAlpha = config.opacity;
   drawInput?.(ctx);

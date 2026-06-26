@@ -1,11 +1,14 @@
 import { useState } from "react";
 import { RenderItemName } from "../operations";
 
+// eslint-disable-next-line @typescript-eslint/no-empty-object-type
+export interface IConfig {}
+
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
-const configs: Partial<Record<RenderItemName, ItemConfigFn<any>>> = {} as const;
+const configs: Partial<Record<RenderItemName, ItemConfigFn<IConfig>>> = {} as const;
 
 /** Function to configure an item */
-export type ItemConfigFn<TConfig = unknown> = (props: {
+export type ItemConfigFn<TConfig = IConfig> = (props: {
   config: Readonly<TConfig>;
   mutateConfig: (mutate: (config: TConfig) => void) => void;
 }) => React.ReactNode;
@@ -25,13 +28,13 @@ export function addRendererConfig(
 export function getRendererConfig(
   name: RenderItemName | undefined,
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
-): ItemConfigFn<any> | undefined {
+): ItemConfigFn<IConfig> | undefined {
   if (!name) return undefined;
   const configComponent = configs[name as RenderItemName];
   return configComponent;
 }
 
-export const JsonConfig: ItemConfigFn<unknown> = ({ config, mutateConfig }) => {
+export const JsonConfig: ItemConfigFn<IConfig> = ({ config, mutateConfig }) => {
   const [error, setError] = useState("");
   return (
     <form

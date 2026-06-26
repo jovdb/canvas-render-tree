@@ -11,7 +11,7 @@ import { samples } from "./samples";
 import { produce } from "immer";
 import { RenderTreePanel } from "./components/RenderTreePanel";
 import { TreeIndex } from "./components/RenderTree";
-import { getRendererConfig, JsonConfig } from "./configs";
+import { getRendererConfig, IConfig, JsonConfig } from "./configs";
 import { RenderItemName } from "./operations";
 import "./configs/load";
 import { schemas, OperationSchema } from "./schemas";
@@ -98,10 +98,11 @@ function App() {
   const RendererOverlay = getRendererOverlay(renderItemName);
 
   const [_isPending, startTransition] = useTransition();
-  const onConfigChange = (mutate: (config: unknown) => void) => {
+  const onConfigChange = (mutate: (config: IConfig) => void) => {
     const newTree = produce(workTree, (draftTree) => {
       const item = selectIndex(draftTree, editIndex ?? []);
-      mutate(item?.config);
+      const cfg = item?.config;
+      if (cfg) mutate(cfg);
     });
     startTransition(() => setWorkTree(newTree));
   };
@@ -201,7 +202,7 @@ function App() {
         <div className="app__render-item-details">
           <h3>Details</h3>
           <ItemConfigurator
-            config={editItem?.config as IRenderItem<unknown>}
+            config={editItem?.config as IRenderItem<IConfig>}
             mutateConfig={onConfigChange}
           />
         </div>
@@ -210,7 +211,7 @@ function App() {
           {editItem && (
             <JsonConfig
               key={JSON.stringify(editItem?.config)}
-              config={editItem?.config as IRenderItem<unknown>}
+              config={editItem?.config as IRenderItem<IConfig>}
               mutateConfig={onConfigChange}
             />
           )}
