@@ -80,6 +80,7 @@ const create = (config: IDrawImageConfig): IRenderItem<IDrawImageConfig> => ({
 const operation = {
   key: "drawImage",
   create,
+  load,
   draw,
   schema,
 } as const;

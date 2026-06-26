@@ -4,6 +4,9 @@ import { IRenderItem } from "./canvas";
 import { AppOverlay } from "./components/AppOverlay";
 import { Canvas } from "./components/Canvas";
 import { useEffect, useMemo, useState, useTransition } from "react";
+import "./operations";
+import "./operations/operations";
+
 import { samples } from "./samples";
 import { produce } from "immer";
 import { RenderTreePanel } from "./components/RenderTreePanel";

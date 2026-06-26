@@ -1,3 +1,6 @@
+import "./draw-image";
+import "./opacity";
+
 import { bevel } from "./bevel";
 import { blend } from "./blend";
 import { drawText } from "./draw-text";

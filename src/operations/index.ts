@@ -1,9 +1,8 @@
-import { IRenderItem, ItemDrawFn } from "../canvas";
+import { IRenderItem, ItemDrawFn, ItemLoadFn } from "../canvas";
 import { addRendererConfig, ItemConfigFn } from "../configs";
 import { ItemOverlayFn, addRendererOverlay } from "../overlays";
+import { addRenderer } from "../renderers";
 import { OperationSchema, addSchema } from "../schemas";
-
-import "./draw-image";
 
 declare global {
   interface IOperations {
@@ -23,6 +22,8 @@ export interface IOperation<TKey extends string, TConfig extends object> {
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   create: (...args: any[]) => IRenderItem<TConfig>;
 
+  load?: ItemLoadFn<TConfig>;
+
   /** Render function to apply the operation */
   draw: ItemDrawFn<TConfig>;
 
@@ -36,6 +37,8 @@ export function addOperation<TKey extends string, TConfig extends object>(
 ) {
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   (operations as any)[operation.key] = operation.create;
+
+  addRenderer(operation.key, operation);
 
   if (operation.schema) {
     addSchema(operation.schema);

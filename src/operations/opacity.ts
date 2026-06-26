@@ -23,7 +23,7 @@ export const draw: ItemDrawFn<IOpacityConfig> = (
 ) => {
   // first draw previous items
   drawPrev?.(ctx);
-
+  
   ctx.save();
   ctx.globalAlpha = config.opacity;
   drawInput?.(ctx);

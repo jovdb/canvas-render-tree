@@ -10,6 +10,7 @@ export function Canvas({ items }: { items: IRenderItem[] }) {
     queryKey: ["canvas", items],
     queryFn: async () => {
       if (!canvasRef.current) return;
+      if (!items?.length) return;
       validateSchemas(items);
       await loadTree(items);
       draw(canvasRef.current, items);
