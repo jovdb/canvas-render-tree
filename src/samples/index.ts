@@ -14,7 +14,7 @@ import { pillowTree } from "./pillow";
 import { pillow2Tree } from "./pillow2";
 import { opacityTree } from "./opacity";
 import { shadowTree } from "./shadow";
-import { catmullRomTree } from "./catmull-rom";
+import { catmullRomShirtTree, catmullRomTree } from "./catmull-rom";
 import { thinPlateSpines } from "./thin-plate-splines";
 import { beierNeelyTree } from "./beier-neely";
 
@@ -67,6 +67,11 @@ export const samples = {
     name: "Catmull-Rom",
     type: "3d",
     tree: catmullRomTree,
+  },
+  catmullRomShirt: {
+    name: "Catmull-Rom Shirt",
+    type: "lifestyle",
+    tree: catmullRomShirtTree,
   },
   thinPlatesSplines: {
     name: "thinPlatesSplines",

@@ -1,0 +1,73 @@
+body {
+  --border-color: #ccc;
+}
+
+.render-item {
+  position: relative;
+  padding: 2px 5px;
+  margin: 2px 0;
+  border-radius: 3px;
+  border: 2px solid var(--border-color);
+
+  background-color: transparent;
+}
+
+.render-item--selectable:hover {
+  cursor: pointer;
+  background-color: #eee;
+}
+
+.render-item--selected {
+  border: 2px solid #44f;
+  background: #ddf;
+}
+
+.render-item--selectable.render-item--selected:hover {
+  border: 2px solid #44f;
+  background: #ccf;
+}
+
+.render-item__visibility {
+  position: absolute;
+}
+
+.render-item__name {
+  margin: 0 20px;
+  text-align: center;
+}
+
+.render-item__group {
+  /* margin: 0.4em 0.4em 0 0.4em; */
+  padding: 0.2em;
+  border: 2px dashed var(--border-color);
+  border-radius: 0.2em;
+}
+
+.render-item__group--collapsed > .render-tree {
+  display: none;
+}
+
+.render-item__input-below {
+  position: relative;
+  margin-left: 0.4em;
+  margin-right: 0.4em;
+  color: var(--border-color);
+  transform-origin: 0% 50%;
+  height: 1.3em;
+  text-align: right;
+}
+
+.render-item__input-arrow {
+  position: absolute;
+  left: 50%;
+  transform: scale(2);
+}
+
+.render-item__input-collapse {
+  display: none;
+  cursor: pointer;
+}
+
+.render-item__input:hover > * > .render-item__input-collapse {
+  display: block;
+}

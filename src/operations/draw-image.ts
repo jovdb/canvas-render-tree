@@ -1,7 +1,7 @@
 import { IRenderItem, ItemDrawFn, ItemLoadFn } from "../canvas";
 import { addRenderer } from "../renderers";
 import { loadImageAsync } from "../resources";
-import { OperationSchema } from "../shemas";
+import { addSchema, OperationSchema } from "../shemas";
 
 export interface IDrawImageConfig {
   imageUrl: string;
@@ -13,6 +13,9 @@ export const drawImageSchema: OperationSchema<"drawImage"> = {
   name: "drawImage",
   description: "Draw an image",
 };
+
+addSchema(drawImageSchema);
+
 /** Draw an image on the canvas */
 export const drawImage = (config: IDrawImageConfig): IRenderItem => ({
   name: "drawImage",

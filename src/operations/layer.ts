@@ -1,5 +1,6 @@
 import { getContext2d, IRenderItem, ItemDrawFn, RenderTree } from "../canvas";
 import { addRenderer } from "../renderers";
+import { addSchema } from "../shemas";
 
 /**
  * Draw children on a new render layer
@@ -8,6 +9,15 @@ import { addRenderer } from "../renderers";
 export const layer = (input: RenderTree): IRenderItem => ({
   name: "layer",
   input,
+});
+
+addSchema({
+  name: "layer",
+  description: "Group children on a new render layer",
+  input: {
+    description: "The input to draw on the new layer",
+    required: true,
+  },
 });
 
 export const draw: ItemDrawFn = (ctx, drawPrev, _config, drawInput) => {

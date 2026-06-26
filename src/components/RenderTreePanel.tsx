@@ -1,5 +1,5 @@
 import { IRenderItem } from "../canvas";
-import { RenderTree, TreeIndex } from "./RenderTree";
+import { RenderTree2, TreeIndex } from "./RenderTree2/RenderTree2";
 
 interface RenderTreePanelProps {
   items: readonly IRenderItem[];
@@ -50,7 +50,7 @@ export function RenderTreePanel({
           }
         }}
       >
-        <RenderTree
+        <RenderTree2
           items={items}
           parentIndexes={[]}
           editIndex={editIndex}

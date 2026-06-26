@@ -1,9 +1,19 @@
 import { IRenderItem, ItemDrawFn, RenderTree } from "../canvas";
 import { addRenderer } from "../renderers";
+import { addSchema, OperationSchema } from "../shemas";
 
 export interface IBlendConfig {
   blendMode: GlobalCompositeOperation;
 }
+
+addSchema({
+  name: "blend",
+  description: "Blend the input with the previous items",
+  input: {
+    description: "The input to blend",
+    required: true,
+  },
+});
 
 export const blend = (
   blendMode: GlobalCompositeOperation,

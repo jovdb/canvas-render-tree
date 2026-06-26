@@ -1,4 +1,4 @@
-import { IRenderItem, ItemDrawFn } from "../canvas";
+import { IRenderItem, ItemDrawFn, RenderTree } from "../canvas";
 import { addRendererOverlay, ItemOverlayFn } from "../overlays";
 import { addRenderer } from "../renderers";
 import React from "react";
@@ -20,14 +20,18 @@ export interface ICatmullRomConfig {
   controlPoints?: ControlPointConfig[];
 }
 
-export const catmullRom = ({
-  gridRows = 3,
-  gridCols = 3,
-  strength = 10,
-  controlPoints = [],
-}: ICatmullRomConfig): IRenderItem<ICatmullRomConfig> => ({
+export const catmullRom = (
+  {
+    gridRows = 3,
+    gridCols = 3,
+    strength = 10,
+    controlPoints = [],
+  }: ICatmullRomConfig,
+  input: RenderTree,
+): IRenderItem<ICatmullRomConfig> => ({
   name: "catmullRom",
   config: { strength, gridRows, gridCols, controlPoints },
+  input,
 });
 
 // ============================================================================
@@ -217,57 +221,61 @@ export const draw: ItemDrawFn<ICatmullRomConfig> = (
   config,
   drawInput,
 ) => {
-  // First draw background / previous stack items
-  drawPrev?.(ctx);
+  if (drawInput) {
+    ctx.save();
+    drawInput(ctx);
 
-  if (drawInput) ctx.save();
-  drawInput?.(ctx);
+    const w = ctx.canvas.width;
+    const h = ctx.canvas.height;
 
-  const w = ctx.canvas.width;
-  const h = ctx.canvas.height;
+    const originalData = ctx.getImageData(0, 0, w, h);
 
-  const originalData = ctx.getImageData(0, 0, w, h);
+    // Get grid resolution from config (defaults to 4x4)
+    const rows = config?.gridRows || 4;
+    const cols = config?.gridCols || 4;
 
-  // Get grid resolution from config (defaults to 4x4)
-  const rows = config?.gridRows || 4;
-  const cols = config?.gridCols || 4;
+    const warper = new CatmullRomGridWarper(w, h, rows, cols);
 
-  const warper = new CatmullRomGridWarper(w, h, rows, cols);
+    // Initialize grids: source (unchanged) and destination (will be deformed)
+    const sourceGrid: Point[][] = [];
+    const destGrid: Point[][] = [];
 
-  // Initialize grids: source (unchanged) and destination (will be deformed)
-  const sourceGrid: Point[][] = [];
-  const destGrid: Point[][] = [];
+    for (let r = 0; r < rows; r++) {
+      sourceGrid[r] = [];
+      destGrid[r] = [];
+      const y = (r / (rows - 1)) * h;
 
-  for (let r = 0; r < rows; r++) {
-    sourceGrid[r] = [];
-    destGrid[r] = [];
-    const y = (r / (rows - 1)) * h;
+      for (let c = 0; c < cols; c++) {
+        const x = (c / (cols - 1)) * w;
 
-    for (let c = 0; c < cols; c++) {
-      const x = (c / (cols - 1)) * w;
-
-      sourceGrid[r][c] = { x, y };
-      destGrid[r][c] = { x, y }; // Defaults match origin
-    }
-  }
-
-  // Apply configured control point offsets to destination grid
-  // dx and dy are normalized (0-1), where 0 is left/top and 1 is right/bottom
-  if (config?.controlPoints) {
-    for (const cpConfig of config.controlPoints) {
-      const { row, col, dx, dy } = cpConfig;
-      if (row >= 0 && row < rows && col >= 0 && col < cols) {
-        destGrid[row][col].x += dx * w;
-        destGrid[row][col].y += dy * h;
+        sourceGrid[r][c] = { x, y };
+        destGrid[r][c] = { x, y }; // Defaults match origin
       }
     }
+
+    // Apply configured control point offsets to destination grid
+    // dx and dy are normalized (0-1), where 0 is left/top and 1 is right/bottom
+    if (config?.controlPoints) {
+      for (const cpConfig of config.controlPoints) {
+        const { row, col, dx, dy } = cpConfig;
+        if (row >= 0 && row < rows && col >= 0 && col < cols) {
+          destGrid[row][col].x += dx * w;
+          destGrid[row][col].y += dy * h;
+        }
+      }
+    }
+
+    // Process the pixel warp structure via Catmull-Rom
+    const warpedData = warper.warpImage(originalData, destGrid);
+    ctx.putImageData(warpedData, 0, 0);
+
+    ctx.restore();
   }
 
-  // Process the pixel warp structure via Catmull-Rom
-  const warpedData = warper.warpImage(originalData, destGrid);
-  ctx.putImageData(warpedData, 0, 0);
-
-  if (drawInput) ctx.restore();
+  // Draw Previous behind it, so we don't need to create an new layer/RenderingContext2D
+  ctx.globalCompositeOperation = "destination-over";
+  drawPrev?.(ctx);
+  ctx.globalCompositeOperation = "source-over";
 };
 
 addRenderer("catmullRom", {

@@ -3,7 +3,7 @@
 // uvmap: input + uvmap renders
 
 import { IRenderItem } from "./canvas";
-import { drawImageSchema } from "./operations/draw-image";
+import { RenderItemName } from "./operations";
 import { opacitySchema } from "./operations/opacity";
 import { shadowSchema } from "./operations/shadow";
 
@@ -16,12 +16,12 @@ export interface OperationRenderArg {
 export interface OperationSchema<TOperationName extends string> {
   name: TOperationName;
   description?: string;
+  prevAsInput?: OperationRenderArg | undefined;
   input?: OperationRenderArg | undefined;
   args?: OperationRenderArg[];
 }
 
 export const schemas = {
-  drawImage: drawImageSchema,
   opacity: opacitySchema,
   shadow: shadowSchema,
 };
@@ -57,4 +57,18 @@ export function validateSchemas(renderTree: IRenderItem[]) {
   renderTree.forEach((item) => {
     validateSchema(item);
   });
+}
+
+export function getSchema<T extends RenderItemName>(
+  name: T,
+): OperationSchema<T> | undefined;
+export function getSchema(name: string): OperationSchema<string> | undefined;
+export function getSchema(name: string): OperationSchema<string> | undefined {
+  return schemas[name as keyof typeof schemas];
+}
+
+export function addSchema<T extends RenderItemName>(
+  schema: OperationSchema<T>,
+) {
+  schemas[schema.name as unknown as any] = schema;
 }
