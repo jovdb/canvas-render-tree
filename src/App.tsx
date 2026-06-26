@@ -11,7 +11,7 @@ import { TreeIndex } from "./components/RenderTree";
 import { getRendererConfig, JsonConfig } from "./configs";
 import { RenderItemName } from "./operations";
 import "./configs/load";
-import { schemas, OperationSchema } from "./shemas";
+import { schemas, OperationSchema } from "./schemas";
 import { getRendererOverlay } from "./overlays";
 
 export function selectIndex(tree: IRenderItem[], index: TreeIndex) {
@@ -64,15 +64,16 @@ function filterTree(
 function App() {
   const [editIndex, setEditIndex] = useState<TreeIndex | undefined>();
   const [visibleIndexes, setVisibleIndexes] = useState<TreeIndex[]>([]);
-  const [sampleKey, setSampleKey] = useState<keyof typeof samples>("glass");
+  const [sampleKey, setSampleKey] = useState<keyof typeof samples>("opacity");
 
   /** Working tree is a copy of the entire sample and can be modified */
   const [workTree, setWorkTree] = useState<IRenderItem[]>([]);
 
   useEffect(() => {
     const sample = samples[sampleKey];
-    const tree = sample.tree();
+    const tree = sample?.tree();
 
+    if (!tree) return;
     // Reset
     setWorkTree(tree);
     setEditIndex([]);
@@ -104,8 +105,9 @@ function App() {
 
   const schema = useMemo(() => {
     if (!editItem) return undefined;
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
     return (schemas as unknown as any)[editItem.name] as
-      | OperationSchema<RenderItemName>
+      | OperationSchema<string>
       | undefined;
   }, [editItem]);
 
@@ -126,7 +128,7 @@ function App() {
           style={{ marginBottom: "1rem" }}
         >
           {sampleGroups.map((group) => (
-            <optgroup label={group}>
+            <optgroup label={group} key={group}>
               {Object.keys(samples)
                 .filter(
                   // eslint-disable-next-line @typescript-eslint/no-explicit-any

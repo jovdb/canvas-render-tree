@@ -1,5 +1,4 @@
-import { addRendererConfig } from ".";
-import { ItemConfigFn } from "../canvas";
+import { addRendererConfig, ItemConfigFn } from ".";
 import { IBSplinePointsConfig } from "../operations/bspline-points";
 
 export const BSplinePointsConfig: ItemConfigFn<IBSplinePointsConfig> = ({

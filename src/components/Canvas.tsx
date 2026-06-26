@@ -1,7 +1,7 @@
 import { useRef } from "react";
 import { draw, IRenderItem, loadTree } from "../canvas";
 import { useQuery } from "@tanstack/react-query";
-import { validateSchemas } from "../shemas";
+import { validateSchemas } from "../schemas";
 
 export function Canvas({ items }: { items: IRenderItem[] }) {
   const canvasRef = useRef<HTMLCanvasElement>(null);

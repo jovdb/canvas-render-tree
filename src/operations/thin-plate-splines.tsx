@@ -3,7 +3,6 @@
 import { IRenderItem, ItemDrawFn } from "../canvas";
 import { addRendererOverlay, ItemOverlayFn } from "../overlays";
 import { addRenderer } from "../renderers";
-import React from "react";
 import { FreeControlPointsOverlay, FreeControlPointsConfig } from "../components/FreeControlPointsOverlay";
 
 // ============================================================================

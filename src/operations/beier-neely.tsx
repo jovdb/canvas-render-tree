@@ -5,10 +5,9 @@
 import { IRenderItem, ItemDrawFn, RenderTree } from "../canvas";
 import { addRendererOverlay, ItemOverlayFn } from "../overlays";
 import { addRenderer } from "../renderers";
-import React from "react";
+
 import {
   FreeControlPointsOverlay,
-  FreeControlPoint,
   FreeControlPointsConfig,
 } from "../components/FreeControlPointsOverlay";
 

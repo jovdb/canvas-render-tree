@@ -1,6 +1,6 @@
 import { IRenderItem, ItemDrawFn, RenderTree } from "../canvas";
 import { addRenderer } from "../renderers";
-import { addSchema, OperationSchema } from "../shemas";
+import { addSchema } from "../schemas";
 
 export interface IBlendConfig {
   blendMode: GlobalCompositeOperation;
@@ -10,8 +10,11 @@ addSchema({
   name: "blend",
   description: "Blend the input with the previous items",
   input: {
-    description: "The input to blend",
+    description: "Rendering to apply blending to",
     required: true,
+  },
+  prevAsInput: {
+    description: "Source for blending",
   },
 });
 

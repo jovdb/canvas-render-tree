@@ -1,5 +1,4 @@
-import { addRendererConfig } from ".";
-import { ItemConfigFn } from "../canvas";
+import { addRendererConfig, ItemConfigFn } from ".";
 import { IBicubicGridConfig } from "../operations/bicubic-grid";
 
 export const BicubicGridConfig: ItemConfigFn<IBicubicGridConfig> = ({

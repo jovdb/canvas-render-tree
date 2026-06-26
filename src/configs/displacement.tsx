@@ -1,5 +1,4 @@
-import { addRendererConfig } from ".";
-import { ItemConfigFn } from "../canvas";
+import { addRendererConfig, ItemConfigFn } from ".";
 import { IDisplacementConfig } from "../operations/displacement";
 
 export const DisplacementConfig: ItemConfigFn<IDisplacementConfig> = ({

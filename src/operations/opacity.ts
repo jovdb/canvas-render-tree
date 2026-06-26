@@ -1,12 +1,12 @@
+import { addOperation } from ".";
 import { IRenderItem, ItemDrawFn, RenderTree } from "../canvas";
-import { addRenderer } from "../renderers";
-import { OperationSchema } from "../shemas";
+import { OperationSchema } from "../schemas";
 
 export interface IOpacityConfig {
   opacity: number;
 }
 
-export const opacitySchema: OperationSchema<"opacity"> = {
+const schema: OperationSchema<"opacity"> = {
   name: "opacity",
   description: "Draw each child with the given opacity",
   input: {
@@ -14,16 +14,6 @@ export const opacitySchema: OperationSchema<"opacity"> = {
   },
   args: [],
 };
-
-export const opacity = (
-  opacity: number,
-  /** When passed, only the children will have opacity */
-  input?: RenderTree | undefined,
-): IRenderItem<IOpacityConfig> => ({
-  name: "opacity",
-  config: { opacity },
-  input,
-});
 
 export const draw: ItemDrawFn<IOpacityConfig> = (
   ctx,
@@ -40,6 +30,26 @@ export const draw: ItemDrawFn<IOpacityConfig> = (
   ctx.restore();
 };
 
-addRenderer("opacity", {
-  draw,
+export const create = (
+  opacity: number,
+  /** When passed, only the children will have opacity */
+  input?: RenderTree | undefined,
+): IRenderItem<IOpacityConfig> => ({
+  name: "opacity",
+  config: { opacity },
+  input,
 });
+
+const operation = {
+  key: "opacity",
+  create,
+  draw,
+  schema,
+} as const;
+addOperation(operation);
+
+declare global {
+  interface IOperations {
+    opacity: typeof create;
+  }
+}

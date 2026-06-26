@@ -3,7 +3,7 @@ import { TreeIndex, RenderTree2 } from "./RenderTree2";
 import "./RenderItem2.css";
 import { EyeIcon } from "../../icons/eye";
 import { EyeClosedIcon } from "../../icons/eye-closed";
-import { getSchema } from "../../shemas";
+import { getSchema } from "../../schemas";
 import { useState } from "react";
 
 export function RenderItem2({

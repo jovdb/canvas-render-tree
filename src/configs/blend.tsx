@@ -1,5 +1,4 @@
-import { addRendererConfig } from ".";
-import { ItemConfigFn } from "../canvas";
+import { addRendererConfig, ItemConfigFn } from ".";
 import { IBlendConfig } from "../operations/blend";
 
 const blendModes = [

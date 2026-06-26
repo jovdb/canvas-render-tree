@@ -1,6 +1,6 @@
 import { getContext2d, IRenderItem, ItemDrawFn, RenderTree } from "../canvas";
 import { addRenderer } from "../renderers";
-import { addSchema } from "../shemas";
+import { addSchema } from "../schemas";
 
 /**
  * Draw children on a new render layer

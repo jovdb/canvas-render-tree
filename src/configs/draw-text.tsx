@@ -1,5 +1,4 @@
-import { addRendererConfig } from ".";
-import { ItemConfigFn } from "../canvas";
+import { addRendererConfig, ItemConfigFn } from ".";
 import { IDrawTextConfig } from "../operations/draw-text";
 import { ColorConfig } from "./color";
 

@@ -2,10 +2,16 @@ body {
   --border-color: #ccc;
 }
 
+.render-tree {
+  .render-item__group--collapsed > & {
+    display: none;
+  }
+}
+
 .render-item {
   position: relative;
   padding: 2px 5px;
-  margin: 2px 0;
+  margin: 4px 0;
   border-radius: 3px;
   border: 2px solid var(--border-color);
 
@@ -38,13 +44,10 @@ body {
 
 .render-item__group {
   /* margin: 0.4em 0.4em 0 0.4em; */
-  padding: 0.2em;
+  margin: 0.2em 0;
+  border-radius: 6px;
+  padding: 2px 4px;
   border: 2px dashed var(--border-color);
-  border-radius: 0.2em;
-}
-
-.render-item__group--collapsed > .render-tree {
-  display: none;
 }
 
 .render-item__input-below {
@@ -66,8 +69,9 @@ body {
 .render-item__input-collapse {
   display: none;
   cursor: pointer;
-}
 
-.render-item__input:hover > * > .render-item__input-collapse {
-  display: block;
+  .render-item__group--collapsed  * &,
+  .render-item__input:hover > * > & {
+    display: block;
+  }
 }

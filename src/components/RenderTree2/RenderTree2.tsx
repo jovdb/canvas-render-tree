@@ -1,4 +1,4 @@
-import { IRenderItem } from "../canvas";
+import { IRenderItem } from "../../canvas";
 import { RenderItem2 } from "./RenderItem2";
 
 /** Indexes in tree */

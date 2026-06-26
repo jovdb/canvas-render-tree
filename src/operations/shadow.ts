@@ -1,6 +1,6 @@
 import { getContext2d, IRenderItem, ItemDrawFn, RenderTree } from "../canvas";
 import { addRenderer } from "../renderers";
-import { OperationSchema } from "../shemas";
+import { OperationSchema } from "../schemas";
 
 export interface IShadowConfig {
   type?: "outer" | "inner";

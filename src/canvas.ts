@@ -1,4 +1,3 @@
-import React from "react";
 import { renderers } from "./renderers";
 
 type DrawFn = (ctx: CanvasRenderingContext2D) => void;
@@ -37,12 +36,6 @@ export interface IItemRenderer<TConfig = unknown> {
   draw?: ItemDrawFn<TConfig>;
   load?: ItemLoadFn<TConfig>;
 }
-
-/** Function to configure an item */
-export type ItemConfigFn<TConfig = unknown> = (props: {
-  config: Readonly<TConfig>;
-  mutateConfig: (mutate: (config: TConfig) => void) => void;
-}) => React.ReactNode;
 
 /**
  * The data describing the render step. \

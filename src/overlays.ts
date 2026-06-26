@@ -11,7 +11,7 @@ const overlays: Partial<Record<RenderItemName, ItemOverlayFn<any>>> =
   {} as const;
 
 export function addRendererOverlay(
-  name: RenderItemName,
+  name: string,
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   rendererOverlay: ItemOverlayFn<any>,
 ) {

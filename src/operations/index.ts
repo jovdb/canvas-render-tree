@@ -1,54 +1,51 @@
-import { bevel } from "./bevel";
-import { blend } from "./blend";
-import { drawImage } from "./draw-image";
-import { drawText } from "./draw-text";
-import { fillColor } from "./fill-color";
-import { layer } from "./layer";
-import { mask } from "./mask";
-import { opacity } from "./opacity";
-import { shadow } from "./shadow";
-import { blur } from "./blur";
-import { saturation } from "./saturation";
-import { convolve } from "./convolve";
-import { transform } from "./transform";
-import { invert } from "./invert";
-import { repaint } from "./repaint";
-// import { meshWarp } from "./copilot-warp";
-import { displacement } from "./displacement";
-import { bSplinePoints } from "./bspline-points";
-import { uvMap } from "./uv-map";
-import { cyl } from "./cyl";
-import { perspective } from "./perspective";
-import { bicubicGrid } from "./bicubic-grid";
-import { catmullRom } from "./catmull-rom";
-import { thinPlateSplines } from "./thin-plate-splines";
-import { beierNeely } from "./beier-neely";
+import { IRenderItem, ItemDrawFn } from "../canvas";
+import { addRendererConfig, ItemConfigFn } from "../configs";
+import { ItemOverlayFn, addRendererOverlay } from "../overlays";
+import { OperationSchema, addSchema } from "../schemas";
 
-export const operations = {
-  drawImage,
-  drawText,
-  fillColor,
-  layer,
-  opacity,
-  blend,
-  mask,
-  bevel,
-  shadow,
-  blur,
-  transform,
-  saturation,
-  convolve,
-  invert,
-  repaint,
-  bSplinePoints,
-  bicubicGrid,
-  displacement,
-  uvMap,
-  cyl,
-  perspective,
-  catmullRom,
-  thinPlateSplines,
-  beierNeely,
-};
+import "./draw-image";
+
+declare global {
+  interface IOperations {
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    [key: string]: (...args: any[]) => IRenderItem<unknown>;
+  }
+}
+
+export const operations = {} as IOperations;
 
 export type RenderItemName = keyof typeof operations;
+
+export interface IOperation<TKey extends string, TConfig extends object> {
+  key: TKey;
+
+  /** Helper function to create an item for the render tree  */
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  create: (...args: any[]) => IRenderItem<TConfig>;
+
+  /** Render function to apply the operation */
+  draw: ItemDrawFn<TConfig>;
+
+  schema?: OperationSchema<TKey>;
+  configComponent?: ItemConfigFn<TConfig>;
+  overlayComponent?: ItemOverlayFn<TConfig>;
+}
+
+export function addOperation<TKey extends string, TConfig extends object>(
+  operation: IOperation<TKey, TConfig>,
+) {
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  (operations as any)[operation.key] = operation.create;
+
+  if (operation.schema) {
+    addSchema(operation.schema);
+  }
+
+  if (operation.configComponent) {
+    addRendererConfig(operation.key, operation.configComponent);
+  }
+
+  if (operation.overlayComponent) {
+    addRendererOverlay(operation.key, operation.overlayComponent);
+  }
+}

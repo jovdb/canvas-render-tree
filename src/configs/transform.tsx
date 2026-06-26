@@ -1,5 +1,4 @@
-import { addRendererConfig } from ".";
-import { ItemConfigFn } from "../canvas";
+import { addRendererConfig, ItemConfigFn } from ".";
 import { ITransformConfig } from "../operations/transform";
 
 export const TransformConfig: ItemConfigFn<ITransformConfig> = ({

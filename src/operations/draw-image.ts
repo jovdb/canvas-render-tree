@@ -1,7 +1,8 @@
 import { IRenderItem, ItemDrawFn, ItemLoadFn } from "../canvas";
 import { addRenderer } from "../renderers";
 import { loadImageAsync } from "../resources";
-import { addSchema, OperationSchema } from "../shemas";
+import { OperationSchema } from "../schemas";
+import { addOperation } from ".";
 
 export interface IDrawImageConfig {
   imageUrl: string;
@@ -9,18 +10,10 @@ export interface IDrawImageConfig {
   targetRect?: readonly [x: number, y: number, w: number, h: number];
 }
 
-export const drawImageSchema: OperationSchema<"drawImage"> = {
+const schema: OperationSchema<"drawImage"> = {
   name: "drawImage",
   description: "Draw an image",
 };
-
-addSchema(drawImageSchema);
-
-/** Draw an image on the canvas */
-export const drawImage = (config: IDrawImageConfig): IRenderItem => ({
-  name: "drawImage",
-  config,
-});
 
 const imageCache = new Map<
   string,
@@ -77,3 +70,23 @@ addRenderer("drawImage", {
   draw,
   load,
 });
+
+/** Draw an image on the canvas */
+const create = (config: IDrawImageConfig): IRenderItem<IDrawImageConfig> => ({
+  name: "drawImage",
+  config,
+});
+
+const operation = {
+  key: "drawImage",
+  create,
+  draw,
+  schema,
+} as const;
+addOperation(operation);
+
+declare global {
+  interface IOperations {
+    drawImage: typeof create;
+  }
+}

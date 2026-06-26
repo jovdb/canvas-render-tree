@@ -1,5 +1,4 @@
-import { addRendererConfig } from ".";
-import { ItemConfigFn } from "../canvas";
+import { addRendererConfig, ItemConfigFn } from ".";
 import { IShadowConfig } from "../operations/shadow";
 
 export const ShadowConfig: ItemConfigFn<IShadowConfig> = ({
