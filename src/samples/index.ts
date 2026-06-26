@@ -1,4 +1,5 @@
 import { opacityTree } from "./opacity";
+import { shadowTree } from "./shadow";
 
 export const samples = {
   opacity: {
@@ -6,12 +7,12 @@ export const samples = {
     type: "2d",
     tree: opacityTree,
   },
-  /*
   shadow: {
     name: "Shadow",
     type: "2d",
     tree: shadowTree,
   },
+  /*
   gold: {
     name: "Gold foil",
     type: "2d",

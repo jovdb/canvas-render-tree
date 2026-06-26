@@ -9,8 +9,8 @@ export function Canvas({ items }: { items: IRenderItem[] }) {
   const { isFetching, error } = useQuery({
     queryKey: ["canvas", items],
     queryFn: async () => {
-      if (!canvasRef.current) return;
-      if (!items?.length) return;
+      if (!canvasRef.current) return null;
+      if (!items?.length) return null;
       validateSchemas(items);
       await loadTree(items);
       draw(canvasRef.current, items);

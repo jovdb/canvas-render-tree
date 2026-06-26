@@ -1,5 +1,6 @@
 import "./draw-image";
 import "./opacity";
+import "./shadow";
 
 import { bevel } from "./bevel";
 import { blend } from "./blend";
@@ -7,7 +8,6 @@ import { drawText } from "./draw-text";
 import { fillColor } from "./fill-color";
 import { layer } from "./layer";
 import { mask } from "./mask";
-import { shadow } from "./shadow";
 import { blur } from "./blur";
 import { saturation } from "./saturation";
 import { convolve } from "./convolve";
@@ -32,7 +32,6 @@ operations["layer"] = layer;
 operations["blend"] = blend;
 operations["mask"] = mask;
 operations["bevel"] = bevel;
-operations["shadow"] = shadow;
 operations["blur"] = blur;
 operations["transform"] = transform;
 operations["saturation"] = saturation;

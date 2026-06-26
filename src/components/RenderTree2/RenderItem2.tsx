@@ -40,6 +40,7 @@ export function RenderItem2({
   }
 
   const [collapseInput, setCollapseInput] = useState(false);
+  const name = schema?.getName ? schema.getName(item.config) : item.name;
 
   return (
     <>
@@ -99,7 +100,7 @@ export function RenderItem2({
           }}
           className="render-item__name"
         >
-          {item.name}
+          {name}
         </div>
       </div>
     </>

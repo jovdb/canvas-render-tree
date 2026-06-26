@@ -1,5 +1,5 @@
+import { addOperation } from ".";
 import { getContext2d, IRenderItem, ItemDrawFn, RenderTree } from "../canvas";
-import { addRenderer } from "../renderers";
 import { OperationSchema } from "../schemas";
 
 export interface IShadowConfig {
@@ -11,8 +11,10 @@ export interface IShadowConfig {
   onlyShadow?: boolean;
 }
 
-export const shadowSchema: OperationSchema<"shadow"> = {
+const schema: OperationSchema<"shadow"> = {
   name: "shadow",
+  getName: (config: IShadowConfig) =>
+    `shadow: ${config.type === "outer" ? "outer" : "inner"}`,
   description: "Add shadow to the last painted item",
   input: {
     required: true,
@@ -24,10 +26,10 @@ export const shadowSchema: OperationSchema<"shadow"> = {
  * Add shadow last painted item, use a layer to apply on all
  * Tip: Use a child layer to apply shadow once on complete image
  */
-export const shadow = (
+const create = (
   config: IShadowConfig,
   input?: RenderTree,
-): IRenderItem => ({
+): IRenderItem<IShadowConfig> => ({
   name: "shadow",
   config,
   input,
@@ -117,6 +119,10 @@ export const draw: ItemDrawFn<IShadowConfig> = (
   }
 };
 
-addRenderer("shadow", {
+const operation = {
+  key: "shadow",
+  create,
   draw,
-});
+  schema,
+} as const;
+addOperation(operation);

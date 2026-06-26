@@ -41,7 +41,7 @@ export interface IItemRenderer<TConfig = unknown> {
  * The data describing the render step. \
  * This will be serialized and saved
  */
-export interface IRenderItem<TConfig = unknown> {
+export interface IRenderItem<TConfig = object> {
   /** Node name */
   name: string;
 
