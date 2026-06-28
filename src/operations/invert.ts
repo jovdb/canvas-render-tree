@@ -2,7 +2,7 @@ import { IRenderItem, ItemDrawFn, RenderTree } from "../canvas";
 import { IConfig } from "../configs";
 import { addRenderer } from "../renderers";
 
-export const invert = (input: RenderTree): IRenderItem<IConfig> => ({
+export const invert = (input: RenderTree): IRenderItem<IConfig  > => ({
   name: "invert",
   input,
 });

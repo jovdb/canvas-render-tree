@@ -13,6 +13,12 @@ export interface IDrawImageConfig {
 const schema: OperationSchema<"drawImage"> = {
   name: "drawImage",
   description: "Draw an image",
+  getName: (config) => {
+    // get part after last slash
+    const parts = config?.imageUrl.split("/");
+    const name = parts?.[parts.length - 1];
+    return name ? `drawImage: ${name}` : "drawImage";
+  },
 };
 
 const imageCache = new Map<

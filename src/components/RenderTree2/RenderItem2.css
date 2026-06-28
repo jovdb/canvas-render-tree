@@ -3,8 +3,50 @@ body {
 }
 
 .render-tree {
+  text-align: center;
   .render-item__group--collapsed > & {
     display: none;
+  }
+}
+
+.render-tree__add {
+  border-radius: 50%;
+  border-width: 0px;
+  padding: 0;
+  color: #fff;
+  background-color: #ddd;
+  width: 15px;
+  font-weight: bold;
+  height: 15px;
+  cursor: pointer;
+  margin: 0;
+  visibility: hidden;
+
+  .render-tree__buttons:hover & {
+    visibility: visible;
+  }
+}
+
+.render-item__del {
+  position: absolute;
+  top: -2px;
+  right: -5px;
+
+  border-radius: 50%;
+  border-width: 0px;
+  padding: 0;
+  color: #fff;
+  background-color: #f88;
+  width: 15px;
+  font-weight: bold;
+  font-size: 12px;
+  height: 15px;
+  cursor: pointer;
+  margin: 0;
+  visibility: hidden;
+
+  .render-item__wrapper:hover > & {
+    visibility: visible;
   }
 }
 
@@ -14,8 +56,12 @@ body {
   margin: 4px 0;
   border-radius: 3px;
   border: 2px solid var(--border-color);
+  background-color: #eee;
+}
 
-  background-color: transparent;
+/* For delete */
+.render-item__wrapper {
+  position: relative;
 }
 
 .render-item--selectable:hover {
@@ -50,6 +96,19 @@ body {
   border: 2px dashed var(--border-color);
 }
 
+/* horizontal stack */
+.render-item__inputs {
+  display: flex;
+  flex-direction: row;
+  justify-content: center;
+  align-items: center;
+  gap: 0.4em;
+}
+
+.render-item__input {
+  width: 100%;
+}
+
 .render-item__input-below {
   position: relative;
   margin-left: 0.4em;
@@ -63,15 +122,15 @@ body {
 .render-item__input-arrow {
   position: absolute;
   left: 50%;
-  transform: scale(2);
+  transform: scale(2) translate(-25%, 0);
 }
 
 .render-item__input-collapse {
   display: none;
   cursor: pointer;
 
-  .render-item__group--collapsed  * &,
-  .render-item__input:hover > * > & {
+  .render-item__group--collapsed * &,
+  .render-item__input-below:hover > & {
     display: block;
   }
 }

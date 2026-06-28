@@ -64,6 +64,95 @@ function filterTree(
   return newItems;
 }
 
+function deleteFromTree(
+  items: readonly IRenderItem[],
+  targetIndex: TreeIndex,
+): IRenderItem[] {
+  if (targetIndex.length === 0) return [...items];
+
+  const [targetPos, ...restIndex] = targetIndex;
+
+  return items
+    .map((item, index) => {
+      if (index === targetPos) {
+        if (restIndex.length === 0) {
+          // Delete this item at the current level
+          return null as unknown as IRenderItem;
+        }
+
+        // Need to recurse into children
+        // Children are args (flattened) + input
+        const flatArgs = item.args?.flat() ?? [];
+        const flatInput = item.input ?? [];
+        const allChildren = [...flatArgs, ...flatInput];
+
+        const [childTargetPos, ...childRestIndex] = restIndex;
+
+        if (childTargetPos < flatArgs.length) {
+          // Target is in args
+          // Find which arg array and position within it
+          let argsIndex = 0;
+          let positionInArg = childTargetPos;
+          let foundArgIndex = -1;
+
+          for (let i = 0; i < (item.args?.length ?? 0); i++) {
+            const arg = item.args![i];
+            if (positionInArg < arg.length) {
+              foundArgIndex = i;
+              break;
+            }
+            positionInArg -= arg.length;
+          }
+
+          if (foundArgIndex >= 0 && item.args) {
+            const newArgs = [...item.args];
+            const argToModify = [...newArgs[foundArgIndex]];
+
+            if (childRestIndex.length === 0) {
+              // Delete from this arg array
+              argToModify.splice(positionInArg, 1);
+            } else {
+              // Recurse deeper
+              const newArg = deleteFromTree(argToModify, childRestIndex);
+              newArgs[foundArgIndex] = newArg;
+            }
+
+            return {
+              ...item,
+              args: newArgs.length > 0 ? newArgs : undefined,
+            };
+          }
+        } else {
+          // Target is in input
+          const positionInInput = childTargetPos - flatArgs.length;
+          const input = item.input ?? [];
+
+          if (childRestIndex.length === 0) {
+            // Delete from input
+            const newInput = [...input];
+            newInput.splice(positionInInput, 1);
+            return {
+              ...item,
+              input: newInput.length > 0 ? newInput : undefined,
+            };
+          } else {
+            // Recurse into input
+            const newInput = deleteFromTree(input, [
+              positionInInput,
+              ...childRestIndex,
+            ]);
+            return {
+              ...item,
+              input: newInput.length > 0 ? newInput : undefined,
+            };
+          }
+        }
+      }
+      return item;
+    })
+    .filter((item) => item !== null) as IRenderItem[];
+}
+
 function App() {
   const [editIndex, setEditIndex] = useState<TreeIndex | undefined>();
   const [visibleIndexes, setVisibleIndexes] = useState<TreeIndex[]>([]);
@@ -174,6 +263,10 @@ function App() {
             onClick={(_item, treeIndex) => {
               setEditIndex(treeIndex);
             }}
+            onDelete={(item, treeIndex) => {
+              const newTree = deleteFromTree(workTree, treeIndex);
+              setWorkTree(newTree);
+            }}
             onVisibilityChange={(_item, treeIndex) => {
               setVisibleIndexes((prev) => {
                 const treeItemSTring = JSON.stringify(treeIndex);
@@ -188,6 +281,10 @@ function App() {
                   return [...prev, treeIndex];
                 }
               });
+            }}
+            onTreeChange={(newTree) => {
+              setWorkTree(newTree);
+              console.log("New tree:", JSON.stringify(newTree, null, 2));
             }}
           />
         </div>

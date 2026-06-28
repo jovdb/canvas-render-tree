@@ -1,8 +1,15 @@
+import { operations } from "../operations";
+import { availableImages } from "../resources";
 import { goldFoilTree } from "./gold-foil";
 import { opacityTree } from "./opacity";
 import { shadowTree } from "./shadow";
 
 export const samples = {
+  empty: {
+    name: "Empty",
+    type: "2d",
+    tree: () => [],
+  },
   opacity: {
     name: "Opacity",
     type: "2d",
@@ -12,6 +19,16 @@ export const samples = {
     name: "Shadow",
     type: "2d",
     tree: shadowTree,
+  },
+  blend: {
+    name: "Blend",
+    type: "2d",
+    tree: () => [
+      operations.drawImage({ imageUrl: availableImages.testbeeld }),
+      operations.blend("multiply", [
+        operations.drawImage({ imageUrl: availableImages.homer }),
+      ]),
+    ],
   },
   gold: {
     name: "Gold foil",

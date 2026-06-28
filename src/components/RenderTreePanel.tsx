@@ -6,7 +6,9 @@ interface RenderTreePanelProps {
   editIndex: TreeIndex | undefined;
   visibleIndexes: readonly TreeIndex[];
   onClick?(item: IRenderItem, treeIndex: TreeIndex): void;
+  onDelete?(item: IRenderItem, treeIndex: TreeIndex): void;
   onVisibilityChange?(item: IRenderItem, treeIndex: TreeIndex): void;
+  onTreeChange?(newTree: IRenderItem[]): void;
 }
 
 export function RenderTreePanel({
@@ -14,7 +16,9 @@ export function RenderTreePanel({
   editIndex,
   visibleIndexes = [],
   onClick,
+  onDelete,
   onVisibilityChange,
+  onTreeChange,
 }: RenderTreePanelProps) {
   function onSave() {
     console.log(JSON.stringify(items, undefined, 2));
@@ -62,7 +66,9 @@ export function RenderTreePanel({
             ),
           )}
           onClick={onClick}
+          onDelete={onDelete}
           onVisibilityChange={onVisibilityChange}
+          onTreeChange={onTreeChange}
         />
       </div>
     </>

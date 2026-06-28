@@ -50,7 +50,7 @@ export function RenderItem({
           role="button"
           tabIndex={0}
         >
-          {isVisible ? <EyeIcon size={16} /> : <EyeClosedIcon size={16} />}
+          {/*isVisible ? <EyeIcon size={16} /> : <EyeClosedIcon size={16} />*/}
         </span>
         <div
           onClick={(e) => {
