@@ -15,7 +15,8 @@ const schema: OperationSchema<"drawImage"> = {
   description: "Draw an image",
   getName: (config) => {
     // get part after last slash
-    const parts = config?.imageUrl.split("/");
+    const imageUrl = (config as IDrawImageConfig | undefined)?.imageUrl;
+    const parts = imageUrl?.split("/");
     const name = parts?.[parts.length - 1];
     return name ? `drawImage: ${name}` : "drawImage";
   },

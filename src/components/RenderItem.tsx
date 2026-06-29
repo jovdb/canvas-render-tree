@@ -1,8 +1,6 @@
 import { IRenderItem } from "../canvas";
 import { TreeIndex, RenderTree } from "./RenderTree";
 import "./RenderItem.css";
-import { EyeIcon } from "../icons/eye";
-import { EyeClosedIcon } from "../icons/eye-closed";
 
 export function RenderItem({
   item,
@@ -25,12 +23,6 @@ export function RenderItem({
 }) {
   // const isSelected = selectedItems.includes(item);
   const isSelected = treeIndex.join() === editIndex?.join();
-  const isVisible =
-    !visibleIndexes?.length ||
-    visibleIndexes.some(
-      (visibleIndex) =>
-        JSON.stringify(visibleIndex) === JSON.stringify(treeIndex),
-    );
   return (
     <>
       <div

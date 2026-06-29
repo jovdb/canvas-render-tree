@@ -16,6 +16,7 @@ import { RenderItemName } from "./operations";
 import "./configs/load";
 import { schemas, OperationSchema } from "./schemas";
 import { getRendererOverlay } from "./overlays";
+import { useWorkTree, useWorkTreeActions } from "./stores/useWorkTreeStore";
 
 export function selectIndex(tree: IRenderItem[], index: TreeIndex) {
   if (index.length === 0) return undefined;
@@ -90,13 +91,11 @@ function replaceWithInput(
 
   const [childTargetPos, ...childRestIndex] = restIndex;
   const flatArgs = parentItem.args?.flat() ?? [];
-  const flatInput = parentItem.input ?? [];
-  
   if (childTargetPos < flatArgs.length) {
     // Target is in args
     let positionInFoundArg = childTargetPos;
     let foundArgIndex = -1;
-    
+
     for (let i = 0; i < (parentItem.args?.length ?? 0); i++) {
       const arg = parentItem.args![i];
       if (positionInFoundArg < arg.length) {
@@ -105,11 +104,11 @@ function replaceWithInput(
       }
       positionInFoundArg -= arg.length;
     }
-    
+
     if (foundArgIndex >= 0 && parentItem.args) {
       const newArgs = [...parentItem.args];
       const argArray = [...newArgs[foundArgIndex]];
-      
+
       if (childRestIndex.length === 0) {
         // Replace this arg item with its input
         const itemToReplace = argArray[positionInFoundArg];
@@ -117,10 +116,13 @@ function replaceWithInput(
         argArray.splice(positionInFoundArg, 1, ...replacementItems);
       } else {
         // Recurse deeper into this arg
-        const newArgArray = replaceWithInput(argArray, [positionInFoundArg, ...childRestIndex]);
+        const newArgArray = replaceWithInput(argArray, [
+          positionInFoundArg,
+          ...childRestIndex,
+        ]);
         newArgs[foundArgIndex] = newArgArray;
       }
-      
+
       newItems[targetPos] = {
         ...parentItem,
         args: newArgs.length > 0 ? newArgs : undefined,
@@ -130,7 +132,7 @@ function replaceWithInput(
     // Target is in input
     const positionInInput = childTargetPos - flatArgs.length;
     const input = parentItem.input ?? [];
-    
+
     if (childRestIndex.length === 0) {
       // Replace this input item with its input
       const newInput = [...input];
@@ -143,124 +145,36 @@ function replaceWithInput(
       };
     } else {
       // Recurse into input
-      const newInput = replaceWithInput(input, [positionInInput, ...childRestIndex]);
+      const newInput = replaceWithInput(input, [
+        positionInInput,
+        ...childRestIndex,
+      ]);
       newItems[targetPos] = {
         ...parentItem,
         input: newInput.length > 0 ? newInput : undefined,
       };
     }
   }
-  
+
   return newItems;
-}
-
-function deleteFromTree(
-  items: readonly IRenderItem[],
-  targetIndex: TreeIndex,
-): IRenderItem[] {
-  if (targetIndex.length === 0) return [...items];
-
-  const [targetPos, ...restIndex] = targetIndex;
-
-  return items
-    .map((item, index) => {
-      if (index === targetPos) {
-        if (restIndex.length === 0) {
-          // Delete this item at the current level
-          return null as unknown as IRenderItem;
-        }
-
-        // Need to recurse into children
-        // Children are args (flattened) + input
-        const flatArgs = item.args?.flat() ?? [];
-        const flatInput = item.input ?? [];
-        const allChildren = [...flatArgs, ...flatInput];
-
-        const [childTargetPos, ...childRestIndex] = restIndex;
-
-        if (childTargetPos < flatArgs.length) {
-          // Target is in args
-          // Find which arg array and position within it
-          let argsIndex = 0;
-          let positionInArg = childTargetPos;
-          let foundArgIndex = -1;
-
-          for (let i = 0; i < (item.args?.length ?? 0); i++) {
-            const arg = item.args![i];
-            if (positionInArg < arg.length) {
-              foundArgIndex = i;
-              break;
-            }
-            positionInArg -= arg.length;
-          }
-
-          if (foundArgIndex >= 0 && item.args) {
-            const newArgs = [...item.args];
-            const argToModify = [...newArgs[foundArgIndex]];
-
-            if (childRestIndex.length === 0) {
-              // Delete from this arg array
-              argToModify.splice(positionInArg, 1);
-            } else {
-              // Recurse deeper
-              const newArg = deleteFromTree(argToModify, childRestIndex);
-              newArgs[foundArgIndex] = newArg;
-            }
-
-            return {
-              ...item,
-              args: newArgs.length > 0 ? newArgs : undefined,
-            };
-          }
-        } else {
-          // Target is in input
-          const positionInInput = childTargetPos - flatArgs.length;
-          const input = item.input ?? [];
-
-          if (childRestIndex.length === 0) {
-            // Delete from input
-            const newInput = [...input];
-            newInput.splice(positionInInput, 1);
-            return {
-              ...item,
-              input: newInput.length > 0 ? newInput : undefined,
-            };
-          } else {
-            // Recurse into input
-            const newInput = deleteFromTree(input, [
-              positionInInput,
-              ...childRestIndex,
-            ]);
-            return {
-              ...item,
-              input: newInput.length > 0 ? newInput : undefined,
-            };
-          }
-        }
-      }
-      return item;
-    })
-    .filter((item) => item !== null) as IRenderItem[];
 }
 
 function App() {
   const [editIndex, setEditIndex] = useState<TreeIndex | undefined>();
   const [visibleIndexes, setVisibleIndexes] = useState<TreeIndex[]>([]);
-  const [sampleKey, setSampleKey] = useState<keyof typeof samples>("opacity");
 
   /** Working tree is a copy of the entire sample and can be modified */
-  const [workTree, setWorkTree] = useState<IRenderItem[]>([]);
+  const workTree = useWorkTree();
+  const { setWorkTree, updateWorkTree, resetWorkTree } = useWorkTreeActions();
+
+  const [sampleKey, setSampleKey] = useState<string>("opacity");
 
   useEffect(() => {
-    const sample = samples[sampleKey];
-    const tree = sample?.tree();
-
-    if (!tree) return;
-    // Reset
-    setWorkTree(tree);
+    const tree = samples[sampleKey]?.tree() ?? [];
+    resetWorkTree(tree);
     setEditIndex([]);
     setVisibleIndexes([]);
-  }, [sampleKey]);
+  }, [resetWorkTree, sampleKey]);
 
   /** The items to render, workTree with selection filter */
   const renderTree =
@@ -283,7 +197,7 @@ function App() {
       const cfg = item?.config;
       if (cfg) mutate(cfg);
     });
-    startTransition(() => setWorkTree(newTree));
+    startTransition(() => updateWorkTree(() => newTree));
   };
 
   const schema = useMemo(() => {
@@ -353,9 +267,8 @@ function App() {
             onClick={(_item, treeIndex) => {
               setEditIndex(treeIndex);
             }}
-            onDelete={(item, treeIndex) => {
-              const newTree = replaceWithInput(workTree, treeIndex);
-              setWorkTree(newTree);
+            onDelete={(_item, treeIndex) => {
+              setWorkTree(replaceWithInput(workTree, treeIndex));
             }}
             onVisibilityChange={(_item, treeIndex) => {
               setVisibleIndexes((prev) => {

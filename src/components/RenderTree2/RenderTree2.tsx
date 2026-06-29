@@ -1,3 +1,4 @@
+import React from "react";
 import { IRenderItem } from "../../canvas";
 import { operations } from "../../operations";
 import { availableImages } from "../../resources";
@@ -55,9 +56,8 @@ export function RenderTree2({
         </button>
       </div>
       {items?.map((item, index) => (
-        <>
+        <React.Fragment key={`${item.name}-${index}`}>
           <RenderItem2
-            key={`${item.name}-${index}`}
             item={item}
             prevItems={items.slice(0, index)}
             treeIndex={[...parentIndexes, index]}
@@ -81,7 +81,7 @@ export function RenderTree2({
               +
             </button>
           </div>
-        </>
+        </React.Fragment>
       ))}
     </div>
   );

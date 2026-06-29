@@ -1,8 +1,6 @@
 import { IRenderItem } from "../../canvas";
 import { TreeIndex, RenderTree2 } from "./RenderTree2";
 import "./RenderItem2.css";
-import { EyeIcon } from "../../icons/eye";
-import { EyeClosedIcon } from "../../icons/eye-closed";
 import { getSchema } from "../../schemas";
 import { useState } from "react";
 
@@ -33,12 +31,6 @@ export function RenderItem2({
 }) {
   // const isSelected = selectedItems.includes(item);
   const isSelected = treeIndex.join() === editIndex?.join();
-  const isVisible =
-    !visibleIndexes?.length ||
-    visibleIndexes.some(
-      (visibleIndex) =>
-        JSON.stringify(visibleIndex) === JSON.stringify(treeIndex),
-    );
   const schema = getSchema(item.name);
   if (!schema) {
     console.warn(`No schema found for item name: ${item.name}`);
@@ -61,7 +53,7 @@ export function RenderItem2({
     <>
       <div className="render-item__inputs">
         {inputs?.map((input, index) => (
-          <div className="render-item__input">
+          <div className="render-item__input" key={index}>
             <div
               className={`render-item__group ${collapseInput ? "render-item__group--collapsed" : ""}`}
             >
@@ -76,9 +68,9 @@ export function RenderItem2({
                 onVisibilityChange={onVisibilityChange}
                 onTreeChange={(newTree) => {
                   const newItems = [
-                    ...input.slice(0, index),
-                    newTree,
-                    ...input.slice(index + 1),
+                    ...(input ?? []).slice(0, index),
+                    ...(Array.isArray(newTree) ? newTree : [newTree]),
+                    ...(input ?? []).slice(index + 1),
                   ];
                   onTreeChange?.(newItems);
                 }}
