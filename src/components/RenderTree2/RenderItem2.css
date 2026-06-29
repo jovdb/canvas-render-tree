@@ -9,6 +9,10 @@ body {
   }
 }
 
+.render-tree__buttons {
+  position: relative;
+}
+
 .render-tree__add {
   border-radius: 50%;
   border-width: 0px;
@@ -25,6 +29,32 @@ body {
   .render-tree__buttons:hover & {
     visibility: visible;
   }
+}
+
+.render-tree__add-popup {
+  position: absolute;
+  top: calc(100% + 4px);
+  left: 50%;
+  transform: translateX(-50%);
+  z-index: 10;
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  padding: 4px;
+  border: 1px solid var(--border-color);
+  border-radius: 6px;
+  background: white;
+  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.15);
+  min-width: 120px;
+}
+
+.render-tree__add-option {
+  border: 1px solid #ddd;
+  border-radius: 4px;
+  background: #fff;
+  padding: 4px 6px;
+  cursor: pointer;
+  text-align: left;
 }
 
 .render-item__del {

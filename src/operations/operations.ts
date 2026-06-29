@@ -2,10 +2,10 @@ import "./draw-image";
 import "./opacity";
 import "./blend";
 import "./shadow";
+import "./fill-color";
 
 import { bevel } from "./bevel";
 import { drawText } from "./draw-text";
-import { fillColor } from "./fill-color";
 import { layer } from "./layer";
 import { mask } from "./mask";
 import { blur } from "./blur";
@@ -27,7 +27,6 @@ import { beierNeely } from "./beier-neely";
 import { operations } from ".";
 
 operations["drawText"] = drawText;
-operations["fillColor"] = fillColor;
 operations["layer"] = layer;
 operations["mask"] = mask;
 operations["bevel"] = bevel;

@@ -12,7 +12,7 @@ const schema: OperationSchema<"opacity"> = {
   description: "Draw each child with the given opacity",
   getName: (config) =>
     config
-      ? `opacity: ${Math.round((config as IOpacityConfig).opacity * 100)}%`
+      ? `opacity: ${Math.round(((config as IOpacityConfig).opacity ?? 0.5) * 100)}%`
       : "opacity",
   input: {
     required: true,
@@ -30,13 +30,13 @@ export const draw: ItemDrawFn<IOpacityConfig> = (
   drawPrev?.(ctx);
 
   ctx.save();
-  ctx.globalAlpha = config.opacity;
+  ctx.globalAlpha = config.opacity ?? 0.5;
   drawInput?.(ctx);
   ctx.restore();
 };
 
 export const create = (
-  opacity: number,
+  opacity: number = 0.5,
   /** When passed, only the children will have opacity */
   input?: RenderTree | undefined,
 ): IRenderItem<IOpacityConfig> => ({
