@@ -1,6 +1,5 @@
 import { getContext2d, IRenderItem, ItemDrawFn, RenderTree } from "../canvas";
 import { IConfig } from "../configs";
-import { addRenderer } from "../renderers";
 import { OperationSchema } from "../schemas";
 import { addOperation } from ".";
 
@@ -33,9 +32,7 @@ export const draw: ItemDrawFn = (ctx, drawPrev, _config, drawInput) => {
 };
 
 /** Draw children on a new render layer */
-export const create = (
-  input: RenderTree,
-): IRenderItem<ILayerConfig> => ({
+export const create = (input: RenderTree): IRenderItem<ILayerConfig> => ({
   name: "layer",
   input,
 });
@@ -47,13 +44,6 @@ const operation = {
   schema,
 } as const;
 addOperation(operation);
-
-addRenderer("layer", {
-  draw,
-});
-
-// Backward compatibility
-export const layer = create;
 
 declare global {
   interface IOperations {

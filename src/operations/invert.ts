@@ -1,6 +1,5 @@
 import { IRenderItem, ItemDrawFn, RenderTree } from "../canvas";
 import { IConfig } from "../configs";
-import { addRenderer } from "../renderers";
 import { OperationSchema } from "../schemas";
 import { addOperation } from ".";
 
@@ -15,14 +14,17 @@ const schema: OperationSchema<"invert"> = {
   args: [],
 };
 
-export const create = (
-  input: RenderTree,
-): IRenderItem<IInvertConfig> => ({
+export const create = (input: RenderTree): IRenderItem<IInvertConfig> => ({
   name: "invert",
   input,
 });
 
-export const draw: ItemDrawFn<IInvertConfig> = (ctx, drawPrev, _config, drawInput) => {
+export const draw: ItemDrawFn<IInvertConfig> = (
+  ctx,
+  drawPrev,
+  _config,
+  drawInput,
+) => {
   // first draw previous items
   drawPrev?.(ctx);
 
@@ -64,13 +66,6 @@ const operation = {
   schema,
 } as const;
 addOperation(operation);
-
-addRenderer("invert", {
-  draw,
-});
-
-// Backward compatibility
-export const invert = create;
 
 declare global {
   interface IOperations {

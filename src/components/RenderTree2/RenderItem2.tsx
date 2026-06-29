@@ -46,7 +46,7 @@ export function RenderItem2({
   ];
 
   if (inputs.length === 0) {
-    if (schema?.prevAsInput || schema?.input || schema?.args) {
+    if (schema?.prevAsInput || schema?.input || schema?.args?.length) {
       inputs.push(undefined);
     }
   }

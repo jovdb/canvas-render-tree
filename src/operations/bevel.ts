@@ -4,7 +4,6 @@ import {
   drawKernel,
   gaussianBlurKernel as gaussianBlurKernel,
 } from "../kernels";
-import { addRenderer } from "../renderers";
 import { OperationSchema } from "../schemas";
 import { addOperation } from ".";
 
@@ -241,9 +240,6 @@ const operation = {
 } as const;
 addOperation(operation);
 
-addRenderer("bevel", {
-  draw,
-});
 
 declare global {
   interface IOperations {

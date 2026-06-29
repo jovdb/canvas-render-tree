@@ -1,7 +1,6 @@
 import { IRenderItem, ItemDrawFn, RenderTree } from "../canvas";
 import { IConfig } from "../configs";
 import { drawKernel, normalizeKernel } from "../kernels";
-import { addRenderer } from "../renderers";
 import { OperationSchema } from "../schemas";
 import { addOperation } from ".";
 
@@ -170,13 +169,6 @@ const operation = {
   schema,
 } as const;
 addOperation(operation);
-
-addRenderer("convolve", {
-  draw,
-});
-
-// Backward compatibility
-export const convolve = create;
 
 declare global {
   interface IOperations {

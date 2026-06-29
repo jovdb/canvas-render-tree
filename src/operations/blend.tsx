@@ -9,7 +9,8 @@ export interface IBlendConfig {
 
 const schema: OperationSchema<"blend"> = {
   name: "blend",
-  getName: (config) => config ? `blend: ${(config as IBlendConfig).blendMode}` : "blend",
+  getName: (config) =>
+    config ? `blend: ${(config as IBlendConfig).blendMode}` : "blend",
   description: "Blend the input with the previous items",
   input: {
     description: "Rendering to apply blending to",
@@ -20,7 +21,7 @@ const schema: OperationSchema<"blend"> = {
   },
 } as const;
 
-export const create = (
+const create = (
   blendMode: GlobalCompositeOperation,
   /** When passed, only the children will be blended */
   input?: RenderTree | undefined,

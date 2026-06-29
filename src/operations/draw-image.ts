@@ -1,5 +1,4 @@
 import { IRenderItem, ItemDrawFn, ItemLoadFn } from "../canvas";
-import { addRenderer } from "../renderers";
 import { loadImageAsync } from "../resources";
 import { OperationSchema } from "../schemas";
 import { addOperation } from ".";
@@ -72,11 +71,6 @@ export const load: ItemLoadFn<IDrawImageConfig> = (config) => {
     imageCache.set(key, image);
   });
 };
-
-addRenderer("drawImage", {
-  draw,
-  load,
-});
 
 /** Draw an image on the canvas */
 const create = (config: IDrawImageConfig): IRenderItem<IDrawImageConfig> => ({

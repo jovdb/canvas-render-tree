@@ -1,6 +1,5 @@
 import { getContext2d, IRenderItem, ItemDrawFn, RenderTree } from "../canvas";
 import { IConfig } from "../configs";
-import { addRenderer } from "../renderers";
 import { OperationSchema } from "../schemas";
 import { addOperation } from ".";
 
@@ -241,6 +240,7 @@ function createUVMapImageData(width: number, height: number): ImageData {
 }
 */
 
+// eslint-disable-next-line @typescript-eslint/no-empty-object-type
 export interface IUVMapConfig extends IConfig {}
 
 const schema: OperationSchema<"uvMap"> = {
@@ -259,7 +259,7 @@ export const create = (uv: RenderTree): IRenderItem<IUVMapConfig> => ({
   input: uv,
 });
 
-export const draw: ItemDrawFn<undefined> = (
+export const draw: ItemDrawFn<IUVMapConfig> = (
   ctx,
   drawPrev,
   _config,
@@ -292,13 +292,6 @@ const operation = {
   schema,
 } as const;
 addOperation(operation);
-
-addRenderer("uvMap", {
-  draw,
-});
-
-// Backward compatibility
-export const uvMap = create;
 
 declare global {
   interface IOperations {

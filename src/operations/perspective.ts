@@ -1,6 +1,5 @@
 import { IRenderItem, ItemDrawFn, RenderTree } from "../canvas";
 import { IConfig } from "../configs";
-import { addRenderer } from "../renderers";
 import { OperationSchema } from "../schemas";
 import { addOperation } from ".";
 
@@ -332,13 +331,6 @@ const operation = {
   schema,
 } as const;
 addOperation(operation);
-
-addRenderer("perspective", {
-  draw,
-});
-
-// Backward compatibility
-export const perspective = create;
 
 declare global {
   interface IOperations {

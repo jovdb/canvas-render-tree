@@ -1,6 +1,5 @@
 import { IRenderItem, ItemDrawFn, RenderTree } from "../canvas";
 import { IConfig } from "../configs";
-import { addRenderer } from "../renderers";
 import { OperationSchema } from "../schemas";
 import { addOperation } from ".";
 
@@ -194,13 +193,6 @@ const operation = {
   schema,
 } as const;
 addOperation(operation);
-
-addRenderer("cyl", {
-  draw,
-});
-
-// Backward compatibility
-export const cyl = create;
 
 declare global {
   interface IOperations {

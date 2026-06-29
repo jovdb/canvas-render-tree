@@ -1,6 +1,5 @@
 import { IRenderItem, ItemDrawFn, RenderTree } from "../canvas";
 import { IConfig } from "../configs";
-import { addRenderer } from "../renderers";
 import { OperationSchema } from "../schemas";
 import { addOperation } from ".";
 
@@ -20,12 +19,12 @@ const schema: OperationSchema<"drawText"> = {
   description: "Draw text on the canvas",
   getName: (config) =>
     config
-      ? `drawText: "${(config as IDrawTextConfig).text}"`
+      ? `drawText: "${
+          ((config as IDrawTextConfig).text || "").length > 10
+            ? ((config as IDrawTextConfig).text || "").substring(0, 10) + "..."
+            : (config as IDrawTextConfig).text || ""
+        }"`
       : "drawText",
-  input: {
-    required: false,
-  },
-  args: [],
 };
 
 export const draw: ItemDrawFn<IDrawTextConfig> = (ctx, drawPrev, config) => {
@@ -67,13 +66,6 @@ const operation = {
   schema,
 } as const;
 addOperation(operation);
-
-addRenderer("drawText", {
-  draw,
-});
-
-// Backward compatibility
-export const drawText = create;
 
 declare global {
   interface IOperations {

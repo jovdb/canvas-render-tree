@@ -1,6 +1,5 @@
 import { getContext2d, IRenderItem, ItemDrawFn, RenderTree } from "../canvas";
 import { IConfig } from "../configs";
-import { addRenderer } from "../renderers";
 import { OperationSchema } from "../schemas";
 import { addOperation } from ".";
 
@@ -88,7 +87,8 @@ export interface IDisplacementConfig extends IConfig {
 
 const schema: OperationSchema<"displacement"> = {
   name: "displacement",
-  description: "Apply displacement map effect using red and green channels for X/Y displacement",
+  description:
+    "Apply displacement map effect using red and green channels for X/Y displacement",
   getName: (config) =>
     config
       ? `displacement: strength=${(config as IDisplacementConfig).strength ?? 10}`
@@ -143,13 +143,6 @@ const operation = {
   schema,
 } as const;
 addOperation(operation);
-
-addRenderer("displacement", {
-  draw,
-});
-
-// Backward compatibility
-export const displacement = create;
 
 declare global {
   interface IOperations {

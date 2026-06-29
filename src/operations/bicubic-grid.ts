@@ -1,6 +1,5 @@
 import { IRenderItem, ItemDrawFn, RenderTree } from "../canvas";
 import { IConfig } from "../configs";
-import { addRenderer } from "../renderers";
 import { OperationSchema } from "../schemas";
 import { addOperation } from ".";
 
@@ -402,9 +401,6 @@ const operation = {
 } as const;
 addOperation(operation);
 
-addRenderer("bicubicGrid", {
-  draw,
-});
 
 // Backward compatibility
 export const bicubicGrid = create;
