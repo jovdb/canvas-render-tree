@@ -1,8 +1,23 @@
 import { operations } from "../operations";
 import { availableImages } from "../resources";
+import { beierNeelyTree } from "./beier-neely";
+import { bevel1Tree } from "./bevel";
+import { bicubicGridTree } from "./bicubic-grid";
+import { capTree } from "./cap";
+import { catmullRomTree, catmullRomShirtTree } from "./catmull-rom";
+import { convolutionSamplesTree } from "./convolution-kernel";
+import { displacementTree } from "./displacement";
+import { engravedGlassTree } from "./engraved-glass";
+import { engravedWoodTree } from "./engraved-wood";
 import { goldFoilTree } from "./gold-foil";
 import { opacityTree } from "./opacity";
+import { perspectiveTree } from "./perspective";
+import { pillowTree } from "./pillow";
+import { pillow2Tree } from "./pillow2";
 import { shadowTree } from "./shadow";
+import { bSplinePointsTree } from "./spline-points";
+import { thinPlateSpines } from "./thin-plate-splines";
+import { uvTree } from "./uv";
 
 export const samples = {
   empty: {
@@ -35,8 +50,6 @@ export const samples = {
     type: "2d",
     tree: goldFoilTree,
   },
-
-  /*
   bevel: {
     name: "Bevel",
     type: "2d",
@@ -121,5 +134,4 @@ export const samples = {
     type: "lifestyle",
     tree: pillow2Tree,
   },
-  */
 } as const;

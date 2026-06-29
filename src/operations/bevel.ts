@@ -1,9 +1,12 @@
-import { getContext2d, IRenderItem, ItemDrawFn } from "../canvas";
+import { getContext2d, IRenderItem, ItemDrawFn, RenderTree } from "../canvas";
+import { IConfig } from "../configs";
 import {
   drawKernel,
   gaussianBlurKernel as gaussianBlurKernel,
 } from "../kernels";
 import { addRenderer } from "../renderers";
+import { OperationSchema } from "../schemas";
+import { addOperation } from ".";
 
 type RGBA = [r: number, g: number, b: number, a?: number];
 
@@ -105,7 +108,7 @@ function getPixelValue(
   return 1 - value / total;
 }
 
-export interface IBevelConfig {
+export interface IBevelConfig extends IConfig {
   bevelSize?: number;
   shadowColor?: RGBA;
   highlightColor?: RGBA;
@@ -118,16 +121,18 @@ export interface IBevelConfig {
   kernel?: number[][];
 }
 
-/**
- * Perform bevel on everything already draw
- * You can wrap it in a new layer to control bevel
- */
-export const bevel = (
-  config: IBevelConfig = {},
-): IRenderItem<IBevelConfig> => ({
+const schema: OperationSchema<"bevel"> = {
   name: "bevel",
-  config,
-});
+  description: "Apply bevel effect using highlight and shadow colors",
+  getName: (config) =>
+    config
+      ? `bevel: ${(config as IBevelConfig).bevelSize ?? 6}`
+      : "bevel",
+  input: {
+    required: false,
+  },
+  args: [],
+};
 
 export const draw: ItemDrawFn<IBevelConfig> = (ctx, drawPrev, config) => {
   const {
@@ -215,6 +220,33 @@ export const draw: ItemDrawFn<IBevelConfig> = (ctx, drawPrev, config) => {
   }
 };
 
+/** Apply bevel effect */
+export const create = (
+  config: IBevelConfig = {},
+  input?: RenderTree,
+): IRenderItem<IBevelConfig> => ({
+  name: "bevel",
+  config,
+  input,
+});
+
+// Backward compatibility
+export const bevel = create;
+
+const operation = {
+  key: "bevel",
+  create,
+  draw,
+  schema,
+} as const;
+addOperation(operation);
+
 addRenderer("bevel", {
   draw,
 });
+
+declare global {
+  interface IOperations {
+    bevel: typeof create;
+  }
+}

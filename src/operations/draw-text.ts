@@ -1,6 +1,8 @@
-import { IRenderItem, ItemDrawFn } from "../canvas";
+import { IRenderItem, ItemDrawFn, RenderTree } from "../canvas";
 import { IConfig } from "../configs";
 import { addRenderer } from "../renderers";
+import { OperationSchema } from "../schemas";
+import { addOperation } from ".";
 
 export interface IDrawTextConfig extends IConfig {
   text: string;
@@ -13,11 +15,18 @@ export interface IDrawTextConfig extends IConfig {
   isItalic?: boolean;
 }
 
-/** draw Text on a canvas */
-export const drawText = (config: IDrawTextConfig): IRenderItem => ({
+const schema: OperationSchema<"drawText"> = {
   name: "drawText",
-  config,
-});
+  description: "Draw text on the canvas",
+  getName: (config) =>
+    config
+      ? `drawText: "${(config as IDrawTextConfig).text}"`
+      : "drawText",
+  input: {
+    required: false,
+  },
+  args: [],
+};
 
 export const draw: ItemDrawFn<IDrawTextConfig> = (ctx, drawPrev, config) => {
   // first draw previous items
@@ -41,6 +50,33 @@ export const draw: ItemDrawFn<IDrawTextConfig> = (ctx, drawPrev, config) => {
   ctx.fillText(text, x, y);
 };
 
+/** Draw text on a canvas */
+export const create = (
+  config: IDrawTextConfig,
+  input?: RenderTree,
+): IRenderItem<IDrawTextConfig> => ({
+  name: "drawText",
+  config,
+  input,
+});
+
+const operation = {
+  key: "drawText",
+  create,
+  draw,
+  schema,
+} as const;
+addOperation(operation);
+
 addRenderer("drawText", {
   draw,
 });
+
+// Backward compatibility
+export const drawText = create;
+
+declare global {
+  interface IOperations {
+    drawText: typeof create;
+  }
+}

@@ -1,24 +1,19 @@
 import { getContext2d, IRenderItem, ItemDrawFn, RenderTree } from "../canvas";
+import { IConfig } from "../configs";
 import { addRenderer } from "../renderers";
-import { addSchema } from "../schemas";
+import { OperationSchema } from "../schemas";
+import { addOperation } from ".";
 
-/**
- * Draw children on a new render layer
- * This can be useful to scope input
- */
-export const layer = (input: RenderTree): IRenderItem => ({
-  name: "layer",
-  input,
-});
+export interface ILayerConfig extends IConfig {}
 
-addSchema({
+const schema: OperationSchema<"layer"> = {
   name: "layer",
   description: "Group children on a new render layer",
   input: {
     description: "The input to draw on the new layer",
     required: true,
   },
-});
+};
 
 export const draw: ItemDrawFn = (ctx, drawPrev, _config, drawInput) => {
   // first draw previous items
@@ -37,6 +32,31 @@ export const draw: ItemDrawFn = (ctx, drawPrev, _config, drawInput) => {
   ctx.drawImage(canvas, 0, 0, ctx.canvas.width, ctx.canvas.height);
 };
 
+/** Draw children on a new render layer */
+export const create = (
+  input: RenderTree,
+): IRenderItem<ILayerConfig> => ({
+  name: "layer",
+  input,
+});
+
+const operation = {
+  key: "layer",
+  create,
+  draw,
+  schema,
+} as const;
+addOperation(operation);
+
 addRenderer("layer", {
   draw,
 });
+
+// Backward compatibility
+export const layer = create;
+
+declare global {
+  interface IOperations {
+    layer: typeof create;
+  }
+}

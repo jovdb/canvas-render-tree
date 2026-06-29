@@ -1,5 +1,8 @@
-import { IRenderItem, ItemDrawFn } from "../canvas";
+import { IRenderItem, ItemDrawFn, RenderTree } from "../canvas";
+import { IConfig } from "../configs";
 import { addRenderer } from "../renderers";
+import { OperationSchema } from "../schemas";
+import { addOperation } from ".";
 
 interface Point {
   x: number;
@@ -325,18 +328,26 @@ function drawControlPointDisplacement(
 
   ctx.restore(); // Restore original canvas state
 }
-export interface IBicubicGridConfig {
+export interface IBicubicGridConfig extends IConfig {
   /** Normalized controlPoints */
   controlsPoints: Point[][];
   debug?: boolean;
 }
 
-export const bicubicGrid = (
-  config: IBicubicGridConfig,
-): IRenderItem<IBicubicGridConfig> => ({
+const schema: OperationSchema<"bicubicGrid"> = {
   name: "bicubicGrid",
-  config: config,
-});
+  description: "Apply bicubic grid warping effect",
+  getName: (config) =>
+    config
+      ? `bicubicGrid: grid[${(config as IBicubicGridConfig).controlsPoints.length}x${
+          (config as IBicubicGridConfig).controlsPoints[0].length
+        }]`
+      : "bicubicGrid",
+  input: {
+    required: false,
+  },
+  args: [],
+};
 
 export const draw: ItemDrawFn<IBicubicGridConfig> = (
   ctx,
@@ -373,6 +384,33 @@ export const draw: ItemDrawFn<IBicubicGridConfig> = (
   if (drawInput) ctx.restore();
 };
 
+/** Apply bicubic grid warping */
+export const create = (
+  config: IBicubicGridConfig,
+  input?: RenderTree,
+): IRenderItem<IBicubicGridConfig> => ({
+  name: "bicubicGrid",
+  config: config,
+  input,
+});
+
+const operation = {
+  key: "bicubicGrid",
+  create,
+  draw,
+  schema,
+} as const;
+addOperation(operation);
+
 addRenderer("bicubicGrid", {
   draw,
 });
+
+// Backward compatibility
+export const bicubicGrid = create;
+
+declare global {
+  interface IOperations {
+    bicubicGrid: typeof create;
+  }
+}

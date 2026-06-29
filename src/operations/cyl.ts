@@ -1,18 +1,19 @@
 import { IRenderItem, ItemDrawFn, RenderTree } from "../canvas";
+import { IConfig } from "../configs";
 import { addRenderer } from "../renderers";
+import { OperationSchema } from "../schemas";
+import { addOperation } from ".";
 
-export interface IOpacityConfig {
-  opacity: number;
-}
+export interface ICylConfig extends IConfig {}
 
-export const cyl = (
-  /** When passed, only the children will have opacity */
-  input?: RenderTree | undefined,
-): IRenderItem<IOpacityConfig> => ({
+const schema: OperationSchema<"cyl"> = {
   name: "cyl",
-  config: undefined,
-  input,
-});
+  description: "Render a 3D cylinder",
+  input: {
+    required: false,
+  },
+  args: [],
+};
 
 interface Point3D {
   x: number;
@@ -149,7 +150,17 @@ function drawCylinder(
   }
 }
 
-export const draw: ItemDrawFn<IOpacityConfig> = (
+/** Create a cylinder render */
+export const create = (
+  /** When passed, cylinder will be rendered with children */
+  input?: RenderTree | undefined,
+): IRenderItem<ICylConfig> => ({
+  name: "cyl",
+  input,
+});
+
+/** Draw a 3D cylinder */
+export const draw: ItemDrawFn<ICylConfig> = (
   ctx,
   drawPrev,
   _config,
@@ -176,6 +187,23 @@ export const draw: ItemDrawFn<IOpacityConfig> = (
   if (drawInput) ctx.restore();
 };
 
+const operation = {
+  key: "cyl",
+  create,
+  draw,
+  schema,
+} as const;
+addOperation(operation);
+
 addRenderer("cyl", {
   draw,
 });
+
+// Backward compatibility
+export const cyl = create;
+
+declare global {
+  interface IOperations {
+    cyl: typeof create;
+  }
+}

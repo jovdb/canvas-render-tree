@@ -1,5 +1,8 @@
 import { getContext2d, IRenderItem, ItemDrawFn, RenderTree } from "../canvas";
+import { IConfig } from "../configs";
 import { addRenderer } from "../renderers";
+import { OperationSchema } from "../schemas";
+import { addOperation } from ".";
 
 // displacement map
 
@@ -79,18 +82,22 @@ function applyDisplacementMap(
   return destinationImageData;
 }
 
-export interface IDisplacementConfig {
+export interface IDisplacementConfig extends IConfig {
   strength?: number;
 }
 
-export const displacement = (
-  strength: number,
-  displacement: RenderTree,
-): IRenderItem => ({
+const schema: OperationSchema<"displacement"> = {
   name: "displacement",
-  config: { strength },
-  input: displacement,
-});
+  description: "Apply displacement map effect using red and green channels for X/Y displacement",
+  getName: (config) =>
+    config
+      ? `displacement: strength=${(config as IDisplacementConfig).strength ?? 10}`
+      : "displacement",
+  input: {
+    required: true,
+  },
+  args: [],
+};
 
 export const draw: ItemDrawFn<IDisplacementConfig> = (
   ctx,
@@ -119,6 +126,33 @@ export const draw: ItemDrawFn<IDisplacementConfig> = (
   return this;
 };
 
+/** Apply displacement map effect */
+export const create = (
+  strength: number,
+  displacement: RenderTree,
+): IRenderItem<IDisplacementConfig> => ({
+  name: "displacement",
+  config: { strength },
+  input: displacement,
+});
+
+const operation = {
+  key: "displacement",
+  create,
+  draw,
+  schema,
+} as const;
+addOperation(operation);
+
 addRenderer("displacement", {
   draw,
 });
+
+// Backward compatibility
+export const displacement = create;
+
+declare global {
+  interface IOperations {
+    displacement: typeof create;
+  }
+}

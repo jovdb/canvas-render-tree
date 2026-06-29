@@ -1,5 +1,8 @@
 import { IRenderItem, ItemDrawFn, RenderTree } from "../canvas";
+import { IConfig } from "../configs";
 import { addRenderer } from "../renderers";
+import { OperationSchema } from "../schemas";
+import { addOperation } from ".";
 
 // Helper function to convert RGB to HSL
 function rgbToHsl(r: number, g: number, b: number) {
@@ -60,19 +63,22 @@ function hslToRgb(h: number, s: number, l: number) {
   return [r * 255, g * 255, b * 255];
 }
 
-export interface ISaturationConfig {
+export interface ISaturationConfig extends IConfig {
   factor?: number;
 }
 
-/** Pass 0 for grayscale */
-export const saturation = (
-  config: ISaturationConfig = {},
-  input: RenderTree,
-): IRenderItem<ISaturationConfig> => ({
+const schema: OperationSchema<"saturation"> = {
   name: "saturation",
-  config,
-  input,
-});
+  description: "Adjust image saturation (0 for grayscale)",
+  getName: (config) =>
+    config
+      ? `saturation: ${Math.round(((config as ISaturationConfig).factor ?? 0) * 100)}%`
+      : "saturation",
+  input: {
+    required: true,
+  },
+  args: [],
+};
 
 export const draw: ItemDrawFn<ISaturationConfig> = (
   ctx,
@@ -123,6 +129,33 @@ export const draw: ItemDrawFn<ISaturationConfig> = (
   if (drawInput) ctx.restore();
 };
 
+/** Adjust image saturation */
+export const create = (
+  config: ISaturationConfig = {},
+  input: RenderTree,
+): IRenderItem<ISaturationConfig> => ({
+  name: "saturation",
+  config,
+  input,
+});
+
+const operation = {
+  key: "saturation",
+  create,
+  draw,
+  schema,
+} as const;
+addOperation(operation);
+
 addRenderer("saturation", {
   draw,
 });
+
+// Backward compatibility
+export const saturation = create;
+
+declare global {
+  interface IOperations {
+    saturation: typeof create;
+  }
+}

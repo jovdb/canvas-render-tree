@@ -1,6 +1,20 @@
 import { IRenderItem, RenderTree } from "../canvas";
+import { IConfig } from "../configs";
 import { addRenderer } from "../renderers";
-import { create } from "./blend";
+import { OperationSchema } from "../schemas";
+import { addOperation } from ".";
+import { create as createBlend } from "./blend";
+
+export interface IMaskConfig extends IConfig {}
+
+const schema: OperationSchema<"mask"> = {
+  name: "mask",
+  description: "Use children as mask on everything that is already drawn on the layer",
+  input: {
+    description: "The mask input",
+    required: true,
+  },
+};
 
 /**
  * Currently only opacity layer used of mask
@@ -15,11 +29,30 @@ import { create } from "./blend";
  *    ])
  *  ])
  */
-export const mask = (mask?: RenderTree | undefined): IRenderItem => ({
+export const create = (
+  mask?: RenderTree | undefined,
+): IRenderItem<IMaskConfig> => ({
   name: "mask",
-  input: [create("destination-in", mask)],
+  input: [createBlend("destination-in", mask)],
 });
+
+const operation = {
+  key: "mask",
+  create,
+  draw: undefined,
+  schema,
+} as const;
+addOperation(operation);
 
 addRenderer("mask", {
   draw: undefined,
 });
+
+// Backward compatibility
+export const mask = create;
+
+declare global {
+  interface IOperations {
+    mask: typeof create;
+  }
+}

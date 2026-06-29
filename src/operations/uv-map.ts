@@ -1,5 +1,8 @@
 import { getContext2d, IRenderItem, ItemDrawFn, RenderTree } from "../canvas";
+import { IConfig } from "../configs";
 import { addRenderer } from "../renderers";
+import { OperationSchema } from "../schemas";
+import { addOperation } from ".";
 
 /**
  * Generates a 2048x2048 UV Identity Map as a lossless PNG Base64 Data URL.
@@ -238,7 +241,19 @@ function createUVMapImageData(width: number, height: number): ImageData {
 }
 */
 
-export const uvMap = (uv: RenderTree): IRenderItem => ({
+export interface IUVMapConfig extends IConfig {}
+
+const schema: OperationSchema<"uvMap"> = {
+  name: "uvMap",
+  description: "Apply UV mapping transformation",
+  input: {
+    required: true,
+  },
+  args: [],
+};
+
+/** Create UV mapping */
+export const create = (uv: RenderTree): IRenderItem<IUVMapConfig> => ({
   name: "uvMap",
   config: {},
   input: uv,
@@ -270,6 +285,23 @@ export const draw: ItemDrawFn<undefined> = (
   return this;
 };
 
+const operation = {
+  key: "uvMap",
+  create,
+  draw,
+  schema,
+} as const;
+addOperation(operation);
+
 addRenderer("uvMap", {
   draw,
 });
+
+// Backward compatibility
+export const uvMap = create;
+
+declare global {
+  interface IOperations {
+    uvMap: typeof create;
+  }
+}

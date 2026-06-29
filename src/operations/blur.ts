@@ -1,5 +1,8 @@
-import { IRenderItem, ItemDrawFn } from "../canvas";
+import { IRenderItem, ItemDrawFn, RenderTree } from "../canvas";
+import { IConfig } from "../configs";
 import { addRenderer } from "../renderers";
+import { OperationSchema } from "../schemas";
+import { addOperation } from ".";
 
 // Function to create a Gaussian kernel
 function createGaussianKernel(radius: number, sigma: number) {
@@ -24,15 +27,25 @@ function createGaussianKernel(radius: number, sigma: number) {
   return { kernel, size };
 }
 
-export interface IBlurConfig {
+export interface IBlurConfig extends IConfig {
   radius?: number;
   sigma?: number;
 }
 
-export const blur = (config: IBlurConfig = {}): IRenderItem<IBlurConfig> => ({
+const schema: OperationSchema<"blur"> = {
   name: "blur",
-  config,
-});
+  description: "Apply Gaussian blur effect",
+  getName: (config) =>
+    config
+      ? `blur: radius=${(config as IBlurConfig).radius ?? 5}, sigma=${
+          (config as IBlurConfig).sigma ?? 2
+        }`
+      : "blur",
+  input: {
+    required: false,
+  },
+  args: [],
+};
 
 export const draw: ItemDrawFn<IBlurConfig> = (ctx, drawPrev, config) => {
   // first draw previous items
@@ -85,6 +98,33 @@ export const draw: ItemDrawFn<IBlurConfig> = (ctx, drawPrev, config) => {
   ctx.putImageData(output, 0, 0);
 };
 
+/** Apply Gaussian blur effect */
+export const create = (
+  config: IBlurConfig = {},
+  input?: RenderTree,
+): IRenderItem<IBlurConfig> => ({
+  name: "blur",
+  config,
+  input,
+});
+
+const operation = {
+  key: "blur",
+  create,
+  draw,
+  schema,
+} as const;
+addOperation(operation);
+
 addRenderer("blur", {
   draw,
 });
+
+// Backward compatibility
+export const blur = create;
+
+declare global {
+  interface IOperations {
+    blur: typeof create;
+  }
+}

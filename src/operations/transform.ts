@@ -1,7 +1,10 @@
 import { IRenderItem, ItemDrawFn, RenderTree } from "../canvas";
+import { IConfig } from "../configs";
 import { addRenderer } from "../renderers";
+import { OperationSchema } from "../schemas";
+import { addOperation } from ".";
 
-export interface ITransformConfig {
+export interface ITransformConfig extends IConfig {
   translateX?: number;
   translateY?: number;
   scale?: number;
@@ -9,10 +12,27 @@ export interface ITransformConfig {
   scaleY?: number;
 }
 
-export const transform = (
+const schema: OperationSchema<"transform"> = {
+  name: "transform",
+  description: "Apply geometric transformation (translate, scale) to input",
+  getName: (config) =>
+    config
+      ? `transform: scale=${
+          (config as ITransformConfig).scale ??
+          (config as ITransformConfig).scaleX ??
+          1
+        }`
+      : "transform",
+  input: {
+    required: true,
+  },
+  args: [],
+};
+
+export const create = (
   config: ITransformConfig,
   input: RenderTree,
-): IRenderItem => ({
+): IRenderItem<ITransformConfig> => ({
   name: "transform",
   config,
   input,
@@ -51,6 +71,23 @@ export const draw: ItemDrawFn<ITransformConfig> = (
   if (drawInput) ctx.restore();
 };
 
+const operation = {
+  key: "transform",
+  create,
+  draw,
+  schema,
+} as const;
+addOperation(operation);
+
 addRenderer("transform", {
   draw,
 });
+
+// Backward compatibility
+export const transform = create;
+
+declare global {
+  interface IOperations {
+    transform: typeof create;
+  }
+}

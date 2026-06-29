@@ -1,13 +1,28 @@
 import { IRenderItem, ItemDrawFn, RenderTree } from "../canvas";
 import { IConfig } from "../configs";
 import { addRenderer } from "../renderers";
+import { OperationSchema } from "../schemas";
+import { addOperation } from ".";
 
-export const invert = (input: RenderTree): IRenderItem<IConfig  > => ({
+export interface IInvertConfig extends IConfig {}
+
+const schema: OperationSchema<"invert"> = {
+  name: "invert",
+  description: "Invert the colors of the input",
+  input: {
+    required: true,
+  },
+  args: [],
+};
+
+export const create = (
+  input: RenderTree,
+): IRenderItem<IInvertConfig> => ({
   name: "invert",
   input,
 });
 
-export const draw: ItemDrawFn = (ctx, drawPrev, _config, drawInput) => {
+export const draw: ItemDrawFn<IInvertConfig> = (ctx, drawPrev, _config, drawInput) => {
   // first draw previous items
   drawPrev?.(ctx);
 
@@ -42,6 +57,23 @@ export const draw: ItemDrawFn = (ctx, drawPrev, _config, drawInput) => {
   drawPrev?.(ctx);
 };
 
+const operation = {
+  key: "invert",
+  create,
+  draw,
+  schema,
+} as const;
+addOperation(operation);
+
 addRenderer("invert", {
   draw,
 });
+
+// Backward compatibility
+export const invert = create;
+
+declare global {
+  interface IOperations {
+    invert: typeof create;
+  }
+}

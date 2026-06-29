@@ -1,7 +1,10 @@
 import { IRenderItem, ItemDrawFn, RenderTree } from "../canvas";
+import { IConfig } from "../configs";
 import { addRenderer } from "../renderers";
+import { OperationSchema } from "../schemas";
+import { addOperation } from ".";
 
-export interface IPerspectiveConfig {
+export interface IPerspectiveConfig extends IConfig {
   /** Normalized control points */
   controlPoints: [
     topLeft: Point,
@@ -11,15 +14,27 @@ export interface IPerspectiveConfig {
   ];
 }
 
-export const perspective = (
+/** Create perspective transformation */
+export const create = (
   config: IPerspectiveConfig,
-  /** When passed, only the children will have opacity */
+  /** When passed, perspective will be applied to children */
   input?: RenderTree | undefined,
 ): IRenderItem<IPerspectiveConfig> => ({
   name: "perspective",
   config,
   input,
 });
+const schema: OperationSchema<"perspective"> = {
+  name: "perspective",
+  description: "Apply perspective transformation using control points",
+  getName: (config) =>
+    config ? `perspective: 4 control points` : "perspective",
+  input: {
+    required: true,
+  },
+  args: [],
+};
+
 interface Point {
   x: number;
   y: number;
@@ -310,6 +325,23 @@ export const draw: ItemDrawFn<IPerspectiveConfig> = (
   if (drawInput) ctx.restore();
 };
 
+const operation = {
+  key: "perspective",
+  create,
+  draw,
+  schema,
+} as const;
+addOperation(operation);
+
 addRenderer("perspective", {
   draw,
 });
+
+// Backward compatibility
+export const perspective = create;
+
+declare global {
+  interface IOperations {
+    perspective: typeof create;
+  }
+}

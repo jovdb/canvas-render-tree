@@ -1,6 +1,9 @@
-import { IRenderItem, ItemDrawFn } from "../canvas";
+import { IRenderItem, ItemDrawFn, RenderTree } from "../canvas";
+import { IConfig } from "../configs";
 import { drawKernel, normalizeKernel } from "../kernels";
 import { addRenderer } from "../renderers";
+import { OperationSchema } from "../schemas";
+import { addOperation } from ".";
 
 /** Same kernel will be used for all color channels */
 /*
@@ -91,7 +94,7 @@ function applyKernel(
   return newImageData;
 }
 
-interface IConvolveConfig {
+export interface IConvolveConfig extends IConfig {
   /**
    * Convolution Kernel to use
    * https://docs.gimp.org/2.10/en/gimp-filter-convolution-matrix.html
@@ -103,16 +106,20 @@ interface IConvolveConfig {
   multiply?: number;
 }
 
-/**
- * Apply a convolution kernel on an image
- * You can wrap it in a new layer to control the input image to target
- */
-export const convolve = (
-  config: IConvolveConfig,
-): IRenderItem<IConvolveConfig> => ({
+const schema: OperationSchema<"convolve"> = {
   name: "convolve",
-  config,
-});
+  description: "Apply a convolution kernel on an image",
+  getName: (config) =>
+    config
+      ? `convolve: kernel[${(config as IConvolveConfig).kernel.length}x${
+          (config as IConvolveConfig).kernel[0].length
+        }]`
+      : "convolve",
+  input: {
+    required: false,
+  },
+  args: [],
+};
 
 export const draw: ItemDrawFn<IConvolveConfig> = (ctx, drawPrev, config) => {
   // first draw previous items
@@ -146,6 +153,33 @@ export const draw: ItemDrawFn<IConvolveConfig> = (ctx, drawPrev, config) => {
   ctx.putImageData(newImageData, 0, 0); // Put the ImageData onto the canvas
 };
 
+/** Apply a convolution kernel on an image */
+export const create = (
+  config: IConvolveConfig,
+  input?: RenderTree,
+): IRenderItem<IConvolveConfig> => ({
+  name: "convolve",
+  config,
+  input,
+});
+
+const operation = {
+  key: "convolve",
+  create,
+  draw,
+  schema,
+} as const;
+addOperation(operation);
+
 addRenderer("convolve", {
   draw,
 });
+
+// Backward compatibility
+export const convolve = create;
+
+declare global {
+  interface IOperations {
+    convolve: typeof create;
+  }
+}
