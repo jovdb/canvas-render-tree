@@ -37,7 +37,15 @@ export function RenderTree2({
     onTreeChange?.(newItems);
   }
 
-  function onAddAfter(index: number) {}
+  function onAddAfter(index: number) {
+    debugger;
+    const newItem = operations.drawImage({
+      imageUrl: availableImages.parrot,
+    });
+    const newItems = [...(items ?? [])];
+    newItems.splice(index + 1, 0, newItem);
+    onTreeChange?.(newItems);
+  }
 
   return (
     <div className="render-tree">
@@ -59,9 +67,19 @@ export function RenderTree2({
             onClick={onClick}
             onDelete={onDelete}
             onVisibilityChange={onVisibilityChange}
+            onTreeChange={(newItem) => {
+              const newItems = [...(items ?? [])];
+              newItems[index].input = newItem;
+              onTreeChange?.(newItems);
+            }}
           />
           <div className="render-tree__buttons">
-            <button className="render-tree__add">+</button>
+            <button
+              className="render-tree__add"
+              onClick={() => onAddAfter(index)}
+            >
+              +
+            </button>
           </div>
         </>
       ))}

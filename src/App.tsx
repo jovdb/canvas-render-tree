@@ -64,6 +64,96 @@ function filterTree(
   return newItems;
 }
 
+function replaceWithInput(
+  items: readonly IRenderItem[],
+  targetIndex: TreeIndex,
+): IRenderItem[] {
+  if (targetIndex.length === 0) return [...items];
+
+  const [targetPos, ...restIndex] = targetIndex;
+
+  if (restIndex.length === 0) {
+    // Replace item at root level
+    const newItems = [...items];
+    const itemToReplace = newItems[targetPos];
+    if (itemToReplace) {
+      const replacementItems = itemToReplace.input ?? [];
+      newItems.splice(targetPos, 1, ...replacementItems);
+    }
+    return newItems;
+  }
+
+  // Need to recurse into a specific item's children
+  const newItems = [...items];
+  const parentItem = newItems[targetPos];
+  if (!parentItem) return newItems;
+
+  const [childTargetPos, ...childRestIndex] = restIndex;
+  const flatArgs = parentItem.args?.flat() ?? [];
+  const flatInput = parentItem.input ?? [];
+  
+  if (childTargetPos < flatArgs.length) {
+    // Target is in args
+    let positionInFoundArg = childTargetPos;
+    let foundArgIndex = -1;
+    
+    for (let i = 0; i < (parentItem.args?.length ?? 0); i++) {
+      const arg = parentItem.args![i];
+      if (positionInFoundArg < arg.length) {
+        foundArgIndex = i;
+        break;
+      }
+      positionInFoundArg -= arg.length;
+    }
+    
+    if (foundArgIndex >= 0 && parentItem.args) {
+      const newArgs = [...parentItem.args];
+      const argArray = [...newArgs[foundArgIndex]];
+      
+      if (childRestIndex.length === 0) {
+        // Replace this arg item with its input
+        const itemToReplace = argArray[positionInFoundArg];
+        const replacementItems = itemToReplace?.input ?? [];
+        argArray.splice(positionInFoundArg, 1, ...replacementItems);
+      } else {
+        // Recurse deeper into this arg
+        const newArgArray = replaceWithInput(argArray, [positionInFoundArg, ...childRestIndex]);
+        newArgs[foundArgIndex] = newArgArray;
+      }
+      
+      newItems[targetPos] = {
+        ...parentItem,
+        args: newArgs.length > 0 ? newArgs : undefined,
+      };
+    }
+  } else {
+    // Target is in input
+    const positionInInput = childTargetPos - flatArgs.length;
+    const input = parentItem.input ?? [];
+    
+    if (childRestIndex.length === 0) {
+      // Replace this input item with its input
+      const newInput = [...input];
+      const itemToReplace = newInput[positionInInput];
+      const replacementItems = itemToReplace?.input ?? [];
+      newInput.splice(positionInInput, 1, ...replacementItems);
+      newItems[targetPos] = {
+        ...parentItem,
+        input: newInput.length > 0 ? newInput : undefined,
+      };
+    } else {
+      // Recurse into input
+      const newInput = replaceWithInput(input, [positionInInput, ...childRestIndex]);
+      newItems[targetPos] = {
+        ...parentItem,
+        input: newInput.length > 0 ? newInput : undefined,
+      };
+    }
+  }
+  
+  return newItems;
+}
+
 function deleteFromTree(
   items: readonly IRenderItem[],
   targetIndex: TreeIndex,
@@ -264,7 +354,7 @@ function App() {
               setEditIndex(treeIndex);
             }}
             onDelete={(item, treeIndex) => {
-              const newTree = deleteFromTree(workTree, treeIndex);
+              const newTree = replaceWithInput(workTree, treeIndex);
               setWorkTree(newTree);
             }}
             onVisibilityChange={(_item, treeIndex) => {
