@@ -55,7 +55,13 @@ export const create = (
   input?: RenderTree,
 ): IRenderItem<IDrawTextConfig> => ({
   name: "drawText",
-  config,
+  config: {
+    text: "Text",
+    x: 100,
+    y: 100,
+    foregroundColor: "#000",
+    ...config,
+  },
   input,
 });
 
