@@ -39,15 +39,17 @@ export function RenderItem2({
   const [collapseInput, setCollapseInput] = useState(false);
   const name = schema?.getName ? schema.getName(item.config) : item.name;
 
-  const inputs = schema?.input
-    ? [
-        ...(schema?.prevAsInput ? [prevItems] : []),
-        ...(item.input ? [item.input] : []),
-        ...(item.args ? item.args : []),
-      ]
-    : schema?.input?.required
-      ? [undefined]
-      : undefined;
+  const inputs: Array<readonly IRenderItem[] | undefined> = [
+    ...(schema?.prevAsInput ? [prevItems] : []),
+    ...(item.input ? [item.input] : []),
+    ...(item.args ? item.args : []),
+  ];
+
+  if (inputs.length === 0) {
+    if (schema?.prevAsInput || schema?.input || schema?.args) {
+      inputs.push(undefined);
+    }
+  }
 
   return (
     <>
