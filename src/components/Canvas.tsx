@@ -10,10 +10,10 @@ export function Canvas({ items }: { items: IRenderItem[] }) {
     queryKey: ["canvas", items],
     queryFn: async () => {
       if (!canvasRef.current) return null;
-      if (!items?.length) return null;
-      validateSchemas(items);
+
       await loadTree(items);
       draw(canvasRef.current, items);
+      validateSchemas(items);
       return null;
     },
   });

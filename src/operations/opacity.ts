@@ -10,6 +10,10 @@ export interface IOpacityConfig extends IConfig {
 const schema: OperationSchema<"opacity"> = {
   name: "opacity",
   description: "Draw each child with the given opacity",
+  getName: (config) =>
+    config
+      ? `opacity: ${Math.round((config as IOpacityConfig).opacity * 100)}%`
+      : "opacity",
   input: {
     required: true,
   },
