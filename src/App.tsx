@@ -65,112 +65,20 @@ function filterTree(
   return newItems;
 }
 
-function replaceWithInput(
-  items: readonly IRenderItem[],
-  targetIndex: TreeIndex,
-): IRenderItem[] {
-  if (targetIndex.length === 0) return [...items];
-
-  const [targetPos, ...restIndex] = targetIndex;
-
-  if (restIndex.length === 0) {
-    // Replace item at root level
-    const newItems = [...items];
-    const itemToReplace = newItems[targetPos];
-    if (itemToReplace) {
-      const replacementItems = itemToReplace.input ?? [];
-      newItems.splice(targetPos, 1, ...replacementItems);
-    }
-    return newItems;
-  }
-
-  // Need to recurse into a specific item's children
-  const newItems = [...items];
-  const parentItem = newItems[targetPos];
-  if (!parentItem) return newItems;
-
-  const [childTargetPos, ...childRestIndex] = restIndex;
-  const flatArgs = parentItem.args?.flat() ?? [];
-  if (childTargetPos < flatArgs.length) {
-    // Target is in args
-    let positionInFoundArg = childTargetPos;
-    let foundArgIndex = -1;
-
-    for (let i = 0; i < (parentItem.args?.length ?? 0); i++) {
-      const arg = parentItem.args![i];
-      if (positionInFoundArg < arg.length) {
-        foundArgIndex = i;
-        break;
-      }
-      positionInFoundArg -= arg.length;
-    }
-
-    if (foundArgIndex >= 0 && parentItem.args) {
-      const newArgs = [...parentItem.args];
-      const argArray = [...newArgs[foundArgIndex]];
-
-      if (childRestIndex.length === 0) {
-        // Replace this arg item with its input
-        const itemToReplace = argArray[positionInFoundArg];
-        const replacementItems = itemToReplace?.input ?? [];
-        argArray.splice(positionInFoundArg, 1, ...replacementItems);
-      } else {
-        // Recurse deeper into this arg
-        const newArgArray = replaceWithInput(argArray, [
-          positionInFoundArg,
-          ...childRestIndex,
-        ]);
-        newArgs[foundArgIndex] = newArgArray;
-      }
-
-      newItems[targetPos] = {
-        ...parentItem,
-        args: newArgs.length > 0 ? newArgs : undefined,
-      };
-    }
-  } else {
-    // Target is in input
-    const positionInInput = childTargetPos - flatArgs.length;
-    const input = parentItem.input ?? [];
-
-    if (childRestIndex.length === 0) {
-      // Replace this input item with its input
-      const newInput = [...input];
-      const itemToReplace = newInput[positionInInput];
-      const replacementItems = itemToReplace?.input ?? [];
-      newInput.splice(positionInInput, 1, ...replacementItems);
-      newItems[targetPos] = {
-        ...parentItem,
-        input: newInput.length > 0 ? newInput : undefined,
-      };
-    } else {
-      // Recurse into input
-      const newInput = replaceWithInput(input, [
-        positionInInput,
-        ...childRestIndex,
-      ]);
-      newItems[targetPos] = {
-        ...parentItem,
-        input: newInput.length > 0 ? newInput : undefined,
-      };
-    }
-  }
-
-  return newItems;
-}
-
 function App() {
   const [editIndex, setEditIndex] = useState<TreeIndex | undefined>();
   const [visibleIndexes, setVisibleIndexes] = useState<TreeIndex[]>([]);
 
   /** Working tree is a copy of the entire sample and can be modified */
   const workTree = useWorkTree();
-  const { setWorkTree, updateWorkTree, resetWorkTree } = useWorkTreeActions();
+  const { setWorkTree, updateWorkTree, resetWorkTree, deleteItem } =
+    useWorkTreeActions();
 
-  const [sampleKey, setSampleKey] = useState<string>("opacity");
+  const [sampleKey, setSampleKey] = useState<keyof typeof samples>("opacity");
 
   useEffect(() => {
-    const tree = samples[sampleKey]?.tree() ?? [];
+    const sample = samples[sampleKey];
+    const tree = sample?.tree() ?? [];
     resetWorkTree(tree);
     setEditIndex([]);
     setVisibleIndexes([]);
@@ -268,7 +176,7 @@ function App() {
               setEditIndex(treeIndex);
             }}
             onDelete={(_item, treeIndex) => {
-              setWorkTree(replaceWithInput(workTree, treeIndex));
+              deleteItem(treeIndex);
             }}
             onVisibilityChange={(_item, treeIndex) => {
               setVisibleIndexes((prev) => {

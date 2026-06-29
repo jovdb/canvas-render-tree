@@ -3,7 +3,9 @@ import { IRenderItem } from "../canvas";
 import { TreeIndex } from "../components/RenderTree";
 
 interface WorkTreeActions {
-  setWorkTree: (tree: IRenderItem[] | ((currentTree: IRenderItem[]) => IRenderItem[])) => void;
+  setWorkTree: (
+    tree: IRenderItem[] | ((currentTree: IRenderItem[]) => IRenderItem[]),
+  ) => void;
   resetWorkTree: (tree: IRenderItem[]) => void;
   updateWorkTree: (updater: (currentTree: IRenderItem[]) => IRenderItem[]) => void;
   addItem: (item: IRenderItem, index?: number) => void;
@@ -119,7 +121,9 @@ export const useWorkTreeStore = create<WorkTreeState>((set) => ({
         return { workTree: nextTree };
       }),
     deleteItem: (targetIndex) =>
-      set((state) => ({ workTree: replaceWithInput(state.workTree, targetIndex) })),
+      set((state) => ({
+        workTree: replaceWithInput(state.workTree, targetIndex),
+      })),
   },
 }));
 
