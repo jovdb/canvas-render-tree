@@ -2,7 +2,9 @@ import { Fragment, useMemo, useState } from "react";
 import { IRenderItem } from "../../canvas";
 import { operations } from "../../operations";
 import { availableImages } from "../../resources";
+import { getSchema } from "../../schemas";
 import { RenderItem2 } from "./RenderItem2";
+import { AddOperationPopover } from "./AddOperationPopover";
 
 /** Indexes in tree */
 export type TreeIndex = number[];
@@ -33,7 +35,16 @@ export function RenderTree2({
     | undefined
   >();
 
-  const operationNames = useMemo(() => Object.keys(operations).sort(), []);
+  const operationOptions = useMemo(
+    () =>
+      Object.keys(operations)
+        .sort()
+        .map((operationName) => ({
+          operationName,
+          description: getSchema(operationName)?.description ?? "",
+        })),
+    [],
+  );
 
   function createDefaultItem(operationName: string): IRenderItem {
     switch (operationName) {
@@ -73,26 +84,24 @@ export function RenderTree2({
     setAddMenu(undefined);
   }
 
+  function renderAddMenu(mode: "first" | "after", index?: number) {
+    const isOpen = addMenu?.mode === mode && addMenu.index === index;
+
+    return (
+      <AddOperationPopover
+        open={isOpen}
+        onOpenChange={(open) => {
+          setAddMenu(open ? { mode, index } : undefined);
+        }}
+        operations={operationOptions}
+        onSelect={(operationName) => addItem(operationName, index)}
+      />
+    );
+  }
+
   return (
     <div className="render-tree">
-      <div className="render-tree__buttons">
-        <button className="render-tree__add" onClick={() => setAddMenu({ mode: "first" })}>
-          +
-        </button>
-        {addMenu?.mode === "first" && (
-          <div className="render-tree__add-popup">
-            {operationNames.map((operationName) => (
-              <button
-                key={operationName}
-                className="render-tree__add-option"
-                onClick={() => addItem(operationName)}
-              >
-                {operationName}
-              </button>
-            ))}
-          </div>
-        )}
-      </div>
+      <div className="render-tree__buttons">{renderAddMenu("first")}</div>
       {items?.map((item, index) => (
         <Fragment key={`${item.name}-${index}`}>
           <RenderItem2
@@ -107,31 +116,12 @@ export function RenderTree2({
             onVisibilityChange={onVisibilityChange}
             onTreeChange={(newItem) => {
               const newItems = [...(items ?? [])];
+              // TODO: What if doesn't support input according to schema
               newItems[index].input = newItem;
               onTreeChange?.(newItems);
             }}
           />
-          <div className="render-tree__buttons">
-            <button
-              className="render-tree__add"
-              onClick={() => setAddMenu({ mode: "after", index })}
-            >
-              +
-            </button>
-            {addMenu?.mode === "after" && addMenu.index === index && (
-              <div className="render-tree__add-popup">
-                {operationNames.map((operationName) => (
-                  <button
-                    key={operationName}
-                    className="render-tree__add-option"
-                    onClick={() => addItem(operationName, index)}
-                  >
-                    {operationName}
-                  </button>
-                ))}
-              </div>
-            )}
-          </div>
+          <div className="render-tree__buttons">{renderAddMenu("after", index)}</div>
         </Fragment>
       ))}
     </div>
