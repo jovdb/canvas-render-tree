@@ -16,11 +16,13 @@ const schema: OperationSchema<"shadow"> = {
   name: "shadow",
   getName: (config) =>
     config ? `shadow: ${(config as IShadowConfig).type === "outer" ? "outer" : "inner"}` : "shadow",
-  description: "Add shadow to the last painted item",
-  input: {
-    required: true,
-  },
-  args: [],
+  description: "Add shadow to the given rendering",
+  args: [
+    {
+      description: "Rendering to apply shadow to",
+      required: true,
+    },
+  ],
 };
 
 /**
@@ -33,14 +35,14 @@ const create = (
 ): IRenderItem<IShadowConfig> => ({
   name: "shadow",
   config,
-  input,
+  args: [input ?? []],
 });
 
 export const draw: ItemDrawFn<IShadowConfig> = ({
   ctx,
   drawPrev,
   config,
-  drawInput,
+  drawArgs,
 }) => {
   const {
     type = "outer",
@@ -63,7 +65,7 @@ export const draw: ItemDrawFn<IShadowConfig> = ({
   if (type === "outer") {
     drawPrev?.(ctx);
     apply(ctx);
-    drawInput?.(ctx);
+    drawArgs?.[0]?.(ctx);
     return;
   } else if (type === "inner") {
     // How to draw inner canvas:
@@ -78,7 +80,7 @@ export const draw: ItemDrawFn<IShadowConfig> = ({
     dataCanvas.height = ctx.canvas.height;
     const tempCtx = getContext2d(dataCanvas, "tempCtx");
 
-    drawInput?.(tempCtx);
+    drawArgs?.[0]?.(tempCtx);
 
     // 1. Create an image with transparent area for the shadow
     const invertedImageCanvas = document.createElement("canvas");

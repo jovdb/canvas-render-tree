@@ -6,7 +6,6 @@ import { useState } from "react";
 
 export function RenderItem2({
   item,
-  prevItems,
   selectedItems = [],
   visibleIndexes = [],
   treeIndex,
@@ -91,6 +90,7 @@ export function RenderItem2({
           }`}
           role="button"
           tabIndex={0}
+          title={schema?.description}
         >
           <span
             className="render-item__visibility"
