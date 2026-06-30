@@ -14,14 +14,24 @@ export interface ITransformConfig extends IConfig {
 const schema: OperationSchema<"transform"> = {
   name: "transform",
   description: "Apply geometric transformation (translate, scale) to input",
-  getName: (config) =>
-    config
-      ? `transform: scale=${
-          (config as ITransformConfig).scale ??
-          (config as ITransformConfig).scaleX ??
-          1
-        }`
-      : "transform",
+  getName: (config) => {
+    const cfg = config as ITransformConfig;
+    let details = "";
+    if (cfg.scale || cfg.scaleX || cfg.scaleY) {
+      if (cfg.scaleX || cfg.scaleY) {
+        details += `scale(${cfg.scaleX ?? 1}, ${cfg.scaleY ?? 1})`;
+      } else {
+        details += `scale(${cfg.scale ?? 1})`;
+      }
+    }
+    if (cfg.translateX || cfg.translateY) {
+      if (details) details += ", ";
+      details += `translate(${cfg.translateX ?? 0}, ${cfg.translateY ?? 0})`;
+    }
+
+    if (details) return `transform: ${details}`;
+    return "transform";
+  },
   input: {
     required: true,
   },
