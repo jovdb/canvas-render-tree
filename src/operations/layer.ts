@@ -8,13 +8,15 @@ export interface ILayerConfig extends IConfig {}
 const schema: OperationSchema<"layer"> = {
   name: "layer",
   description: "Group children on a new render layer",
-  input: {
-    description: "The input to draw on the new layer",
-    required: true,
-  },
+  args: [
+    {
+      description: "The rendering to draw on the new layer",
+      required: true,
+    },
+  ],
 };
 
-export const draw: ItemDrawFn = ({ ctx, drawPrev, drawInput }) => {
+export const draw: ItemDrawFn = ({ ctx, drawPrev, drawArgs }) => {
   // first draw previous items
   drawPrev?.(ctx);
 
@@ -24,6 +26,8 @@ export const draw: ItemDrawFn = ({ ctx, drawPrev, drawInput }) => {
   canvas.height = ctx.canvas.height;
   const childCtx = getContext2d(canvas, "layerCtx");
 
+  const drawInput = drawArgs?.[0];
+
   // Draw children on the offscreen canvas
   drawInput?.(childCtx);
 
@@ -32,9 +36,9 @@ export const draw: ItemDrawFn = ({ ctx, drawPrev, drawInput }) => {
 };
 
 /** Draw children on a new render layer */
-export const create = (input: RenderTree): IRenderItem<ILayerConfig> => ({
+export const create = (input?: RenderTree): IRenderItem<ILayerConfig> => ({
   name: "layer",
-  input,
+  args: input ? [input] : undefined,
 });
 
 const operation = {

@@ -114,10 +114,12 @@ const schema: OperationSchema<"convolve"> = {
           (config as IConvolveConfig).kernel[0].length
         }]`
       : "convolve",
-  input: {
-    required: false,
-  },
-  args: [],
+  args: [
+    {
+      description: "Rendering to convolve",
+      required: false,
+    },
+  ],
 };
 
 export const draw: ItemDrawFn<IConvolveConfig> = ({ ctx, drawPrev, config }) => {
@@ -159,7 +161,7 @@ export const create = (
 ): IRenderItem<IConvolveConfig> => ({
   name: "convolve",
   config,
-  input,
+  args: input ? [input] : undefined,
 });
 
 const operation = {

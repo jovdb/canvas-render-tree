@@ -30,7 +30,7 @@ function replaceWithInput(
     const itemToReplace = newItems[targetPos];
 
     if (itemToReplace) {
-      const replacementItems = itemToReplace.input ?? [];
+      const replacementItems = itemToReplace.args?.flat() ?? [];
       newItems.splice(targetPos, 1, ...replacementItems);
     }
 
@@ -63,7 +63,7 @@ function replaceWithInput(
 
       if (childRestIndex.length === 0) {
         const itemToReplace = argArray[positionInFoundArg];
-        const replacementItems = itemToReplace?.input ?? [];
+        const replacementItems = itemToReplace?.args?.flat() ?? [];
         argArray.splice(positionInFoundArg, 1, ...replacementItems);
       } else {
         const newArgArray = replaceWithInput(argArray, [positionInFoundArg, ...childRestIndex]);
@@ -77,22 +77,22 @@ function replaceWithInput(
     }
   } else {
     const positionInInput = childTargetPos - flatArgs.length;
-    const input = parentItem.input ?? [];
+    const input = parentItem.args?.flat() ?? [];
 
     if (childRestIndex.length === 0) {
       const newInput = [...input];
       const itemToReplace = newInput[positionInInput];
-      const replacementItems = itemToReplace?.input ?? [];
+      const replacementItems = itemToReplace?.args?.flat() ?? [];
       newInput.splice(positionInInput, 1, ...replacementItems);
       newItems[targetPos] = {
         ...parentItem,
-        input: newInput.length > 0 ? newInput : undefined,
+        args: newInput.length > 0 ? [newInput] : undefined,
       };
     } else {
       const newInput = replaceWithInput(input, [positionInInput, ...childRestIndex]);
       newItems[targetPos] = {
         ...parentItem,
-        input: newInput.length > 0 ? newInput : undefined,
+        args: newInput.length > 0 ? [newInput] : undefined,
       };
     }
   }

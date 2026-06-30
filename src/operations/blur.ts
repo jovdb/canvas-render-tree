@@ -40,10 +40,12 @@ const schema: OperationSchema<"blur"> = {
           (config as IBlurConfig).sigma ?? 2
         }`
       : "blur",
-  input: {
-    required: false,
-  },
-  args: [],
+  args: [
+    {
+      description: "Rendering to blur",
+      required: false,
+    },
+  ],
 };
 
 export const draw: ItemDrawFn<IBlurConfig> = ({ ctx, drawPrev, config }) => {
@@ -104,7 +106,7 @@ export const create = (
 ): IRenderItem<IBlurConfig> => ({
   name: "blur",
   config,
-  input,
+  args: input ? [input] : undefined,
 });
 
 const operation = {

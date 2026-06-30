@@ -8,10 +8,12 @@ export interface ICylConfig extends IConfig {}
 const schema: OperationSchema<"cyl"> = {
   name: "cyl",
   description: "Render a 3D cylinder",
-  input: {
-    required: false,
-  },
-  args: [],
+  args: [
+    {
+      description: "Rendering to composite with the cylinder",
+      required: false,
+    },
+  ],
 };
 
 interface Point3D {
@@ -155,18 +157,19 @@ export const create = (
   input?: RenderTree | undefined,
 ): IRenderItem<ICylConfig> => ({
   name: "cyl",
-  input,
+  args: input ? [input] : undefined,
 });
 
 /** Draw a 3D cylinder */
 export const draw: ItemDrawFn<ICylConfig> = ({
   ctx,
   drawPrev,
-  drawInput,
+  drawArgs,
 }) => {
   // first draw previous items
   drawPrev?.(ctx);
 
+  const drawInput = drawArgs?.[0];
   if (drawInput) ctx.save();
 
   const controlPoints: ControlPoints = {

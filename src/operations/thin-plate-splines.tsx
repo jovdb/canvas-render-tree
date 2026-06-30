@@ -362,10 +362,11 @@ export const draw: ItemDrawFn<IThinPlatesSplinesConfig> = ({
   ctx,
   drawPrev,
   config,
-  drawInput,
+  drawArgs,
 }) => {
   drawPrev?.(ctx);
 
+  const drawInput = drawArgs?.[0];
   if (drawInput) ctx.save();
   drawInput?.(ctx);
 

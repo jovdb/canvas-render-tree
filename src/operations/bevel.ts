@@ -127,10 +127,12 @@ const schema: OperationSchema<"bevel"> = {
     config
       ? `bevel: ${(config as IBevelConfig).bevelSize ?? 6}`
       : "bevel",
-  input: {
-    required: false,
-  },
-  args: [],
+  args: [
+    {
+      description: "Rendering to bevel",
+      required: false,
+    },
+  ],
 };
 
 export const draw: ItemDrawFn<IBevelConfig> = ({ ctx, drawPrev, config }) => {
@@ -226,7 +228,7 @@ export const create = (
 ): IRenderItem<IBevelConfig> => ({
   name: "bevel",
   config,
-  input,
+  args: input ? [input] : undefined,
 });
 
 // Backward compatibility

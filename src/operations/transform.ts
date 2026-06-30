@@ -13,7 +13,7 @@ export interface ITransformConfig extends IConfig {
 
 const schema: OperationSchema<"transform"> = {
   name: "transform",
-  description: "Apply geometric transformation (translate, scale) to input",
+  description: "Apply geometric transformation (translate, scale) to the given rendering",
   getName: (config) => {
     const cfg = config as ITransformConfig;
     let details = "";
@@ -32,26 +32,28 @@ const schema: OperationSchema<"transform"> = {
     if (details) return `transform: ${details}`;
     return "transform";
   },
-  input: {
-    required: true,
-  },
-  args: [],
+  args: [
+    {
+      description: "Rendering to transform",
+      required: true,
+    },
+  ],
 };
 
 export const create = (
   config: ITransformConfig,
-  input: RenderTree,
+  input?: RenderTree,
 ): IRenderItem<ITransformConfig> => ({
   name: "transform",
   config,
-  input,
+  args: [input ?? []],
 });
 
 export const draw: ItemDrawFn<ITransformConfig> = ({
   ctx,
   drawPrev,
   config,
-  drawInput,
+  drawArgs,
 }) => {
   // first draw previous items
   drawPrev?.(ctx);
@@ -73,6 +75,8 @@ export const draw: ItemDrawFn<ITransformConfig> = ({
     if (typeof translateX === "number" || typeof translateY === "number")
       ctx.translate(translateX ?? 0, translateY ?? 0);
   }
+
+  const drawInput = drawArgs?.[0];
 
   if (drawInput) ctx.save();
   apply();

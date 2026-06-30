@@ -165,7 +165,7 @@ export const create = (
     isBold: config.isBold ?? false,
     isItalic: config.isItalic ?? false,
   },
-  input,
+  args: input ? [input] : undefined,
 });
 
 const operation = {

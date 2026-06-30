@@ -21,17 +21,19 @@ export const create = (
 ): IRenderItem<IPerspectiveConfig> => ({
   name: "perspective",
   config,
-  input,
+  args: [input ?? []],
 });
 const schema: OperationSchema<"perspective"> = {
   name: "perspective",
   description: "Apply perspective transformation using control points",
   getName: (config) =>
     config ? `perspective: 4 control points` : "perspective",
-  input: {
-    required: true,
-  },
-  args: [],
+  args: [
+    {
+      description: "Rendering to transform",
+      required: true,
+    },
+  ],
 };
 
 interface Point {
@@ -271,11 +273,12 @@ export const draw: ItemDrawFn<IPerspectiveConfig> = ({
   ctx,
   drawPrev,
   config,
-  drawInput,
+  drawArgs,
 }) => {
   // first draw previous items
   drawPrev?.(ctx);
 
+  const drawInput = drawArgs?.[0];
   if (drawInput) ctx.save();
 
   const { width, height } = ctx.canvas;

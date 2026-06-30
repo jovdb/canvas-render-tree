@@ -342,21 +342,24 @@ const schema: OperationSchema<"bicubicGrid"> = {
           (config as IBicubicGridConfig).controlsPoints[0].length
         }]`
       : "bicubicGrid",
-  input: {
-    required: false,
-  },
-  args: [],
+  args: [
+    {
+      description: "Rendering to warp",
+      required: false,
+    },
+  ],
 };
 
 export const draw: ItemDrawFn<IBicubicGridConfig> = ({
   ctx,
   drawPrev,
   config,
-  drawInput,
+  drawArgs,
 }) => {
   // first draw previous items
   drawPrev?.(ctx);
 
+  const drawInput = drawArgs?.[0];
   if (drawInput) ctx.save();
 
   const imageData = ctx.getImageData(0, 0, ctx.canvas.width, ctx.canvas.height);
@@ -390,7 +393,7 @@ export const create = (
 ): IRenderItem<IBicubicGridConfig> => ({
   name: "bicubicGrid",
   config: config,
-  input,
+  args: input ? [input] : undefined,
 });
 
 const operation = {

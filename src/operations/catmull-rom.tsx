@@ -219,8 +219,9 @@ export const draw: ItemDrawFn<ICatmullRomConfig> = ({
   ctx,
   drawPrev,
   config,
-  drawInput,
+  drawArgs,
 }) => {
+  const drawInput = drawArgs?.[0];
   if (drawInput) {
     ctx.save();
     drawInput(ctx);

@@ -246,27 +246,30 @@ export interface IUVMapConfig extends IConfig {}
 const schema: OperationSchema<"uvMap"> = {
   name: "uvMap",
   description: "Apply UV mapping transformation",
-  input: {
-    required: true,
-  },
-  args: [],
+  args: [
+    {
+      description: "Rendering to map",
+      required: true,
+    },
+  ],
 };
 
 /** Create UV mapping */
-export const create = (uv: RenderTree): IRenderItem<IUVMapConfig> => ({
+export const create = (uv?: RenderTree): IRenderItem<IUVMapConfig> => ({
   name: "uvMap",
   config: {},
-  input: uv,
+  args: uv ? [uv] : undefined,
 });
 
 export const draw: ItemDrawFn<IUVMapConfig> = ({
   ctx,
   drawPrev,
-  drawInput,
+  drawArgs,
 }) => {
   // first draw previous items
   drawPrev?.(ctx);
 
+  const drawInput = drawArgs?.[0];
   if (drawInput) ctx.save();
 
   // Create an offscreen canvas

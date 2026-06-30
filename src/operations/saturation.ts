@@ -73,17 +73,19 @@ const schema: OperationSchema<"saturation"> = {
     config
       ? `saturation: ${Math.round(((config as ISaturationConfig).factor ?? 0) * 100)}%`
       : "saturation",
-  input: {
-    required: true,
-  },
-  args: [],
+  args: [
+    {
+      description: "Rendering to adjust",
+      required: true,
+    },
+  ],
 };
 
 export const draw: ItemDrawFn<ISaturationConfig> = ({
   ctx,
   drawPrev,
   config,
-  drawInput,
+  drawArgs,
 }) => {
   // first draw previous items
   drawPrev?.(ctx);
@@ -122,6 +124,8 @@ export const draw: ItemDrawFn<ISaturationConfig> = ({
     ctx.putImageData(imageData, 0, 0);
   }
 
+  const drawInput = drawArgs?.[0];
+
   if (drawInput) ctx.save();
   apply();
   drawInput?.(ctx);
@@ -131,11 +135,11 @@ export const draw: ItemDrawFn<ISaturationConfig> = ({
 /** Adjust image saturation */
 export const create = (
   config: ISaturationConfig = {},
-  input: RenderTree,
+  input?: RenderTree,
 ): IRenderItem<ISaturationConfig> => ({
   name: "saturation",
   config,
-  input,
+  args: [input ?? []],
 });
 
 const operation = {

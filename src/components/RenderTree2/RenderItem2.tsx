@@ -6,6 +6,7 @@ import { useState } from "react";
 
 export function RenderItem2({
   item,
+  prevItems,
   selectedItems = [],
   visibleIndexes = [],
   treeIndex,
@@ -38,10 +39,20 @@ export function RenderItem2({
   const [collapseInput, setCollapseInput] = useState(false);
   const name = schema?.getName ? schema.getName(item.config) : item.name;
 
+  const inputs: Array<readonly IRenderItem[] | undefined> = [
+    ...(schema?.prevAsInput ? [prevItems] : []),
+    ...(item.args ? item.args : []),
+  ];
+
+  if (inputs.length === 0) {
+    if (schema?.prevAsInput || schema?.input || schema?.args?.length) {
+      inputs.push(undefined);
+    }
+  }
   return (
     <>
       <div className="render-item__inputs">
-        {item.args?.map((arg, index) => (
+        {inputs?.map((arg, index) => (
           <div className="render-item__input" key={index}>
             <div
               className={`render-item__group ${collapseInput ? "render-item__group--collapsed" : ""}`}

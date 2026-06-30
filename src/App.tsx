@@ -24,10 +24,7 @@ export function selectIndex(tree: IRenderItem[], index: TreeIndex) {
 
   const [nextIndex, ...restIndex] = index;
   const restTree = tree[nextIndex];
-  const items = [
-    ...(restTree.args ? restTree.args.flat() : []),
-    ...(restTree.input ? restTree.input : []),
-  ];
+  const items = restTree?.args ? restTree.args.flat() : [];
   if (!restTree || !items) return undefined;
   return selectIndex(items, restIndex);
 }
@@ -41,10 +38,7 @@ function filterTree(
 
   items?.forEach((item, index) => {
     const treeIndex = [...parentTreeIndexes, index];
-    const items = [
-      ...(item.args ? item.args.flat() : []),
-      ...(item.input ? item.input : []),
-    ];
+    const items = item.args ? item.args.flat() : [];
     const children = filterTree(items, visibleIndexes, treeIndex);
 
     if (

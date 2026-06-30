@@ -93,22 +93,25 @@ const schema: OperationSchema<"displacement"> = {
     config
       ? `displacement: strength=${(config as IDisplacementConfig).strength ?? 10}`
       : "displacement",
-  input: {
-    required: true,
-  },
-  args: [],
+  args: [
+    {
+      description: "Rendering to displace",
+      required: true,
+    },
+  ],
 };
 
 export const draw: ItemDrawFn<IDisplacementConfig> = ({
   ctx,
   drawPrev,
   config,
-  drawInput,
+  drawArgs,
 }) => {
   // first draw previous items
   drawPrev?.(ctx);
 
   const { strength } = config;
+  const drawInput = drawArgs?.[0];
   if (drawInput) ctx.save();
 
   // Create an offscreen canvas
@@ -129,11 +132,11 @@ export const draw: ItemDrawFn<IDisplacementConfig> = ({
 /** Apply displacement map effect */
 export const create = (
   strength: number,
-  displacement: RenderTree,
+  displacement?: RenderTree,
 ): IRenderItem<IDisplacementConfig> => ({
   name: "displacement",
   config: { strength },
-  input: displacement,
+  args: [displacement ?? []],
 });
 
 const operation = {

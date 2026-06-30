@@ -225,11 +225,11 @@ export const beierNeely = (
     falloff = 2.0,
     minDistance = 0.01,
   }: IBeierNeelyConfig,
-  input: RenderTree,
+  input?: RenderTree,
 ): IRenderItem<IBeierNeelyConfig> => ({
   name: "beierNeely",
   config: { controlPoints, strength, falloff, minDistance },
-  input,
+  args: input ? [input] : undefined,
 });
 
 // ============================================================================
@@ -240,10 +240,11 @@ export const draw: ItemDrawFn<IBeierNeelyConfig> = ({
   ctx,
   drawPrev,
   config,
-  drawInput,
+  drawArgs,
 }) => {
   drawPrev?.(ctx);
 
+  const drawInput = drawArgs?.[0];
   if (!drawInput) return;
 
   ctx.save();

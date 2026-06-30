@@ -116,8 +116,10 @@ export function RenderTree2({
             onVisibilityChange={onVisibilityChange}
             onTreeChange={(newItem) => {
               const newItems = [...(items ?? [])];
-              // TODO: What if doesn't support input according to schema
-              newItems[index].input = newItem;
+              newItems[index] = {
+                ...newItems[index],
+                args: Array.isArray(newItem) ? [newItem] : [newItem ? [newItem] : []],
+              };
               onTreeChange?.(newItems);
             }}
           />

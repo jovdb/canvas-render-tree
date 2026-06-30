@@ -11,11 +11,13 @@ const schema: OperationSchema<"blend"> = {
   name: "blend",
   getName: (config) =>
     config ? `blend: ${(config as IBlendConfig).blendMode}` : "blend",
-  description: "Blend the input with the previous items",
-  input: {
-    description: "Rendering to apply blending to",
-    required: true,
-  },
+  description: "Blend the rendering with the previous items",
+  args: [
+    {
+      description: "Rendering to apply blending to",
+      required: true,
+    },
+  ],
   prevAsInput: {
     description: "Source for blending",
   },
@@ -28,16 +30,21 @@ const create = (
 ): IRenderItem<IBlendConfig> => ({
   name: "blend",
   config: { blendMode },
-  input,
+  args: input ? [input] : undefined,
 });
 
-const draw: ItemDrawFn<IBlendConfig> = ({ ctx, drawPrev, config, drawInput }) => {
+const draw: ItemDrawFn<IBlendConfig> = ({
+  ctx,
+  drawPrev,
+  config,
+  drawArgs,
+}) => {
   // first draw previous items
   drawPrev?.(ctx);
 
   ctx.save();
   ctx.globalCompositeOperation = config.blendMode;
-  drawInput?.(ctx);
+  drawArgs?.[0]?.(ctx);
   ctx.restore();
 };
 

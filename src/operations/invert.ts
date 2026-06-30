@@ -7,22 +7,24 @@ export interface IInvertConfig extends IConfig {}
 
 const schema: OperationSchema<"invert"> = {
   name: "invert",
-  description: "Invert the colors of the input",
-  input: {
-    required: true,
-  },
-  args: [],
+  description: "Invert the colors of the given rendering",
+  args: [
+    {
+      description: "Rendering to invert",
+      required: true,
+    },
+  ],
 };
 
-export const create = (input: RenderTree): IRenderItem<IInvertConfig> => ({
+export const create = (input?: RenderTree): IRenderItem<IInvertConfig> => ({
   name: "invert",
-  input,
+  args: [input ?? []],
 });
 
 export const draw: ItemDrawFn<IInvertConfig> = ({
   ctx,
   drawPrev,
-  drawInput,
+  drawArgs,
 }) => {
   // first draw previous items
   drawPrev?.(ctx);
@@ -49,6 +51,8 @@ export const draw: ItemDrawFn<IInvertConfig> = ({
 
     ctx.putImageData(imageData, 0, 0);
   }
+
+  const drawInput = drawArgs?.[0];
 
   if (drawInput) ctx.save();
   apply();
