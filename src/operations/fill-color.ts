@@ -20,7 +20,7 @@ const create = (color = "#FFF"): IRenderItem<IFillColorConfig> => ({
   },
 });
 
-export const draw: ItemDrawFn<IFillColorConfig> = (ctx, drawPrev, config) => {
+export const draw: ItemDrawFn<IFillColorConfig> = ({ ctx, drawPrev, config }) => {
   // first draw previous items
   drawPrev?.(ctx);
 

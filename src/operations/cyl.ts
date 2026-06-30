@@ -159,12 +159,11 @@ export const create = (
 });
 
 /** Draw a 3D cylinder */
-export const draw: ItemDrawFn<ICylConfig> = (
+export const draw: ItemDrawFn<ICylConfig> = ({
   ctx,
   drawPrev,
-  _config,
   drawInput,
-) => {
+}) => {
   // first draw previous items
   drawPrev?.(ctx);
 

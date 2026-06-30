@@ -79,12 +79,12 @@ const schema: OperationSchema<"saturation"> = {
   args: [],
 };
 
-export const draw: ItemDrawFn<ISaturationConfig> = (
+export const draw: ItemDrawFn<ISaturationConfig> = ({
   ctx,
   drawPrev,
   config,
   drawInput,
-) => {
+}) => {
   // first draw previous items
   drawPrev?.(ctx);
 

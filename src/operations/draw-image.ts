@@ -26,7 +26,7 @@ const imageCache = new Map<
   Promise<HTMLImageElement> | HTMLImageElement
 >();
 
-export const draw: ItemDrawFn<IDrawImageConfig> = (ctx, drawPrev, config) => {
+export const draw: ItemDrawFn<IDrawImageConfig> = ({ ctx, drawPrev, config }) => {
   // first draw previous items
   drawPrev?.(ctx);
 

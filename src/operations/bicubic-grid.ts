@@ -348,12 +348,12 @@ const schema: OperationSchema<"bicubicGrid"> = {
   args: [],
 };
 
-export const draw: ItemDrawFn<IBicubicGridConfig> = (
+export const draw: ItemDrawFn<IBicubicGridConfig> = ({
   ctx,
   drawPrev,
   config,
   drawInput,
-) => {
+}) => {
   // first draw previous items
   drawPrev?.(ctx);
 

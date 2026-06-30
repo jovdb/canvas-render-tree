@@ -14,7 +14,7 @@ const schema: OperationSchema<"layer"> = {
   },
 };
 
-export const draw: ItemDrawFn = (ctx, drawPrev, _config, drawInput) => {
+export const draw: ItemDrawFn = ({ ctx, drawPrev, drawInput }) => {
   // first draw previous items
   drawPrev?.(ctx);
 

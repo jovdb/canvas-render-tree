@@ -46,7 +46,7 @@ const schema: OperationSchema<"blur"> = {
   args: [],
 };
 
-export const draw: ItemDrawFn<IBlurConfig> = (ctx, drawPrev, config) => {
+export const draw: ItemDrawFn<IBlurConfig> = ({ ctx, drawPrev, config }) => {
   // first draw previous items
   drawPrev?.(ctx);
 

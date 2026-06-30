@@ -31,7 +31,7 @@ const create = (
   input,
 });
 
-const draw: ItemDrawFn<IBlendConfig> = (ctx, drawPrev, config, drawInput) => {
+const draw: ItemDrawFn<IBlendConfig> = ({ ctx, drawPrev, config, drawInput }) => {
   // first draw previous items
   drawPrev?.(ctx);
 

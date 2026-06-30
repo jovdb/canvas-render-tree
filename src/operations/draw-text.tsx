@@ -126,7 +126,7 @@ const schema: OperationSchema<"drawText"> = {
       : "drawText",
 };
 
-export const draw: ItemDrawFn<IDrawTextConfig> = (ctx, drawPrev, config) => {
+export const draw: ItemDrawFn<IDrawTextConfig> = ({ ctx, drawPrev, config }) => {
   // first draw previous items
   drawPrev?.(ctx);
 
@@ -155,11 +155,15 @@ export const create = (
 ): IRenderItem<IDrawTextConfig> => ({
   name: "drawText",
   config: {
-    text: "Text",
-    x: 0,
-    y: 0,
-    foregroundColor: "#000",
     ...config,
+    text: config.text ?? "Text",
+    x: config.x ?? 0,
+    y: config.y ?? 0,
+    foregroundColor: config.foregroundColor ?? "#000",
+    fontSize: config.fontSize ?? 16,
+    fontFamilyName: config.fontFamilyName ?? "Arial",
+    isBold: config.isBold ?? false,
+    isItalic: config.isItalic ?? false,
   },
   input,
 });

@@ -236,12 +236,12 @@ export const beierNeely = (
 // Draw Function
 // ============================================================================
 
-export const draw: ItemDrawFn<IBeierNeelyConfig> = (
+export const draw: ItemDrawFn<IBeierNeelyConfig> = ({
   ctx,
   drawPrev,
   config,
   drawInput,
-) => {
+}) => {
   drawPrev?.(ctx);
 
   if (!drawInput) return;

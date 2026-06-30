@@ -215,12 +215,12 @@ class CatmullRomGridWarper {
 // Draw Function
 // ============================================================================
 
-export const draw: ItemDrawFn<ICatmullRomConfig> = (
+export const draw: ItemDrawFn<ICatmullRomConfig> = ({
   ctx,
   drawPrev,
   config,
   drawInput,
-) => {
+}) => {
   if (drawInput) {
     ctx.save();
     drawInput(ctx);

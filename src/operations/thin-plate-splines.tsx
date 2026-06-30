@@ -358,12 +358,12 @@ export const thinPlateSplines = ({
 // Draw Function
 // ============================================================================
 
-export const draw: ItemDrawFn<IThinPlatesSplinesConfig> = (
+export const draw: ItemDrawFn<IThinPlatesSplinesConfig> = ({
   ctx,
   drawPrev,
   config,
   drawInput,
-) => {
+}) => {
   drawPrev?.(ctx);
 
   if (drawInput) ctx.save();

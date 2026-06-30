@@ -36,12 +36,12 @@ const create = (
   input,
 });
 
-export const draw: ItemDrawFn<IShadowConfig> = (
+export const draw: ItemDrawFn<IShadowConfig> = ({
   ctx,
   drawPrev,
   config,
   drawInput,
-) => {
+}) => {
   const {
     type = "outer",
     shadowBlur = 10,

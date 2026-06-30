@@ -19,12 +19,11 @@ export const create = (input: RenderTree): IRenderItem<IInvertConfig> => ({
   input,
 });
 
-export const draw: ItemDrawFn<IInvertConfig> = (
+export const draw: ItemDrawFn<IInvertConfig> = ({
   ctx,
   drawPrev,
-  _config,
   drawInput,
-) => {
+}) => {
   // first draw previous items
   drawPrev?.(ctx);
 

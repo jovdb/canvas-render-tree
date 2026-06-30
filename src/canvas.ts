@@ -3,26 +3,26 @@ import { renderers } from "./renderers";
 
 type DrawFn = (ctx: CanvasRenderingContext2D) => void;
 
-export type ItemDrawFn<TConfig = unknown> = (
-  ctx: CanvasRenderingContext2D,
+export type ItemDrawFn<TConfig = unknown, TResult = void> = (info: {
+  ctx: CanvasRenderingContext2D;
 
   /**
    * Item can decide on which context the previous items must be drawn
    */
-  drawPrev: DrawFn | undefined,
+  drawPrev: DrawFn | undefined;
 
   /** Config of the node */
-  config: TConfig,
+  config: TConfig;
 
   /**
    * Method that draws the input for this render item
    */
-  drawInput: DrawFn | undefined,
+  drawInput: DrawFn | undefined;
   /**
    * Method that draws args for the operation
    */
-  drawArgs?: DrawFn[] | undefined,
-) => void;
+  drawArgs?: DrawFn[] | undefined;
+}) => TResult;
 
 /**
  * Function to load resources
@@ -71,21 +71,21 @@ function drawTree(items: RenderTree | undefined, _name = "") {
           // eslint-disable-next-line @typescript-eslint/no-explicit-any
           const renderer = (renderers as any)[item.name] as IItemRenderer;
           if (renderer?.draw) {
-            renderer.draw(
+            renderer.draw({
               ctx,
-              prev,
-              item.config,
-              item.input
+              drawPrev: prev,
+              config: item.config,
+              drawInput: item.input
                 ? (ctx: CanvasRenderingContext2D) =>
                     drawTree(item.input, `${item.name}-children`)?.(ctx)
                 : undefined,
-              item.args
+              drawArgs: item.args
                 ? item.args.map(
                     (arg, index) => (ctx: CanvasRenderingContext2D) =>
                       drawTree(arg, `${item.name}-arg-${index}`)?.(ctx),
                   )
                 : undefined,
-            );
+            });
           } else {
             // Some items don't have a render function, but add a child render tree
             // throw new Error(`Missing render function for item '${item.name}'`);

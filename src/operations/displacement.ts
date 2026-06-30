@@ -99,12 +99,12 @@ const schema: OperationSchema<"displacement"> = {
   args: [],
 };
 
-export const draw: ItemDrawFn<IDisplacementConfig> = (
+export const draw: ItemDrawFn<IDisplacementConfig> = ({
   ctx,
   drawPrev,
   config,
   drawInput,
-) => {
+}) => {
   // first draw previous items
   drawPrev?.(ctx);
 

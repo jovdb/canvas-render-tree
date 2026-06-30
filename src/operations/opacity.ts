@@ -14,18 +14,20 @@ const schema: OperationSchema<"opacity"> = {
     config
       ? `opacity: ${Math.round(((config as IOpacityConfig).opacity ?? 0.5) * 100)}%`
       : "opacity",
-  input: {
-    required: true,
-  },
-  args: [],
+  args: [
+    {
+      description: "Rendering to apply opacity to",
+      required: true,
+    },
+  ],
 };
 
-export const draw: ItemDrawFn<IOpacityConfig> = (
+export const draw: ItemDrawFn<IOpacityConfig> = ({
   ctx,
   drawPrev,
   config,
   drawInput,
-) => {
+}) => {
   // first draw previous items
   drawPrev?.(ctx);
 

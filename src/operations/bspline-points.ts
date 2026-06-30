@@ -352,12 +352,12 @@ export const bSplinePoints = (
   config,
 });
 
-export const draw: ItemDrawFn<IBSplinePointsConfig> = (
+export const draw: ItemDrawFn<IBSplinePointsConfig> = ({
   ctx,
   drawPrev,
   config,
   drawInput,
-) => {
+}) => {
   // first draw previous items
   drawPrev?.(ctx);
 

@@ -133,7 +133,7 @@ const schema: OperationSchema<"bevel"> = {
   args: [],
 };
 
-export const draw: ItemDrawFn<IBevelConfig> = (ctx, drawPrev, config) => {
+export const draw: ItemDrawFn<IBevelConfig> = ({ ctx, drawPrev, config }) => {
   const {
     bevelSize = 6,
     shadowColor = [0, 0, 0, 192],

@@ -267,12 +267,12 @@ function applyTransform(x: number, y: number, matrix: number[]): Point {
   };
 }
 
-export const draw: ItemDrawFn<IPerspectiveConfig> = (
+export const draw: ItemDrawFn<IPerspectiveConfig> = ({
   ctx,
   drawPrev,
   config,
   drawInput,
-) => {
+}) => {
   // first draw previous items
   drawPrev?.(ctx);
 

@@ -47,12 +47,12 @@ export const create = (
   input,
 });
 
-export const draw: ItemDrawFn<ITransformConfig> = (
+export const draw: ItemDrawFn<ITransformConfig> = ({
   ctx,
   drawPrev,
   config,
   drawInput,
-) => {
+}) => {
   // first draw previous items
   drawPrev?.(ctx);
 

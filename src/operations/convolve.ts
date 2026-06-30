@@ -120,7 +120,7 @@ const schema: OperationSchema<"convolve"> = {
   args: [],
 };
 
-export const draw: ItemDrawFn<IConvolveConfig> = (ctx, drawPrev, config) => {
+export const draw: ItemDrawFn<IConvolveConfig> = ({ ctx, drawPrev, config }) => {
   // first draw previous items
   drawPrev?.(ctx);
 
