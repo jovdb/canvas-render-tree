@@ -39,28 +39,16 @@ export function RenderItem2({
   const [collapseInput, setCollapseInput] = useState(false);
   const name = schema?.getName ? schema.getName(item.config) : item.name;
 
-  const inputs: Array<readonly IRenderItem[] | undefined> = [
-    ...(schema?.prevAsInput ? [prevItems] : []),
-    ...(item.input ? [item.input] : []),
-    ...(item.args ? item.args : []),
-  ];
-
-  if (inputs.length === 0) {
-    if (schema?.prevAsInput || schema?.input || schema?.args?.length) {
-      inputs.push(undefined);
-    }
-  }
-
   return (
     <>
       <div className="render-item__inputs">
-        {inputs?.map((input, index) => (
+        {item.args?.map((arg, index) => (
           <div className="render-item__input" key={index}>
             <div
               className={`render-item__group ${collapseInput ? "render-item__group--collapsed" : ""}`}
             >
               <RenderTree2
-                items={input}
+                items={arg}
                 selectedItems={selectedItems}
                 visibleIndexes={visibleIndexes}
                 parentIndexes={treeIndex}
@@ -70,16 +58,21 @@ export function RenderItem2({
                 onVisibilityChange={onVisibilityChange}
                 onTreeChange={(newTree) => {
                   const newItems = [
-                    ...(input ?? []).slice(0, index),
+                    ...(arg ?? []).slice(0, index),
                     ...(Array.isArray(newTree) ? newTree : [newTree]),
-                    ...(input ?? []).slice(index + 1),
+                    ...(arg ?? []).slice(index + 1),
                   ];
                   onTreeChange?.(newItems);
                 }}
               />
             </div>
             <div className="render-item__input-below">
-              <span className="render-item__input-arrow">⇣</span>
+              <span
+                className="render-item__input-arrow"
+                title={schema?.args?.[index]?.description}
+              >
+                ⇣
+              </span>
               <span
                 className="render-item__input-collapse"
                 onClick={() => setCollapseInput(!collapseInput)}

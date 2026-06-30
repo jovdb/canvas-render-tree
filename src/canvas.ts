@@ -119,13 +119,15 @@ export function loadTree(items: RenderTree | undefined) {
         }
       }
 
+      // Walk children
+
+      // Input
       if (item.input) {
         loadTreeInner(item.input);
       }
-      if (item.args) {
-        // TODO
-        // // loadTreeInner(item.args);
-      }
+
+      // Args
+      item.args?.forEach((arg) => loadTreeInner(arg));
     });
   }
 

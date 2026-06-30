@@ -26,14 +26,14 @@ export const draw: ItemDrawFn<IOpacityConfig> = ({
   ctx,
   drawPrev,
   config,
-  drawInput,
+  drawArgs,
 }) => {
   // first draw previous items
   drawPrev?.(ctx);
 
   ctx.save();
   ctx.globalAlpha = config.opacity ?? 0.5;
-  drawInput?.(ctx);
+  drawArgs?.[0]?.(ctx);
   ctx.restore();
 };
 
@@ -44,7 +44,7 @@ export const create = (
 ): IRenderItem<IOpacityConfig> => ({
   name: "opacity",
   config: { opacity },
-  input,
+  args: [input ?? []],
 });
 
 const operation = {

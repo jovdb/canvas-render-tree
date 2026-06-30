@@ -165,6 +165,7 @@ body {
   position: absolute;
   left: 50%;
   transform: scale(2) translate(-25%, 0);
+  cursor: default;
 }
 
 .render-item__input-collapse {
