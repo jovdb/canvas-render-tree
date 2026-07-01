@@ -126,7 +126,11 @@ const schema: OperationSchema<"drawText"> = {
       : "drawText",
 };
 
-export const draw: ItemDrawFn<IDrawTextConfig> = ({ ctx, drawPrev, config }) => {
+export const draw: ItemDrawFn<IDrawTextConfig> = ({
+  ctx,
+  drawPrev,
+  config,
+}) => {
   // first draw previous items
   drawPrev?.(ctx);
 
@@ -176,18 +180,6 @@ const operation = {
   overlayComponent: DrawTextOverlay,
 } as const;
 addOperation(operation);
-
-// Register with renderer system
-addRenderer("drawText", {
-  draw,
-});
-
-// Also register the overlay separately for systems that might expect it
-addRendererOverlay("drawText", DrawTextOverlay);
-
-// Backward compatibility
-export const drawText = create;
-
 declare global {
   interface IOperations {
     drawText: typeof create;

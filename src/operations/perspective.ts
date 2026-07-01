@@ -26,8 +26,7 @@ export const create = (
 const schema: OperationSchema<"perspective"> = {
   name: "perspective",
   description: "Apply perspective transformation using control points",
-  getName: (config) =>
-    config ? `perspective: 4 control points` : "perspective",
+  getName: () => "perspective",
   args: [
     {
       description: "Rendering to transform",
