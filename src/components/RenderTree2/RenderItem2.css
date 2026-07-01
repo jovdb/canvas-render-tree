@@ -4,6 +4,8 @@ body {
 
 .render-tree {
   text-align: center;
+  width: min-content;
+
   .render-item__group--collapsed > & {
     display: none;
   }
@@ -145,6 +147,7 @@ body {
   align-items: end;
 
   gap: 0.4em;
+  width: min-content;
 }
 
 .render-item__input {
