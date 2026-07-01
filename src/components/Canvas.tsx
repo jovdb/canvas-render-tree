@@ -1,5 +1,5 @@
 import { useRef } from "react";
-import { draw, IRenderItem, loadTree } from "../canvas";
+import { redrawTree, IRenderItem, loadTree } from "../canvas";
 import { useQuery } from "@tanstack/react-query";
 import { validateSchemas } from "../schemas";
 
@@ -12,7 +12,7 @@ export function Canvas({ items }: { items: IRenderItem[] }) {
       if (!canvasRef.current) return null;
 
       await loadTree(items);
-      draw(canvasRef.current, items);
+      redrawTree(canvasRef.current, items);
       validateSchemas(items);
       return null;
     },
