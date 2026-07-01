@@ -58,7 +58,7 @@ export function engravedWoodTree() {
           },
           [
             operations.drawImage({ imageUrl: availableImages.wood }),
-            operations.fillColor("#0001"), // Make darker inside
+            operations.fillColor({ color: "#0001" }), // Make darker inside
             operations.blend("multiply", [
               operations.drawImage({ imageUrl: availableImages.noise }), // Add
             ]),

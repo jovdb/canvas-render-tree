@@ -98,6 +98,10 @@ const schema: OperationSchema<"displacement"> = {
       description: "Rendering to displace",
       required: true,
     },
+    {
+      description: "Displacement map rendering (red for X, green for Y)",
+      required: true,
+    },
   ],
 };
 
@@ -131,11 +135,11 @@ export const draw: ItemDrawFn<IDisplacementConfig> = ({
 
 /** Apply displacement map effect */
 export const create = (
-  strength: number,
+  config: IDisplacementConfig,
   displacement?: RenderTree,
 ): IRenderItem<IDisplacementConfig> => ({
   name: "displacement",
-  config: { strength },
+  config: { strength: 10, ...config },
   args: [displacement ?? []],
 });
 

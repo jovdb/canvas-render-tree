@@ -31,7 +31,7 @@ export function engravedGlassTree() {
         [
           operations.layer([
             operations.drawImage({ imageUrl: availableImages.noise }),
-            operations.fillColor("#0001"), // make a bit darker
+            operations.fillColor({ color: "#0001" }), // make a bit darker
             operations.blend("destination-in", [
               operations.drawText({
                 text: "Kelly",

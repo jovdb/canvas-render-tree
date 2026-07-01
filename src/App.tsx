@@ -20,7 +20,6 @@ import { TreeIndex } from "./components/RenderTree";
 import { getRendererConfig, IConfig, JsonConfig } from "./configs";
 import { RenderItemName } from "./operations";
 import "./configs/load";
-import { schemas, OperationSchema } from "./schemas";
 import { getRendererOverlay } from "./overlays";
 import { useWorkTree, useWorkTreeActions } from "./stores/useWorkTreeStore";
 
@@ -111,14 +110,6 @@ function App() {
     });
     startTransition(() => updateWorkTree(() => newTree));
   };
-
-  const schema = useMemo(() => {
-    if (!editItem) return undefined;
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    return (schemas as unknown as any)[editItem.name] as
-      | OperationSchema<string>
-      | undefined;
-  }, [editItem]);
 
   const sampleGroups = Object.values(samples)
     .map((sample) => sample.type)

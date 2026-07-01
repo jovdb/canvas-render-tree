@@ -15,7 +15,7 @@ export function capTree() {
   // ];
 
   const tree: RenderTree = [
-    operations.fillColor("#ff0000"),
+    operations.fillColor({ color: "#ff0000" }),
     operations.blend("destination-in", [
       operations.drawText({
         text: "Kelly",

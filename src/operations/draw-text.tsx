@@ -1,7 +1,6 @@
 import { IRenderItem, ItemDrawFn, RenderTree } from "../canvas";
 import { IConfig } from "../configs";
-import { addRenderer } from "../renderers";
-import { addRendererOverlay, ItemOverlayFn } from "../overlays";
+import { ItemOverlayFn } from "../overlays";
 import { OperationSchema } from "../schemas";
 import { addOperation } from ".";
 import React, { useState, useEffect } from "react";

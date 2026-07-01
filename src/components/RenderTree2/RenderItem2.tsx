@@ -85,7 +85,7 @@ export function RenderItem2({
             <div className="render-item__input-below">
               <span
                 className="render-item__input-arrow"
-                title={argNames?.[index]?.description}
+                title={argNames?.[index]}
               >
                 ⇣
               </span>

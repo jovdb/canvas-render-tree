@@ -142,7 +142,7 @@ export const samples = {
   fillColor: {
     name: "Fill Color",
     type: "2d",
-    tree: () => [operations.fillColor("#f5f5f5")],
+    tree: () => [operations.fillColor({ color: "#f5f5f5" })],
   },
   drawText: {
     name: "Draw Text",
@@ -204,6 +204,6 @@ export const samples = {
   cyl: {
     name: "Cylinder",
     type: "3d",
-    tree: () => [operations.cyl([operations.fillColor("#ffcc00")])],
+    tree: () => [operations.cyl([operations.fillColor({ color: "#ffcc00" })])],
   },
 } as const;

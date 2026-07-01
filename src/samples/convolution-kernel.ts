@@ -18,7 +18,7 @@ export function convolutionSamplesTree() {
     {};
 
   const tree: RenderTree = [
-    operations.fillColor(),
+    operations.fillColor({ color: "#ffffff" }),
     operations.transform({ translateX: 30, translateY: 30 }, [
       operations.drawImage({
         ...imageProps,

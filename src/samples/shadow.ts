@@ -4,7 +4,7 @@ import { availableImages } from "../resources";
 
 export function shadowTree() {
   const tree: IRenderItem[] = [
-    operations.fillColor("#f5f"),
+    operations.fillColor({ color: "#f5f5f5" }),
     operations.shadow(
       {
         type: "outer",
