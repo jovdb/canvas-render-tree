@@ -134,4 +134,49 @@ export const samples = {
     type: "lifestyle",
     tree: pillow2Tree,
   },
+  drawImage: {
+    name: "Draw Image",
+    type: "2d",
+    tree: () => [operations.drawImage({ imageUrl: availableImages.homer })],
+  },
+  fillColor: {
+    name: "Fill Color",
+    type: "2d",
+    tree: () => [operations.fillColor("#f5f5f5")],
+  },
+  drawText: {
+    name: "Draw Text",
+    type: "2d",
+    tree: () => [operations.drawText({ text: "Hello", x: 24, y: 48 })],
+  },
+  layer: {
+    name: "Layer",
+    type: "2d",
+    tree: () => [operations.layer([operations.drawImage({ imageUrl: availableImages.homer })])],
+  },
+  blur: {
+    name: "Blur",
+    type: "2d",
+    tree: () => [operations.blur({}, [operations.drawImage({ imageUrl: availableImages.homer })])],
+  },
+  saturation: {
+    name: "Saturation",
+    type: "2d",
+    tree: () => [operations.saturation({ factor: 0.5 }, [operations.drawImage({ imageUrl: availableImages.homer })])],
+  },
+  convolve: {
+    name: "Convolve",
+    type: "2d",
+    tree: () => [operations.convolve({ kernel: [[0, -1, 0], [-1, 5, -1], [0, -1, 0]] }, [operations.drawImage({ imageUrl: availableImages.homer })])],
+  },
+  transform: {
+    name: "Transform",
+    type: "2d",
+    tree: () => [operations.transform({ translateX: 20, scaleX: 0.9 }, [operations.drawImage({ imageUrl: availableImages.homer })])],
+  },
+  cyl: {
+    name: "Cylinder",
+    type: "3d",
+    tree: () => [operations.cyl([operations.fillColor("#ffcc00")])],
+  },
 } as const;
