@@ -9,18 +9,27 @@ export interface IFillColorConfig {
 const schema: OperationSchema<"fillColor"> = {
   name: "fillColor",
   description: "Fill the canvas with a solid color",
-  getName: (config) =>
-    config ? `fillColor: ${(config as IFillColorConfig).color}` : "fillColor",
+  getName: (config) => {
+    const color = (config as IFillColorConfig)?.color;
+    return color ? `fillColor: ${color}` : "fillColor";
+  },
 };
 
-const create = (color = "#FFF"): IRenderItem<IFillColorConfig> => ({
+const create = (
+  config: IFillColorConfig | undefined,
+): IRenderItem<IFillColorConfig> => ({
   name: "fillColor",
   config: {
-    color,
+    color: "#fff",
+    ...config,
   },
 });
 
-export const draw: ItemDrawFn<IFillColorConfig> = ({ ctx, drawPrev, config }) => {
+export const draw: ItemDrawFn<IFillColorConfig> = ({
+  ctx,
+  drawPrev,
+  config,
+}) => {
   // first draw previous items
   drawPrev?.(ctx);
 
