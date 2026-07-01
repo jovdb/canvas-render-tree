@@ -48,13 +48,35 @@ const schema: OperationSchema<"blur"> = {
   ],
 };
 
-export const draw: ItemDrawFn<IBlurConfig> = ({ ctx, drawPrev, config }) => {
+export const draw: ItemDrawFn<IBlurConfig> = ({
+  ctx,
+  drawPrev,
+  config,
+  drawArgs,
+}) => {
   // first draw previous items
   drawPrev?.(ctx);
 
   const { radius = 5, sigma = 2 } = config;
 
-  const imageData = ctx.getImageData(0, 0, ctx.canvas.width, ctx.canvas.height);
+  const drawInput = drawArgs?.[0];
+  if (!drawInput) return;
+
+  const offscreenCanvas = document.createElement("canvas");
+  offscreenCanvas.width = ctx.canvas.width;
+  offscreenCanvas.height = ctx.canvas.height;
+  const offscreenCtx = offscreenCanvas.getContext("2d");
+  if (!offscreenCtx) return;
+
+  offscreenCtx.clearRect(0, 0, offscreenCanvas.width, offscreenCanvas.height);
+  drawInput(offscreenCtx);
+
+  const imageData = offscreenCtx.getImageData(
+    0,
+    0,
+    offscreenCanvas.width,
+    offscreenCanvas.height,
+  );
   const data = imageData.data;
   const width = imageData.width;
   const height = imageData.height;
@@ -96,7 +118,8 @@ export const draw: ItemDrawFn<IBlurConfig> = ({ ctx, drawPrev, config }) => {
     }
   }
 
-  ctx.putImageData(output, 0, 0);
+  offscreenCtx.putImageData(output, 0, 0);
+  ctx.drawImage(offscreenCanvas, 0, 0);
 };
 
 /** Apply Gaussian blur effect */
