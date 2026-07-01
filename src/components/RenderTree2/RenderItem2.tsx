@@ -49,6 +49,12 @@ export function RenderItem2({
       inputs.push(undefined);
     }
   }
+
+  const argNames = [
+    ...(schema?.prevAsInput ? [schema?.prevAsInput.description ?? ""] : []),
+    ...(schema?.args?.map((arg) => arg.description ?? "") ?? []),
+  ];
+
   return (
     <>
       <div className="render-item__inputs">
@@ -79,7 +85,7 @@ export function RenderItem2({
             <div className="render-item__input-below">
               <span
                 className="render-item__input-arrow"
-                title={schema?.args?.[index]?.description}
+                title={argNames?.[index]?.description}
               >
                 ⇣
               </span>

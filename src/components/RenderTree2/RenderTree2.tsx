@@ -2,7 +2,7 @@ import { Fragment, useMemo, useState } from "react";
 import { IRenderItem } from "../../canvas";
 import { operations } from "../../operations";
 import { availableImages } from "../../resources";
-import { getSchema } from "../../schemas";
+import { getSchema, schemas } from "../../schemas";
 import { RenderItem2 } from "./RenderItem2";
 import { AddOperationPopover } from "./AddOperationPopover";
 
@@ -31,8 +31,7 @@ export function RenderTree2({
   onTreeChange?(newTree: IRenderItem[]): void;
 }) {
   const [addMenu, setAddMenu] = useState<
-    | { mode: "first" | "after"; index?: number }
-    | undefined
+    { mode: "first" | "after"; index?: number } | undefined
   >();
 
   const operationOptions = useMemo(
@@ -64,9 +63,9 @@ export function RenderTree2({
           onlyShadow: false,
         });
       default:
-        return (operations as Record<string, (...args: unknown[]) => IRenderItem>)[
-          operationName
-        ]({});
+        return (
+          operations as Record<string, (...args: unknown[]) => IRenderItem>
+        )[operationName]({});
     }
   }
 
@@ -99,33 +98,53 @@ export function RenderTree2({
     );
   }
 
+  let hasPrevAsInput = false;
+
   return (
     <div className="render-tree">
       <div className="render-tree__buttons">{renderAddMenu("first")}</div>
-      {items?.map((item, index) => (
-        <Fragment key={`${item.name}-${index}`}>
-          <RenderItem2
-            item={item}
-            prevItems={items.slice(0, index)}
-            treeIndex={[...parentIndexes, index]}
-            editIndex={editIndex}
-            selectedItems={selectedItems}
-            visibleIndexes={visibleIndexes}
-            onClick={onClick}
-            onDelete={onDelete}
-            onVisibilityChange={onVisibilityChange}
-            onTreeChange={(newItem) => {
-              const newItems = [...(items ?? [])];
-              newItems[index] = {
-                ...newItems[index],
-                args: Array.isArray(newItem) ? [newItem] : [newItem ? [newItem] : []],
-              };
-              onTreeChange?.(newItems);
-            }}
-          />
-          <div className="render-tree__buttons">{renderAddMenu("after", index)}</div>
-        </Fragment>
-      ))}
+      {items?.reduceRight(
+        (prevComponents, item, index) => {
+          const schema = schemas[item.name as keyof typeof schemas];
+          const prevAsInput = !!schema?.prevAsInput;
+          if (hasPrevAsInput) return prevComponents; // skip rendering this item, as it is already included as input to the next item
+          if (prevAsInput) {
+            hasPrevAsInput = true;
+          }
+
+          const newComponent = (
+            <Fragment key={`${item.name}-${index}`}>
+              <RenderItem2
+                item={item}
+                prevItems={items.slice(0, index)}
+                treeIndex={[...parentIndexes, index]}
+                editIndex={editIndex}
+                selectedItems={selectedItems}
+                visibleIndexes={visibleIndexes}
+                onClick={onClick}
+                onDelete={onDelete}
+                onVisibilityChange={onVisibilityChange}
+                onTreeChange={(newItem) => {
+                  const newItems = [...(items ?? [])];
+                  newItems[index] = {
+                    ...newItems[index],
+                    args: Array.isArray(newItem)
+                      ? [newItem]
+                      : [newItem ? [newItem] : []],
+                  };
+                  onTreeChange?.(newItems);
+                }}
+              />
+              <div className="render-tree__buttons">
+                {renderAddMenu("after", index)}
+              </div>
+            </Fragment>
+          );
+          prevComponents.unshift(newComponent);
+          return prevComponents;
+        },
+        [] as React.ReactNode[], // initial value
+      )}
     </div>
   );
 }
