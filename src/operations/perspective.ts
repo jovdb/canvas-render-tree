@@ -278,11 +278,21 @@ export const draw: ItemDrawFn<IPerspectiveConfig> = ({
   drawPrev?.(ctx);
 
   const drawInput = drawArgs?.[0];
-  if (drawInput) ctx.save();
+  if (!drawInput) return;
 
   const { width, height } = ctx.canvas;
+  const offscreenCanvas = document.createElement("canvas");
+  offscreenCanvas.width = width;
+  offscreenCanvas.height = height;
+  const offscreenCtx = offscreenCanvas.getContext("2d");
+  if (!offscreenCtx) {
+    throw new Error("Failed to get 2D context for offscreen canvas");
+  }
+
+  drawInput?.(offscreenCtx);
+
   const destinationImageData = new ImageData(width, height);
-  const sourceImageData = ctx.getImageData(0, 0, width, height);
+  const sourceImageData = offscreenCtx.getImageData(0, 0, width, height);
 
   // Define the four corners of the source image (a rectangle)
   const srcPoints: Point[] = [
@@ -320,10 +330,8 @@ export const draw: ItemDrawFn<IPerspectiveConfig> = ({
     destPoints,
   );
 
-  ctx.putImageData(destinationImageData, 0, 0);
-
-  drawInput?.(ctx);
-  if (drawInput) ctx.restore();
+  offscreenCtx.putImageData(destinationImageData, 0, 0);
+  ctx.drawImage(offscreenCanvas, 0, 0);
 };
 
 const operation = {
