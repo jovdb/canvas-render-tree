@@ -92,12 +92,12 @@ export const draw: ItemDrawFn<ISaturationConfig> = ({
 
   const { factor = 0 } = config;
 
-  function apply() {
-    const imageData = ctx.getImageData(
+  function apply(offscreenCtx: CanvasRenderingContext2D) {
+    const imageData = offscreenCtx.getImageData(
       0,
       0,
-      ctx.canvas.width,
-      ctx.canvas.height,
+      offscreenCtx.canvas.width,
+      offscreenCtx.canvas.height,
     );
     const data = imageData.data;
 
@@ -121,15 +121,25 @@ export const draw: ItemDrawFn<ISaturationConfig> = ({
       data[i + 2] = newB;
     }
 
-    ctx.putImageData(imageData, 0, 0);
+    offscreenCtx.putImageData(imageData, 0, 0);
+    ctx.drawImage(offscreenCtx.canvas, 0, 0);
   }
 
   const drawInput = drawArgs?.[0];
+  if (!drawInput?.length) return;
 
-  if (drawInput) ctx.save();
-  apply();
-  drawInput?.(ctx);
-  if (drawInput) ctx.restore();
+  const offscreenCanvas = document.createElement("canvas");
+  offscreenCanvas.width = ctx.canvas.width;
+  offscreenCanvas.height = ctx.canvas.height;
+  const offscreenCtx = offscreenCanvas.getContext("2d");
+  if (!offscreenCtx) return;
+
+  // offscreenCtx.clearRect(0, 0, offscreenCanvas.width, offscreenCanvas.height);
+
+  drawInput(offscreenCtx);
+
+  apply(offscreenCtx);
+  
 };
 
 /** Adjust image saturation */
