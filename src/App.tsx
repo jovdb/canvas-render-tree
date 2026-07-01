@@ -3,7 +3,13 @@ import "./App.css";
 import { IRenderItem } from "./canvas";
 import { AppOverlay } from "./components/AppOverlay";
 import { Canvas } from "./components/Canvas";
-import { useEffect, useMemo, useState, useTransition } from "react";
+import {
+  useDeferredValue,
+  useEffect,
+  useMemo,
+  useState,
+  useTransition,
+} from "react";
 import "./operations";
 import "./operations/operations";
 
@@ -81,10 +87,12 @@ function App() {
   }, [resetWorkTree, sampleKey]);
 
   /** The items to render, workTree with selection filter */
-  const renderTree =
-    workTree && visibleIndexes.length
+  const renderTree = useMemo(() => {
+    return workTree && visibleIndexes.length
       ? filterTree(workTree, visibleIndexes)
       : (workTree ?? []);
+  }, [workTree, visibleIndexes]);
+  const deferredRenderTree = useDeferredValue(renderTree);
   // console.log(JSON.stringify(renderTree, null, 2));
 
   // Configurator
@@ -179,7 +187,7 @@ function App() {
         </select>
         <br />
         <div className="app__canvas">
-          <Canvas items={renderTree ?? []} />
+          <Canvas items={deferredRenderTree ?? []} />
           <AppOverlay>
             {RendererOverlay && (
               <RendererOverlay
