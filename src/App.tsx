@@ -62,6 +62,8 @@ function filterTree(
 function App() {
   const [editIndex, setEditIndex] = useState<TreeIndex | undefined>();
   const [visibleIndexes, setVisibleIndexes] = useState<TreeIndex[]>([]);
+  const [editPanelWidth, setEditPanelWidth] = useState(280);
+  const [isResizing, setIsResizing] = useState(false);
 
   /** Working tree is a copy of the entire sample and can be modified */
   const workTree = useWorkTree();
@@ -114,6 +116,35 @@ function App() {
     .map((sample) => sample.type)
     .filter((value, index, self) => self.indexOf(value) === index);
 
+  useEffect(() => {
+    if (!isResizing) return;
+
+    const onMouseMove = (event: MouseEvent) => {
+      const nextWidth = Math.min(
+        520,
+        Math.max(220, window.innerWidth - event.clientX),
+      );
+      setEditPanelWidth(nextWidth);
+    };
+
+    const onMouseUp = () => {
+      setIsResizing(false);
+    };
+
+    document.body.style.cursor = "col-resize";
+    document.body.style.userSelect = "none";
+
+    window.addEventListener("mousemove", onMouseMove);
+    window.addEventListener("mouseup", onMouseUp);
+
+    return () => {
+      document.body.style.cursor = "";
+      document.body.style.userSelect = "";
+      window.removeEventListener("mousemove", onMouseMove);
+      window.removeEventListener("mouseup", onMouseUp);
+    };
+  }, [isResizing]);
+
   return (
     <div className="app">
       <div className="app__preview">
@@ -160,7 +191,16 @@ function App() {
         </div>
       </div>
 
-      <div className="app__edit-panel">
+      <div
+        className="app__resize-handle"
+        role="separator"
+        aria-orientation="vertical"
+        onMouseDown={(event) => {
+          event.preventDefault();
+          setIsResizing(true);
+        }}
+      />
+      <div className="app__edit-panel" style={{ width: editPanelWidth }}>
         <div className="app__render-tree">
           <RenderTreePanel
             items={workTree}
@@ -192,14 +232,6 @@ function App() {
               console.log("New tree:", JSON.stringify(newTree, null, 2));
             }}
           />
-        </div>
-        <div className="app__render-item-info">
-          <h3>Info</h3>
-          {schema?.description && (
-            <div style={{ marginBottom: "1rem" }}>
-              <strong>Description:</strong> {schema?.description}
-            </div>
-          )}
         </div>
         <div className="app__render-item-details">
           <h3>Details</h3>
