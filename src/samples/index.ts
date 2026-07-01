@@ -152,27 +152,54 @@ export const samples = {
   layer: {
     name: "Layer",
     type: "2d",
-    tree: () => [operations.layer([operations.drawImage({ imageUrl: availableImages.homer })])],
+    tree: () => [
+      operations.layer([
+        operations.drawImage({ imageUrl: availableImages.homer }),
+      ]),
+    ],
   },
   blur: {
     name: "Blur",
     type: "2d",
-    tree: () => [operations.blur({}, [operations.drawImage({ imageUrl: availableImages.homer })])],
+    tree: () => [
+      operations.blur({}, [
+        operations.drawImage({ imageUrl: availableImages.homer }),
+      ]),
+    ],
   },
   saturation: {
     name: "Saturation",
     type: "2d",
-    tree: () => [operations.saturation({ factor: 0.5 }, [operations.drawImage({ imageUrl: availableImages.homer })])],
+    tree: () => [
+      operations.saturation({ factor: 0.5 }, [
+        operations.drawImage({ imageUrl: availableImages.homer }),
+      ]),
+    ],
   },
   convolve: {
     name: "Convolve",
     type: "2d",
-    tree: () => [operations.convolve({ kernel: [[0, -1, 0], [-1, 5, -1], [0, -1, 0]] }, [operations.drawImage({ imageUrl: availableImages.homer })])],
+    tree: () => [
+      operations.convolve(
+        {
+          kernel: [
+            [0, -1, 0],
+            [-1, 5, -1],
+            [0, -1, 0],
+          ],
+        },
+        [operations.drawImage({ imageUrl: availableImages.homer })],
+      ),
+    ],
   },
   transform: {
     name: "Transform",
     type: "2d",
-    tree: () => [operations.transform({ translateX: 20, scaleX: 0.9 }, [operations.drawImage({ imageUrl: availableImages.homer })])],
+    tree: () => [
+      operations.transform({ translateX: 250, translateY: 500, scale: 0.5 }, [
+        operations.drawImage({ imageUrl: availableImages.homer }),
+      ]),
+    ],
   },
   cyl: {
     name: "Cylinder",

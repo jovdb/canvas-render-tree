@@ -1,6 +1,17 @@
+import { ChangeEvent, createElement } from "react";
 import { IRenderItem, ItemDrawFn, RenderTree } from "../canvas";
-import { IConfig } from "../configs";
-import { drawKernel, normalizeKernel } from "../kernels";
+import { IConfig, ItemConfigFn } from "../configs";
+import {
+  boxBlurKernel,
+  drawKernel,
+  edgeDetectKernel,
+  embossKernel,
+  gaussianBlurKernel,
+  normalizeKernel,
+  sharpenKernel,
+  sobelHKernel,
+  sobelVKernel,
+} from "../kernels";
 import { OperationSchema } from "../schemas";
 import { addOperation } from ".";
 
@@ -105,6 +116,94 @@ export interface IConvolveConfig extends IConfig {
   multiply?: number;
 }
 
+type KernelPreset =
+  | "identity-3x3"
+  | "identity-5x5"
+  | "sharpen-3x3"
+  | "box-blur-3x3"
+  | "box-blur-5x5"
+  | "box-blur-10x10"
+  | "gaussian-3x3"
+  | "gaussian-5x5"
+  | "gaussian-10x10"
+  | "edge-3x3"
+  | "emboss-3x3"
+  | "sobel-h-3x3"
+  | "sobel-v-3x3"
+  | "laplacian-3x3";
+
+function createIdentityKernel(size: number) {
+  const center = Math.floor(size / 2);
+  return Array.from({ length: size }, (_, y) =>
+    Array.from({ length: size }, (_, x) => (x === center && y === center ? 1 : 0)),
+  );
+}
+
+function getPresetKernel(preset: KernelPreset, size: number) {
+  switch (preset) {
+    case "identity-3x3":
+      return createIdentityKernel(3);
+    case "identity-5x5":
+      return createIdentityKernel(5);
+    case "sharpen-3x3":
+      return sharpenKernel();
+    case "box-blur-3x3":
+      return boxBlurKernel(1);
+    case "box-blur-5x5":
+      return boxBlurKernel(2);
+    case "box-blur-10x10":
+      return boxBlurKernel(5);
+    case "gaussian-3x3":
+      return gaussianBlurKernel(1);
+    case "gaussian-5x5":
+      return gaussianBlurKernel(2);
+    case "gaussian-10x10":
+      return gaussianBlurKernel(5);
+    case "edge-3x3":
+      return edgeDetectKernel();
+    case "emboss-3x3":
+      return embossKernel();
+    case "sobel-h-3x3":
+      return sobelHKernel();
+    case "sobel-v-3x3":
+      return sobelVKernel();
+    case "laplacian-3x3":
+      return [
+        [0, -1, 0],
+        [-1, 4, -1],
+        [0, -1, 0],
+      ];
+    default:
+      return createIdentityKernel(size);
+  }
+}
+
+function getPresetForKernel(kernel: number[][]): KernelPreset | undefined {
+  const presets: Array<[KernelPreset, number[][]]> = [
+    ["identity-3x3", createIdentityKernel(3)],
+    ["identity-5x5", createIdentityKernel(5)],
+    ["sharpen-3x3", sharpenKernel()],
+    ["box-blur-3x3", boxBlurKernel(1)],
+    ["box-blur-5x5", boxBlurKernel(2)],
+    ["box-blur-10x10", boxBlurKernel(5)],
+    ["gaussian-3x3", gaussianBlurKernel(1)],
+    ["gaussian-5x5", gaussianBlurKernel(2)],
+    ["gaussian-10x10", gaussianBlurKernel(5)],
+    ["edge-3x3", edgeDetectKernel()],
+    ["emboss-3x3", embossKernel()],
+    ["sobel-h-3x3", sobelHKernel()],
+    ["sobel-v-3x3", sobelVKernel()],
+    ["laplacian-3x3", [
+      [0, -1, 0],
+      [-1, 4, -1],
+      [0, -1, 0],
+    ]],
+  ];
+
+  const kernelString = JSON.stringify(kernel);
+  return presets.find(([, presetKernel]) => JSON.stringify(presetKernel) === kernelString)?.[0];
+}
+
 const schema: OperationSchema<"convolve"> = {
   name: "convolve",
   description: "Apply a convolution kernel on an image",
@@ -122,9 +221,17 @@ const schema: OperationSchema<"convolve"> = {
   ],
 };
 
-export const draw: ItemDrawFn<IConvolveConfig> = ({ ctx, drawPrev, config }) => {
+export const draw: ItemDrawFn<IConvolveConfig> = ({
+  ctx,
+  drawPrev,
+  config,
+  drawArgs,
+}) => {
   // first draw previous items
   drawPrev?.(ctx);
+
+  const drawInput = drawArgs?.[0];
+  if (!drawInput) return;
 
   const {
     kernel,
@@ -134,13 +241,26 @@ export const draw: ItemDrawFn<IConvolveConfig> = ({ ctx, drawPrev, config }) => 
   } = config;
 
   function getBevelData() {
-    const imageData = ctx.getImageData(
+    // Create offscreen canvas to apply convolution
+    const offscreenCanvas = document.createElement("canvas");
+    offscreenCanvas.width = ctx.canvas.width;
+    offscreenCanvas.height = ctx.canvas.height;
+    const offscreenCtx = offscreenCanvas.getContext("2d");
+    if (!offscreenCtx)
+      throw new Error("Failed to get 2D context for offscreen canvas");
+
+    drawInput?.(offscreenCtx);
+
+    const imageData = offscreenCtx.getImageData(
       0,
       0,
-      ctx.canvas.width,
-      ctx.canvas.height,
+      offscreenCanvas.width,
+      offscreenCanvas.height,
     );
-    return applyKernel(imageData, kernel, multiply);
+    const newImageData = applyKernel(imageData, kernel, multiply);
+    offscreenCtx.putImageData(newImageData, 0, 0);
+
+    return offscreenCtx;
   }
 
   if (normalize) normalizeKernel(kernel);
@@ -150,8 +270,58 @@ export const draw: ItemDrawFn<IConvolveConfig> = ({ ctx, drawPrev, config }) => 
     return;
   }
 
-  const newImageData = getBevelData();
-  ctx.putImageData(newImageData, 0, 0); // Put the ImageData onto the canvas
+  const offscreenCanvasCtx = getBevelData();
+  ctx.drawImage(offscreenCanvasCtx.canvas, 0, 0); // Put the ImageData onto the canvas
+};
+
+export const ConvolveConfig: ItemConfigFn<IConvolveConfig> = ({
+  config,
+  mutateConfig,
+}) => {
+  const preset = getPresetForKernel(config.kernel);
+
+  const updateKernel = (nextKernel: number[][]) => {
+    mutateConfig((draftConfig) => {
+      draftConfig.kernel = nextKernel;
+    });
+  };
+
+  const handlePresetChange = (event: ChangeEvent<HTMLSelectElement>) => {
+    const nextPreset = event.target.value as KernelPreset;
+    updateKernel(getPresetKernel(nextPreset, 3));
+  };
+
+  return createElement(
+    "div",
+    { style: { display: "grid", gap: "8px" } },
+    createElement(
+      "label",
+      null,
+      "Preset kernel: ",
+      createElement(
+        "select",
+        {
+          value: preset ?? "",
+          onChange: handlePresetChange,
+        },
+        createElement("option", { value: "" }, ""),
+        createElement("option", { value: "identity-3x3" }, "Identity (3x3)"),
+        createElement("option", { value: "identity-5x5" }, "Identity (5x5)"),
+        createElement("option", { value: "sharpen-3x3" }, "Sharpen (3x3)"),
+        createElement("option", { value: "box-blur-3x3" }, "Box blur (3x3)"),
+        createElement("option", { value: "box-blur-5x5" }, "Box blur (5x5)"),
+        createElement("option", { value: "box-blur-10x10" }, "Box blur (10x10)"),
+        createElement("option", { value: "gaussian-3x3" }, "Gaussian blur (3x3)"),
+        createElement("option", { value: "gaussian-5x5" }, "Gaussian blur (5x5)"),
+        createElement("option", { value: "gaussian-10x10" }, "Gaussian blur (10x10)"),
+        createElement("option", { value: "edge-3x3" }, "Edge detection (3x3)"),
+        createElement("option", { value: "emboss-3x3" }, "Emboss (3x3)"),
+        createElement("option", { value: "sobel-h-3x3" }, "Sobel horizontal (3x3)"),
+        createElement("option", { value: "sobel-v-3x3" }, "Sobel vertical (3x3)"),
+        createElement("option", { value: "laplacian-3x3" }, "Laplacian (3x3)"),
+      ),
+    ),
+  );
 };
 
 /** Apply a convolution kernel on an image */
@@ -169,6 +339,7 @@ const operation = {
   create,
   draw,
   schema,
+  configComponent: ConvolveConfig,
 } as const;
 addOperation(operation);
 
