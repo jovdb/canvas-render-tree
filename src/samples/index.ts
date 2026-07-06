@@ -45,6 +45,16 @@ export const samples = {
       ]),
     ],
   },
+  raise: {
+    name: "Raise",
+    type: "2d",
+    tree: () => [
+      operations.drawImage({ imageUrl: availableImages.testbeeld }),
+      operations.raise({ strength: 1 }, [
+        operations.drawImage({ imageUrl: availableImages.homer }),
+      ]),
+    ],
+  },
   gold: {
     name: "Gold foil",
     type: "2d",

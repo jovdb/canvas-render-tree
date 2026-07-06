@@ -2,6 +2,7 @@ import "./draw-image";
 import "./opacity";
 import "./blend";
 import "./shadow";
+import "./raise";
 import "./fill-color";
 
 import "./bevel";
