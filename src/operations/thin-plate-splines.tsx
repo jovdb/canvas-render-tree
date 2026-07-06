@@ -1,9 +1,10 @@
 // https://khanhha.github.io/posts/Thin-Plate-Splines-Warping/
 
 import { IRenderItem, ItemDrawFn } from "../canvas";
-import { addRendererOverlay, ItemOverlayFn } from "../overlays";
-import { addRenderer } from "../renderers";
+import { ItemOverlayFn } from "../overlays";
+import { ItemConfigFn } from "../configs";
 import { FreeControlPointsOverlay, FreeControlPointsConfig } from "../components/FreeControlPointsOverlay";
+import { addOperation, IOperation } from ".";
 
 // ============================================================================
 // Types
@@ -393,10 +394,6 @@ export const draw: ItemDrawFn<IThinPlatesSplinesConfig> = ({
   if (drawInput) ctx.restore();
 };
 
-addRenderer("thinPlateSplines", {
-  draw,
-});
-
 // ============================================================================
 // Overlay Component
 // ============================================================================
@@ -406,13 +403,9 @@ export const ThinPlatesSplinesOverlay: ItemOverlayFn<IThinPlatesSplinesConfig> =
   return <FreeControlPointsOverlay<IThinPlatesSplinesConfig> {...props} />;
 };
 
-addRendererOverlay("thinPlateSplines", ThinPlatesSplinesOverlay);
-
 // ============================================================================
 // Config Component
 // ============================================================================
-
-import { addRendererConfig, ItemConfigFn } from "../configs";
 
 export const ThinPlatesSplinesConfig: ItemConfigFn<IThinPlatesSplinesConfig> = ({
   config,
@@ -476,4 +469,12 @@ export const ThinPlatesSplinesConfig: ItemConfigFn<IThinPlatesSplinesConfig> = (
   );
 };
 
-addRendererConfig("thinPlateSplines", ThinPlatesSplinesConfig);
+const operation: IOperation<"thinPlateSplines", IThinPlatesSplinesConfig> = {
+  key: "thinPlateSplines",
+  create: thinPlateSplines,
+  draw,
+  configComponent: ThinPlatesSplinesConfig,
+  overlayComponent: ThinPlatesSplinesOverlay,
+} as const;
+
+addOperation(operation);

@@ -3,8 +3,9 @@
 // https://dl.acm.org/doi/10.1145/37402.37422
 
 import { IRenderItem, ItemDrawFn, RenderTree } from "../canvas";
-import { addRendererOverlay, ItemOverlayFn } from "../overlays";
-import { addRenderer } from "../renderers";
+import { ItemOverlayFn } from "../overlays";
+import { ItemConfigFn } from "../configs";
+import { addOperation, IOperation } from ".";
 
 import {
   FreeControlPointsOverlay,
@@ -282,10 +283,6 @@ export const draw: ItemDrawFn<IBeierNeelyConfig> = ({
   ctx.restore();
 };
 
-addRenderer("beierNeely", {
-  draw,
-});
-
 // ============================================================================
 // Overlay Component
 // ============================================================================
@@ -295,13 +292,9 @@ export const BeierNeelyOverlay: ItemOverlayFn<IBeierNeelyConfig> = (props) => {
   return <FreeControlPointsOverlay<IBeierNeelyConfig> {...props} />;
 };
 
-addRendererOverlay("beierNeely", BeierNeelyOverlay);
-
 // ============================================================================
 // Config Component
 // ============================================================================
-
-import { addRendererConfig, ItemConfigFn } from "../configs";
 
 export const BeierNeelyConfig: ItemConfigFn<IBeierNeelyConfig> = ({
   config,
@@ -392,4 +385,12 @@ export const BeierNeelyConfig: ItemConfigFn<IBeierNeelyConfig> = ({
   );
 };
 
-addRendererConfig("beierNeely", BeierNeelyConfig);
+const operation: IOperation<"beierNeely", IBeierNeelyConfig> = {
+  key: "beierNeely",
+  create: beierNeely,
+  draw,
+  configComponent: BeierNeelyConfig,
+  overlayComponent: BeierNeelyOverlay,
+} as const;
+
+addOperation(operation);

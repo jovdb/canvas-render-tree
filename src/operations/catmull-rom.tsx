@@ -1,8 +1,9 @@
 import { IRenderItem, ItemDrawFn, RenderTree } from "../canvas";
-import { addRendererOverlay, ItemOverlayFn } from "../overlays";
-import { addRenderer } from "../renderers";
+import { ItemOverlayFn } from "../overlays";
+import { ItemConfigFn } from "../configs";
 import React from "react";
 import { ControlPoint } from "../components/ControlPoint";
+import { addOperation, IOperation } from ".";
 
 export interface ControlPointConfig {
   row: number;
@@ -279,10 +280,6 @@ export const draw: ItemDrawFn<ICatmullRomConfig> = ({
   ctx.globalCompositeOperation = "source-over";
 };
 
-addRenderer("catmullRom", {
-  draw,
-});
-
 // ============================================================================
 // Overlay Component
 // ============================================================================
@@ -415,4 +412,14 @@ export const CatmullRomOverlay: ItemOverlayFn<ICatmullRomConfig> = ({
   );
 };
 
-addRendererOverlay("catmullRom", CatmullRomOverlay);
+export const CatmullRomConfig: ItemConfigFn<ICatmullRomConfig> = () => null;
+
+const operation: IOperation<"catmullRom", ICatmullRomConfig> = {
+  key: "catmullRom",
+  create: catmullRom,
+  draw,
+  configComponent: CatmullRomConfig,
+  overlayComponent: CatmullRomOverlay,
+} as const;
+
+addOperation(operation);

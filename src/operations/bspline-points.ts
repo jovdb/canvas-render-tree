@@ -1,5 +1,6 @@
 import { IRenderItem, ItemDrawFn } from "../canvas";
-import { addRenderer } from "../renderers";
+import { ItemConfigFn } from "../configs";
+import { addOperation, IOperation } from ".";
 type Point = { x: number; y: number };
 type Vector = { dx: number; dy: number };
 
@@ -352,6 +353,8 @@ export const bSplinePoints = (
   config,
 });
 
+export const BSplinePointsConfig: ItemConfigFn<IBSplinePointsConfig> = () => null;
+
 export const draw: ItemDrawFn<IBSplinePointsConfig> = ({
   ctx,
   drawPrev,
@@ -405,6 +408,11 @@ export const draw: ItemDrawFn<IBSplinePointsConfig> = ({
   if (drawInput) ctx.restore();
 };
 
-addRenderer("bSplinePoints", {
+const operation: IOperation<"bSplinePoints", IBSplinePointsConfig> = {
+  key: "bSplinePoints",
+  create: bSplinePoints,
   draw,
-});
+  configComponent: BSplinePointsConfig,
+} as const;
+
+addOperation(operation);
