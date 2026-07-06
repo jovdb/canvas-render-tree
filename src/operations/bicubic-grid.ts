@@ -2,6 +2,7 @@ import { IRenderItem, ItemDrawFn, RenderTree } from "../canvas";
 import { IConfig } from "../configs";
 import { OperationSchema } from "../schemas";
 import { addOperation } from ".";
+import { onChildCtx } from "./layer";
 
 interface Point {
   x: number;
@@ -359,31 +360,34 @@ export const draw: ItemDrawFn<IBicubicGridConfig> = ({
   // first draw previous items
   drawPrev?.(ctx);
 
-  const drawInput = drawArgs?.[0];
-  if (drawInput) ctx.save();
+  onChildCtx(ctx, !!drawPrev, (drawCtx) => {
+    drawArgs?.[0]?.(drawCtx);
 
-  const imageData = ctx.getImageData(0, 0, ctx.canvas.width, ctx.canvas.height);
-  const newImageData = deformImage(imageData, config.controlsPoints);
-  ctx.putImageData(newImageData, 0, 0);
+    const imageData = drawCtx.getImageData(
+      0,
+      0,
+      drawCtx.canvas.width,
+      drawCtx.canvas.height,
+    );
+    const newImageData = deformImage(imageData, config.controlsPoints);
+    drawCtx.putImageData(newImageData, 0, 0);
 
-  if (config?.debug) {
-    const rows = config.controlsPoints.length;
-    const cols = config.controlsPoints[0].length;
-    const originalGrid = createOriginalGrid(rows, cols);
+    if (config?.debug) {
+      const rows = config.controlsPoints.length;
+      const cols = config.controlsPoints[0].length;
+      const originalGrid = createOriginalGrid(rows, cols);
 
-    for (let j = 0; j < rows; j++) {
-      for (let i = 0; i < cols; i++) {
-        drawControlPointDisplacement(
-          ctx,
-          originalGrid[j][i],
-          config.controlsPoints[j][i],
-        );
+      for (let j = 0; j < rows; j++) {
+        for (let i = 0; i < cols; i++) {
+          drawControlPointDisplacement(
+            drawCtx,
+            originalGrid[j][i],
+            config.controlsPoints[j][i],
+          );
+        }
       }
     }
-  }
-
-  drawInput?.(ctx);
-  if (drawInput) ctx.restore();
+  });
 };
 
 /** Apply bicubic grid warping */

@@ -2,6 +2,7 @@ import { getContext2d, IRenderItem, ItemDrawFn, RenderTree } from "../canvas";
 import { IConfig } from "../configs";
 import { OperationSchema } from "../schemas";
 import { addOperation } from ".";
+import { createOffscreenCanvasCtx, onChildCtx } from "./layer";
 
 /**
  * Generates a 2048x2048 UV Identity Map as a lossless PNG Base64 Data URL.
@@ -272,22 +273,17 @@ export const draw: ItemDrawFn<IUVMapConfig> = ({ ctx, drawPrev, drawArgs }) => {
   // first draw previous items
   drawPrev?.(ctx);
 
-  const drawInput = drawArgs?.[0];
-  if (drawInput) ctx.save();
+  onChildCtx(ctx, !!drawPrev, (ctx) => {
+    drawArgs?.[0]?.(ctx);
 
-  // Create an offscreen canvas
-  const uvCanvas = document.createElement("canvas");
-  uvCanvas.width = ctx.canvas.width;
-  uvCanvas.height = ctx.canvas.height;
-  const uvCtx = getContext2d(uvCanvas, "uvMap");
+    // Create an offscreen canvas
+    const uvCtx = createOffscreenCanvasCtx(ctx);
+    drawArgs?.[1]?.(uvCtx);
 
-  drawInput?.(uvCtx);
-
-  const imageData = manipulateImageData(ctx, uvCtx);
-  //const imageData = createUVMapImageData(ctx.canvas.width, ctx.canvas.height);
-  ctx.putImageData(imageData, 0, 0);
-  if (drawInput) ctx.restore();
-  return this;
+    const imageData = manipulateImageData(ctx, uvCtx);
+    //const imageData = createUVMapImageData(ctx.canvas.width, ctx.canvas.height);
+    ctx.putImageData(imageData, 0, 0);
+  });
 };
 
 const operation = {

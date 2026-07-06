@@ -11,6 +11,7 @@ import {
   FreeControlPointsOverlay,
   FreeControlPointsConfig,
 } from "../components/FreeControlPointsOverlay";
+import { onChildCtx } from "./layer";
 
 // ============================================================================
 // Types
@@ -245,42 +246,38 @@ export const draw: ItemDrawFn<IBeierNeelyConfig> = ({
 }) => {
   drawPrev?.(ctx);
 
-  const drawInput = drawArgs?.[0];
-  if (!drawInput) return;
+  onChildCtx(ctx, !!drawPrev, (drawCtx) => {
+    drawArgs?.[0]?.(drawCtx);
 
-  ctx.save();
-  drawInput(ctx);
+    const w = drawCtx.canvas.width;
+    const h = drawCtx.canvas.height;
 
-  const w = ctx.canvas.width;
-  const h = ctx.canvas.height;
+    const originalData = drawCtx.getImageData(0, 0, w, h);
 
-  const originalData = ctx.getImageData(0, 0, w, h);
+    const {
+      controlPoints = [],
+      strength = 1.0,
+      falloff = 2.0,
+      minDistance = 0.01,
+    } = config || {};
 
-  const {
-    controlPoints = [],
-    strength = 1.0,
-    falloff = 2.0,
-    minDistance = 0.01,
-  } = config || {};
+    // Convert control points to source and target points
+    const srcPts = controlPoints.map((p) => ({ x: p.x, y: p.y }));
+    const tgtPts = controlPoints.map((p) => ({ x: p.x + p.dx, y: p.y + p.dy }));
 
-  // Convert control points to source and target points
-  const srcPts = controlPoints.map((p) => ({ x: p.x, y: p.y }));
-  const tgtPts = controlPoints.map((p) => ({ x: p.x + p.dx, y: p.y + p.dy }));
+    const warper = new BeierNeelyWarper(
+      w,
+      h,
+      srcPts,
+      tgtPts,
+      strength,
+      falloff,
+      minDistance,
+    );
 
-  const warper = new BeierNeelyWarper(
-    w,
-    h,
-    srcPts,
-    tgtPts,
-    strength,
-    falloff,
-    minDistance,
-  );
-
-  const warpedData = warper.warpImage(originalData);
-  ctx.putImageData(warpedData, 0, 0);
-
-  ctx.restore();
+    const warpedData = warper.warpImage(originalData);
+    drawCtx.putImageData(warpedData, 0, 0);
+  });
 };
 
 // ============================================================================

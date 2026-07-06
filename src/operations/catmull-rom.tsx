@@ -21,18 +21,18 @@ export interface ICatmullRomConfig {
   controlPoints?: ControlPointConfig[];
 }
 
-export const catmullRom = (
+const create = (
   {
     gridRows = 3,
     gridCols = 3,
     strength = 10,
     controlPoints = [],
   }: ICatmullRomConfig,
-  input: RenderTree,
+  input: RenderTree | undefined,
 ): IRenderItem<ICatmullRomConfig> => ({
   name: "catmullRom",
   config: { strength, gridRows, gridCols, controlPoints },
-  input,
+  args: [input],
 });
 
 // ============================================================================
@@ -416,7 +416,7 @@ export const CatmullRomConfig: ItemConfigFn<ICatmullRomConfig> = () => null;
 
 const operation: IOperation<"catmullRom", ICatmullRomConfig> = {
   key: "catmullRom",
-  create: catmullRom,
+  create,
   draw,
   configComponent: CatmullRomConfig,
   overlayComponent: CatmullRomOverlay,
