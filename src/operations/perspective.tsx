@@ -2,6 +2,9 @@ import { IRenderItem, ItemDrawFn, RenderTree } from "../canvas";
 import { IConfig } from "../configs";
 import { OperationSchema } from "../schemas";
 import { addOperation } from ".";
+import { ItemOverlayFn } from "../overlays";
+import React from "react";
+import { ControlPoint } from "../components/ControlPoint";
 
 export interface IPerspectiveConfig extends IConfig {
   /** Normalized control points */
@@ -334,11 +337,70 @@ export const draw: ItemDrawFn<IPerspectiveConfig> = ({
   ctx.drawImage(offscreenCanvas, 0, 0);
 };
 
+export const PerspectiveOverlay: ItemOverlayFn<IPerspectiveConfig> = ({
+  config,
+  mutateConfig,
+}) => {
+  const [draggedIndex, setDraggedIndex] = React.useState<number | null>(null);
+
+  const handleMouseMove = (event: React.MouseEvent<HTMLDivElement>) => {
+    if (draggedIndex === null) return;
+
+    const rect = event.currentTarget.getBoundingClientRect();
+    const x = clamp((event.clientX - rect.left) / rect.width, 0, 1);
+    const y = clamp((event.clientY - rect.top) / rect.height, 0, 1);
+
+    mutateConfig((draftConfig) => {
+      const nextPoints = [...(draftConfig.controlPoints ?? [])];
+      nextPoints[draggedIndex] = { x, y };
+      draftConfig.controlPoints =
+        nextPoints as IPerspectiveConfig["controlPoints"];
+    });
+  };
+
+  const handleMouseUp = () => setDraggedIndex(null);
+  const handleMouseLeave = () => setDraggedIndex(null);
+
+  const points = config?.controlPoints ?? [
+    { x: 0, y: 0 },
+    { x: 1, y: 0 },
+    { x: 1, y: 1 },
+    { x: 0, y: 1 },
+  ];
+
+  return (
+    <div
+      style={{
+        position: "relative",
+        width: "100%",
+        height: "100%",
+        backgroundColor: "rgba(255,255,255,0.3)",
+      }}
+      onMouseMove={handleMouseMove}
+      onMouseUp={handleMouseUp}
+      onMouseLeave={handleMouseLeave}
+    >
+      {...points.map((point, index) => (
+        <ControlPoint
+          key={`${index}-${point.x}-${point.y}`}
+          left={point.x}
+          top={point.y}
+          color={"blue"}
+          draggable={true}
+          onMouseDown={() => setDraggedIndex(index)}
+        />
+      ))}
+      ,
+    </div>
+  );
+};
+
 const operation = {
   key: "perspective",
   create,
   draw,
   schema,
+  overlayComponent: PerspectiveOverlay,
 } as const;
 addOperation(operation);
 
