@@ -2,6 +2,7 @@ import { addOperation } from ".";
 import { IRenderItem, ItemDrawFn, RenderTree } from "../canvas";
 import { IConfig, ItemConfigFn } from "../configs";
 import { OperationSchema } from "../schemas";
+import { onChildCtx } from "./layer";
 
 export interface IRaiseConfig extends IConfig {
   lightX?: number;
@@ -219,14 +220,18 @@ export const draw: ItemDrawFn<IRaiseConfig> = ({
 }) => {
   drawPrev?.(ctx);
 
-  const drawInput = drawArgs?.[0];
-  if (drawInput) {
-    drawInput(ctx);
-  }
+  onChildCtx(ctx, !!drawPrev, (drawCtx) => {
+    drawArgs?.[0]?.(drawCtx);
 
-  const imageData = ctx.getImageData(0, 0, ctx.canvas.width, ctx.canvas.height);
-  const raised = applyRaiseEffect(imageData, config);
-  ctx.putImageData(raised, 0, 0);
+    const imageData = drawCtx.getImageData(
+      0,
+      0,
+      drawCtx.canvas.width,
+      drawCtx.canvas.height,
+    );
+    const raised = applyRaiseEffect(imageData, config);
+    drawCtx.putImageData(raised, 0, 0);
+  });
 };
 
 export const RaiseConfig: ItemConfigFn<IRaiseConfig> = ({

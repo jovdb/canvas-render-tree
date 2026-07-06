@@ -6,6 +6,7 @@ import {
 } from "../kernels";
 import { OperationSchema } from "../schemas";
 import { addOperation } from ".";
+import { onChildCtx } from "./layer";
 
 type RGBA = [r: number, g: number, b: number, a?: number];
 
@@ -133,7 +134,12 @@ const schema: OperationSchema<"bevel"> = {
   ],
 };
 
-export const draw: ItemDrawFn<IBevelConfig> = ({ ctx, drawPrev, config }) => {
+export const draw: ItemDrawFn<IBevelConfig> = ({
+  ctx,
+  drawPrev,
+  config,
+  drawArgs,
+}) => {
   const {
     bevelSize = 6,
     shadowColor = [0, 0, 0, 192],
@@ -154,71 +160,83 @@ export const draw: ItemDrawFn<IBevelConfig> = ({ ctx, drawPrev, config }) => {
   // first draw previous items
   drawPrev?.(ctx);
 
-  //TODO: Do based on drawArgs
+  onChildCtx(ctx, !!drawPrev, (drawCtx) => {
+    if (debugKernel) {
+      drawKernel(drawCtx, highlightKernel);
+      return;
+    }
 
-  if (debugKernel) {
-    drawKernel(ctx, highlightKernel);
-    return;
-  }
+    drawArgs?.[0]?.(drawCtx);
 
-  const imageData = ctx.getImageData(0, 0, ctx.canvas.width, ctx.canvas.height);
-  const width = imageData.width;
-  const height = imageData.height;
-  const bevel = new ImageData(width, height);
-  const bevelData = bevel.data;
+    const imageData = drawCtx.getImageData(
+      0,
+      0,
+      drawCtx.canvas.width,
+      drawCtx.canvas.height,
+    );
+    const width = imageData.width;
+    const height = imageData.height;
+    const bevel = new ImageData(width, height);
+    const bevelData = bevel.data;
 
-  for (let y = 0; y < height; y++) {
-    for (let x = 0; x < width; x++) {
-      const pixelIndex = (y * width + x) * 4;
-      const shadowStrength = getPixelValue(imageData, x, y, shadowKernel);
-      const highlightStrength = getPixelValue(imageData, x, y, highlightKernel); // Check if pixel is a bevel pixel
+    for (let y = 0; y < height; y++) {
+      for (let x = 0; x < width; x++) {
+        const pixelIndex = (y * width + x) * 4;
+        const shadowStrength = getPixelValue(imageData, x, y, shadowKernel);
+        const highlightStrength = getPixelValue(
+          imageData,
+          x,
+          y,
+          highlightKernel,
+        ); // Check if pixel is a bevel pixel
 
-      if (shadowStrength >= 0 || highlightStrength >= 0) {
-        const sColor = [
-          shadowColor[0],
-          shadowColor[1],
-          shadowColor[2],
-          ((shadowColor[3] ?? 255) *
-            shadowStrength *
-            imageData.data[pixelIndex + 3]) /
-            255,
-        ] as RGBA;
+        if (shadowStrength >= 0 || highlightStrength >= 0) {
+          const sColor = [
+            shadowColor[0],
+            shadowColor[1],
+            shadowColor[2],
+            ((shadowColor[3] ?? 255) *
+              shadowStrength *
+              imageData.data[pixelIndex + 3]) /
+              255,
+          ] as RGBA;
 
-        const hColor = [
-          highlightColor[0],
-          highlightColor[1],
-          highlightColor[2],
-          ((highlightColor[3] ?? 255) *
-            highlightStrength *
-            imageData.data[pixelIndex + 3]) /
-            255,
-        ] as RGBA;
+          const hColor = [
+            highlightColor[0],
+            highlightColor[1],
+            highlightColor[2],
+            ((highlightColor[3] ?? 255) *
+              highlightStrength *
+              imageData.data[pixelIndex + 3]) /
+              255,
+          ] as RGBA;
 
-        // Blend colors
-        const color = blendColors(sColor, hColor);
+          // Blend colors
+          const color = blendColors(sColor, hColor);
 
-        bevelData[pixelIndex] = color[0] ?? 0;
-        bevelData[pixelIndex + 1] = color[1] ?? 0;
-        bevelData[pixelIndex + 2] = color[2] ?? 0;
-        bevelData[pixelIndex + 3] = color[3] ?? 255;
+          bevelData[pixelIndex] = color[0] ?? 0;
+          bevelData[pixelIndex + 1] = color[1] ?? 0;
+          bevelData[pixelIndex + 2] = color[2] ?? 0;
+          bevelData[pixelIndex + 3] = color[3] ?? 255;
+        }
       }
     }
-  }
 
-  if (onlyBevel) {
-    ctx.putImageData(bevel, 0, 0); // Put the ImageData onto the canvas
-  } else {
-    // Crate a new canvas that we can use as image so we can mix it on top, not replace
-    const canvas = document.createElement("canvas");
-    canvas.width = bevel.width;
-    canvas.height = bevel.height;
+    if (onlyBevel) {
+      drawCtx.putImageData(bevel, 0, 0); // Put the ImageData onto the canvas
+    } else {
+      // Crate a new canvas that we can use as image so we can mix it on top, not replace
+      const canvas = document.createElement("canvas");
+      canvas.width = bevel.width;
+      canvas.height = bevel.height;
 
-    const bevelCtx = getContext2d(canvas, "bevelCtx");
-    bevelCtx.putImageData(bevel, 0, 0); // Put the ImageData onto the canvas
+      const bevelCtx = getContext2d(canvas, "bevelCtx");
+      bevelCtx.putImageData(bevel, 0, 0); // Put the ImageData onto the canvas
 
-    // Use drawImage because we want to multiply the bevel over the image
-    ctx.drawImage(canvas, 0, 0);
-  }
+      // Use drawImage because we want to multiply the bevel over the image
+      drawCtx.drawImage(canvas, 0, 0);
+    }
+  });
 };
 
 /** Apply bevel effect */

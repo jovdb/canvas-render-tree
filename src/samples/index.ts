@@ -39,8 +39,9 @@ export const samples = {
     name: "Blend",
     type: "2d",
     tree: () => [
+      operations.drawImage({ imageUrl: availableImages.parrot }),
       operations.blend(
-        "multiply",
+        "xor",
         [operations.drawImage({ imageUrl: availableImages.testbeeld })],
         [operations.drawImage({ imageUrl: availableImages.homer })],
       ),
