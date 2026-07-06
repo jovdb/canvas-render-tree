@@ -56,6 +56,7 @@ export function RenderTreePanel({
       >
         <RenderTree2
           items={items}
+          title=""
           parentIndexes={[]}
           editIndex={editIndex}
           visibleIndexes={visibleIndexes}

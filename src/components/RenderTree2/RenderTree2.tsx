@@ -2,7 +2,7 @@ import { Fragment, useMemo, useState } from "react";
 import { IRenderItem } from "../../canvas";
 import { operations } from "../../operations";
 import { availableImages } from "../../resources";
-import { getSchema, schemas } from "../../schemas";
+import { getSchema } from "../../schemas";
 import { RenderItem2 } from "./RenderItem2";
 import { AddOperationPopover } from "./AddOperationPopover";
 
@@ -109,7 +109,6 @@ export function RenderTree2({
             <Fragment key={`${item.name}-${index}`}>
               <RenderItem2
                 item={item}
-                prevItems={items.slice(0, index)}
                 treeIndex={[...parentIndexes, index]}
                 editIndex={editIndex}
                 selectedItems={selectedItems}

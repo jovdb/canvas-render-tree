@@ -6,7 +6,6 @@ import { useState } from "react";
 
 export function RenderItem2({
   item,
-  prevItems,
   selectedItems = [],
   visibleIndexes = [],
   treeIndex,
@@ -17,7 +16,6 @@ export function RenderItem2({
   onTreeChange,
 }: {
   item: IRenderItem;
-  prevItems: readonly IRenderItem[];
   selectedItems?: readonly IRenderItem[];
   visibleIndexes?: readonly TreeIndex[];
   /** Tree index of this item */
@@ -43,7 +41,7 @@ export function RenderItem2({
     ...(item.args ? item.args : []),
   ];
 
-    const argNames = [
+  const argNames = [
     ...(schema?.args?.map((arg) => arg.description ?? "") ?? []),
   ];
 

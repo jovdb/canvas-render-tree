@@ -25,7 +25,7 @@ export interface OperationSchema<TOperationName extends string> {
 
 export const schemas: Record<string, OperationSchema<string>> = {};
 
-export function validateSchema(renderItem: IRenderItem, hasPrev: boolean) {
+export function validateSchema(renderItem: IRenderItem) {
   const operationName = renderItem.name;
   const schema = schemas[operationName as keyof typeof schemas] as
     | OperationSchema<string>
@@ -55,8 +55,7 @@ export function validateSchema(renderItem: IRenderItem, hasPrev: boolean) {
 
 export function validateSchemas(renderTree: IRenderItem[]) {
   renderTree.forEach((item) => {
-    const itemPrev = renderTree[renderTree.indexOf(item) - 1];
-    validateSchema(item, !!itemPrev);
+    validateSchema(item);
   });
 }
 
