@@ -135,7 +135,9 @@ type KernelPreset =
 function createIdentityKernel(size: number) {
   const center = Math.floor(size / 2);
   return Array.from({ length: size }, (_, y) =>
-    Array.from({ length: size }, (_, x) => (x === center && y === center ? 1 : 0)),
+    Array.from({ length: size }, (_, x) =>
+      x === center && y === center ? 1 : 0,
+    ),
   );
 }
 
@@ -193,15 +195,20 @@ function getPresetForKernel(kernel: number[][]): KernelPreset | undefined {
     ["emboss-3x3", embossKernel()],
     ["sobel-h-3x3", sobelHKernel()],
     ["sobel-v-3x3", sobelVKernel()],
-    ["laplacian-3x3", [
-      [0, -1, 0],
-      [-1, 4, -1],
-      [0, -1, 0],
-    ]],
+    [
+      "laplacian-3x3",
+      [
+        [0, -1, 0],
+        [-1, 4, -1],
+        [0, -1, 0],
+      ],
+    ],
   ];
 
   const kernelString = JSON.stringify(kernel);
-  return presets.find(([, presetKernel]) => JSON.stringify(presetKernel) === kernelString)?.[0];
+  return presets.find(
+    ([, presetKernel]) => JSON.stringify(presetKernel) === kernelString,
+  )?.[0];
 }
 
 const schema: OperationSchema<"convolve"> = {
@@ -310,14 +317,38 @@ export const ConvolveConfig: ItemConfigFn<IConvolveConfig> = ({
         createElement("option", { value: "sharpen-3x3" }, "Sharpen (3x3)"),
         createElement("option", { value: "box-blur-3x3" }, "Box blur (3x3)"),
         createElement("option", { value: "box-blur-5x5" }, "Box blur (5x5)"),
-        createElement("option", { value: "box-blur-10x10" }, "Box blur (10x10)"),
-        createElement("option", { value: "gaussian-3x3" }, "Gaussian blur (3x3)"),
-        createElement("option", { value: "gaussian-5x5" }, "Gaussian blur (5x5)"),
-        createElement("option", { value: "gaussian-10x10" }, "Gaussian blur (10x10)"),
+        createElement(
+          "option",
+          { value: "box-blur-10x10" },
+          "Box blur (10x10)",
+        ),
+        createElement(
+          "option",
+          { value: "gaussian-3x3" },
+          "Gaussian blur (3x3)",
+        ),
+        createElement(
+          "option",
+          { value: "gaussian-5x5" },
+          "Gaussian blur (5x5)",
+        ),
+        createElement(
+          "option",
+          { value: "gaussian-10x10" },
+          "Gaussian blur (10x10)",
+        ),
         createElement("option", { value: "edge-3x3" }, "Edge detection (3x3)"),
         createElement("option", { value: "emboss-3x3" }, "Emboss (3x3)"),
-        createElement("option", { value: "sobel-h-3x3" }, "Sobel horizontal (3x3)"),
-        createElement("option", { value: "sobel-v-3x3" }, "Sobel vertical (3x3)"),
+        createElement(
+          "option",
+          { value: "sobel-h-3x3" },
+          "Sobel horizontal (3x3)",
+        ),
+        createElement(
+          "option",
+          { value: "sobel-v-3x3" },
+          "Sobel vertical (3x3)",
+        ),
         createElement("option", { value: "laplacian-3x3" }, "Laplacian (3x3)"),
       ),
     ),

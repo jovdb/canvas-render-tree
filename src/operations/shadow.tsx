@@ -15,7 +15,9 @@ export interface IShadowConfig extends IConfig {
 const schema: OperationSchema<"shadow"> = {
   name: "shadow",
   getName: (config) =>
-    config ? `shadow: ${(config as IShadowConfig).type === "outer" ? "outer" : "inner"}` : "shadow",
+    config
+      ? `shadow: ${(config as IShadowConfig).type === "outer" ? "outer" : "inner"}`
+      : "shadow",
   description: "Add shadow to the given rendering",
   args: [
     {

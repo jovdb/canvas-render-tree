@@ -261,11 +261,7 @@ export const create = (uv?: RenderTree): IRenderItem<IUVMapConfig> => ({
   args: uv ? [uv] : undefined,
 });
 
-export const draw: ItemDrawFn<IUVMapConfig> = ({
-  ctx,
-  drawPrev,
-  drawArgs,
-}) => {
+export const draw: ItemDrawFn<IUVMapConfig> = ({ ctx, drawPrev, drawArgs }) => {
   // first draw previous items
   drawPrev?.(ctx);
 

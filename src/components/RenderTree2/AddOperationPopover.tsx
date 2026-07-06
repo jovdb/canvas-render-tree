@@ -23,7 +23,9 @@ export function AddOperationPopover({
                 className="render-tree__add-option"
                 onClick={() => onSelect(operationName)}
               >
-                <span className="render-tree__add-option-title">{operationName}</span>
+                <span className="render-tree__add-option-title">
+                  {operationName}
+                </span>
                 {description ? (
                   <span className="render-tree__add-option-description">
                     {description}

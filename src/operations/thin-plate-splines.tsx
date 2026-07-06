@@ -3,7 +3,10 @@
 import { IRenderItem, ItemDrawFn } from "../canvas";
 import { ItemOverlayFn } from "../overlays";
 import { ItemConfigFn } from "../configs";
-import { FreeControlPointsOverlay, FreeControlPointsConfig } from "../components/FreeControlPointsOverlay";
+import {
+  FreeControlPointsOverlay,
+  FreeControlPointsConfig,
+} from "../components/FreeControlPointsOverlay";
 import { addOperation, IOperation } from ".";
 
 // ============================================================================
@@ -314,7 +317,10 @@ class ThinPlateSplinesWarper {
           const p01 = srcPixels[idx01];
           const p11 = srcPixels[idx11];
 
-          let r = 0, g = 0, b = 0, a = 0;
+          let r = 0,
+            g = 0,
+            b = 0,
+            a = 0;
           for (let shift = 0; shift <= 24; shift += 8) {
             const c00 = (p00 >> shift) & 0xff;
             const c10 = (p10 >> shift) & 0xff;
@@ -384,9 +390,19 @@ export const draw: ItemDrawFn<IThinPlatesSplinesConfig> = ({
 
   // Convert control points to source and target points
   const srcPts: TPSPoint[] = controlPoints.map((p) => ({ x: p.x, y: p.y }));
-  const tgtPts: TPSPoint[] = controlPoints.map((p) => ({ x: p.x + p.dx, y: p.y + p.dy }));
+  const tgtPts: TPSPoint[] = controlPoints.map((p) => ({
+    x: p.x + p.dx,
+    y: p.y + p.dy,
+  }));
 
-  const warper = new ThinPlateSplinesWarper(w, h, srcPts, tgtPts, strength, regularization);
+  const warper = new ThinPlateSplinesWarper(
+    w,
+    h,
+    srcPts,
+    tgtPts,
+    strength,
+    regularization,
+  );
 
   const warpedData = warper.warpImage(originalData);
   ctx.putImageData(warpedData, 0, 0);
@@ -398,7 +414,9 @@ export const draw: ItemDrawFn<IThinPlatesSplinesConfig> = ({
 // Overlay Component
 // ============================================================================
 
-export const ThinPlatesSplinesOverlay: ItemOverlayFn<IThinPlatesSplinesConfig> = (props) => {
+export const ThinPlatesSplinesOverlay: ItemOverlayFn<
+  IThinPlatesSplinesConfig
+> = (props) => {
   // Use the reusable FreeControlPointsOverlay component
   return <FreeControlPointsOverlay<IThinPlatesSplinesConfig> {...props} />;
 };
@@ -407,10 +425,9 @@ export const ThinPlatesSplinesOverlay: ItemOverlayFn<IThinPlatesSplinesConfig> =
 // Config Component
 // ============================================================================
 
-export const ThinPlatesSplinesConfig: ItemConfigFn<IThinPlatesSplinesConfig> = ({
-  config,
-  mutateConfig,
-}) => {
+export const ThinPlatesSplinesConfig: ItemConfigFn<
+  IThinPlatesSplinesConfig
+> = ({ config, mutateConfig }) => {
   const { strength = 1.0, regularization = 0.001 } = config || {};
 
   return (

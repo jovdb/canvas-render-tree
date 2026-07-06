@@ -139,7 +139,6 @@ export const draw: ItemDrawFn<ISaturationConfig> = ({
   drawInput(offscreenCtx);
 
   apply(offscreenCtx);
-  
 };
 
 /** Adjust image saturation */

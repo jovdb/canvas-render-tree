@@ -5,7 +5,8 @@ import { RenderItemName } from "../operations";
 export interface IConfig {}
 
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
-const configs: Partial<Record<RenderItemName, ItemConfigFn<IConfig>>> = {} as const;
+const configs: Partial<Record<RenderItemName, ItemConfigFn<IConfig>>> =
+  {} as const;
 
 /** Function to configure an item */
 export type ItemConfigFn<TConfig = IConfig> = (props: {

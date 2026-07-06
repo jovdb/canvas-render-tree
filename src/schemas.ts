@@ -28,8 +28,7 @@ export const schemas: Record<string, OperationSchema<string>> = {};
 export function validateSchema(renderItem: IRenderItem) {
   const operationName = renderItem.name;
   const schema = schemas[operationName as keyof typeof schemas] as
-    | OperationSchema<string>
-    | undefined;
+    OperationSchema<string> | undefined;
 
   if (!schema) return undefined; // No schema, no validation
 

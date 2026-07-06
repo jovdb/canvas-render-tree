@@ -353,7 +353,8 @@ export const bSplinePoints = (
   config,
 });
 
-export const BSplinePointsConfig: ItemConfigFn<IBSplinePointsConfig> = () => null;
+export const BSplinePointsConfig: ItemConfigFn<IBSplinePointsConfig> = () =>
+  null;
 
 export const draw: ItemDrawFn<IBSplinePointsConfig> = ({
   ctx,

@@ -17,7 +17,9 @@ export interface FreeControlPointsConfig {
   controlPoints?: FreeControlPoint[];
 }
 
-export interface FreeControlPointsOverlayProps<TConfig extends FreeControlPointsConfig> {
+export interface FreeControlPointsOverlayProps<
+  TConfig extends FreeControlPointsConfig,
+> {
   config: Readonly<TConfig>;
   mutateConfig: (mutate: (config: TConfig) => void) => void;
   /** Color for source/anchor points */
@@ -37,7 +39,9 @@ export interface FreeControlPointsOverlayProps<TConfig extends FreeControlPoints
  * A reusable overlay component for managing free control points with displacement
  * Can be used by any operation that needs control points (TPS, Beier-Neely, etc.)
  */
-export function FreeControlPointsOverlay<TConfig extends FreeControlPointsConfig>({
+export function FreeControlPointsOverlay<
+  TConfig extends FreeControlPointsConfig,
+>({
   config,
   mutateConfig,
   sourceColor = "blue",
@@ -173,7 +177,7 @@ export function FreeControlPointsOverlay<TConfig extends FreeControlPointsConfig
             width: `${Math.abs(targetX - sourceX) * 100}%`,
             height: `${Math.abs(targetY - sourceY) * 100}%`,
             border: `1px solid ${lineColor}`,
-            transform: `translate(${(targetX > sourceX ? 0 : -100)}%, ${(targetY > sourceY ? 0 : -100)}%) rotate(${Math.atan2(targetY - sourceY, targetX - sourceX)}rad)`,
+            transform: `translate(${targetX > sourceX ? 0 : -100}%, ${targetY > sourceY ? 0 : -100}%) rotate(${Math.atan2(targetY - sourceY, targetX - sourceX)}rad)`,
             pointerEvents: "none",
             borderRadius: "0",
           }}

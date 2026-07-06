@@ -1,10 +1,9 @@
 import { addRendererConfig, ItemConfigFn } from ".";
 import { IThinPlatesSplinesConfig } from "../operations/thin-plate-splines";
 
-export const ThinPlatesSplinesConfig: ItemConfigFn<IThinPlatesSplinesConfig> = ({
-  config,
-  mutateConfig,
-}) => {
+export const ThinPlatesSplinesConfig: ItemConfigFn<
+  IThinPlatesSplinesConfig
+> = ({ config, mutateConfig }) => {
   const { strength = 1.0, regularization = 0.001 } = config || {};
 
   return (

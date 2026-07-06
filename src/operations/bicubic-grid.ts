@@ -404,7 +404,6 @@ const operation = {
 } as const;
 addOperation(operation);
 
-
 // Backward compatibility
 export const bicubicGrid = create;
 

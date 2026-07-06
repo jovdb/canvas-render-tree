@@ -124,9 +124,7 @@ const schema: OperationSchema<"bevel"> = {
   name: "bevel",
   description: "Apply bevel effect using highlight and shadow colors",
   getName: (config) =>
-    config
-      ? `bevel: ${(config as IBevelConfig).bevelSize ?? 6}`
-      : "bevel",
+    config ? `bevel: ${(config as IBevelConfig).bevelSize ?? 6}` : "bevel",
   args: [
     {
       description: "Rendering to bevel",
@@ -241,7 +239,6 @@ const operation = {
   schema,
 } as const;
 addOperation(operation);
-
 
 declare global {
   interface IOperations {

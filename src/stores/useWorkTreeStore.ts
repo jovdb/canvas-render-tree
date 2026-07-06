@@ -7,7 +7,9 @@ interface WorkTreeActions {
     tree: IRenderItem[] | ((currentTree: IRenderItem[]) => IRenderItem[]),
   ) => void;
   resetWorkTree: (tree: IRenderItem[]) => void;
-  updateWorkTree: (updater: (currentTree: IRenderItem[]) => IRenderItem[]) => void;
+  updateWorkTree: (
+    updater: (currentTree: IRenderItem[]) => IRenderItem[],
+  ) => void;
   addItem: (item: IRenderItem, index?: number) => void;
   deleteItem: (targetIndex: TreeIndex) => void;
 }
@@ -66,7 +68,10 @@ function replaceWithInput(
         const replacementItems = itemToReplace?.args?.flat() ?? [];
         argArray.splice(positionInFoundArg, 1, ...replacementItems);
       } else {
-        const newArgArray = replaceWithInput(argArray, [positionInFoundArg, ...childRestIndex]);
+        const newArgArray = replaceWithInput(argArray, [
+          positionInFoundArg,
+          ...childRestIndex,
+        ]);
         newArgs[foundArgIndex] = newArgArray;
       }
 
@@ -89,7 +94,10 @@ function replaceWithInput(
         args: newInput.length > 0 ? [newInput] : undefined,
       };
     } else {
-      const newInput = replaceWithInput(input, [positionInInput, ...childRestIndex]);
+      const newInput = replaceWithInput(input, [
+        positionInInput,
+        ...childRestIndex,
+      ]);
       newItems[targetPos] = {
         ...parentItem,
         args: newInput.length > 0 ? [newInput] : undefined,

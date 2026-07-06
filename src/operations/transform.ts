@@ -13,7 +13,8 @@ export interface ITransformConfig extends IConfig {
 
 const schema: OperationSchema<"transform"> = {
   name: "transform",
-  description: "Apply geometric transformation (translate, scale) to the given rendering",
+  description:
+    "Apply geometric transformation (translate, scale) to the given rendering",
   getName: (config) => {
     const cfg = config as ITransformConfig;
     let details = "";
