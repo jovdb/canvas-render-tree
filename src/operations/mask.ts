@@ -29,7 +29,7 @@
 //  *    ])
 //  *  ])
 //  */
-// export const create = (
+// const create = (
 //   mask?: RenderTree | undefined,
 // ): IRenderItem<IMaskConfig> => ({
 //   name: "mask",

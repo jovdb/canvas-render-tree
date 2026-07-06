@@ -152,7 +152,7 @@ function drawCylinder(
 }
 
 /** Create a cylinder render */
-export const create = (
+const create = (
   /** When passed, cylinder will be rendered with children */
   input: RenderTree | undefined,
 ): IRenderItem<ICylConfig> => ({

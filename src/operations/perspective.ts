@@ -14,7 +14,7 @@ export interface IPerspectiveConfig extends IConfig {
 }
 
 /** Create perspective transformation */
-export const create = (
+const create = (
   config: IPerspectiveConfig,
   /** When passed, perspective will be applied to children */
   input: RenderTree | undefined,

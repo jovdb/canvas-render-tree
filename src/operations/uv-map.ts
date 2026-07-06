@@ -259,7 +259,7 @@ const schema: OperationSchema<"uvMap"> = {
 };
 
 /** Create UV mapping */
-export const create = (
+const create = (
   input: RenderTree | undefined,
   uvMap: RenderTree | undefined,
 ): IRenderItem<IUVMapConfig> => ({

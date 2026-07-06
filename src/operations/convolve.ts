@@ -356,7 +356,7 @@ export const ConvolveConfig: ItemConfigFn<IConvolveConfig> = ({
 };
 
 /** Apply a convolution kernel on an image */
-export const create = (
+const create = (
   config: IConvolveConfig,
   input: RenderTree | undefined,
 ): IRenderItem<IConvolveConfig> => ({

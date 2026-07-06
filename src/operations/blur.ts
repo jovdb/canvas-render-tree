@@ -123,7 +123,7 @@ export const draw: ItemDrawFn<IBlurConfig> = ({
 };
 
 /** Apply Gaussian blur effect */
-export const create = (
+const create = (
   config: IBlurConfig = {},
   input: RenderTree | undefined,
 ): IRenderItem<IBlurConfig> => ({

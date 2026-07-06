@@ -387,7 +387,7 @@ export const draw: ItemDrawFn<IBicubicGridConfig> = ({
 };
 
 /** Apply bicubic grid warping */
-export const create = (
+const create = (
   config: IBicubicGridConfig,
   input: RenderTree,
 ): IRenderItem<IBicubicGridConfig> => ({

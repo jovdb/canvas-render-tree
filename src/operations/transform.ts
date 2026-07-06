@@ -41,7 +41,7 @@ const schema: OperationSchema<"transform"> = {
   ],
 };
 
-export const create = (
+const create = (
   config: ITransformConfig,
   input: RenderTree | undefined,
 ): IRenderItem<ITransformConfig> => ({

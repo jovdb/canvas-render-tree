@@ -134,7 +134,7 @@ export const draw: ItemDrawFn<IDisplacementConfig> = ({
 };
 
 /** Apply displacement map effect */
-export const create = (
+const create = (
   config: IDisplacementConfig,
   input: RenderTree | undefined,
   displacementMap: RenderTree | undefined,

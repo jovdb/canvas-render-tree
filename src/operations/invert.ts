@@ -16,7 +16,7 @@ const schema: OperationSchema<"invert"> = {
   ],
 };
 
-export const create = (
+const create = (
   input: RenderTree | undefined,
 ): IRenderItem<IInvertConfig> => ({
   name: "invert",

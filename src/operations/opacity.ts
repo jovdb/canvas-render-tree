@@ -37,7 +37,7 @@ export const draw: ItemDrawFn<IOpacityConfig> = ({
   ctx.restore();
 };
 
-export const create = (
+const create = (
   opacity: number = 0.5,
   /** When passed, only the children will have opacity */
   input: RenderTree | undefined,

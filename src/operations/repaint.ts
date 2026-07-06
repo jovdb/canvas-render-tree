@@ -18,7 +18,7 @@
 //  * Repaint pixels based on transparency
 //  * Same as blend("source-in")
 //  */
-// export const create = (
+// const create = (
 //   /** Repaint with
 //    * 1 draw operation required, bundle in layer if needed
 //    */
