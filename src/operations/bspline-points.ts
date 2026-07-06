@@ -360,10 +360,12 @@ export const draw: ItemDrawFn<IBSplinePointsConfig> = ({
   ctx,
   drawPrev,
   config,
-  drawInput,
+  drawArgs,
 }) => {
   // first draw previous items
   drawPrev?.(ctx);
+
+  const drawInput = drawArgs?.[0];
 
   if (drawInput) ctx.save();
   drawInput?.(ctx);

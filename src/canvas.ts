@@ -15,11 +15,6 @@ export type ItemDrawFn<TConfig = unknown, TResult = void> = (info: {
   config: TConfig;
 
   /**
-   * Method that draws the input tree for the operation
-   */
-  drawInput?: DrawFn | undefined;
-
-  /**
    * Method that draws args for the operation
    */
   drawArgs?: DrawFn[] | undefined;
@@ -76,10 +71,6 @@ function drawTree(items: RenderTree | undefined, _name = "") {
               ctx,
               drawPrev: prev,
               config: item.config,
-              drawInput: item.input
-                ? (ctx: CanvasRenderingContext2D) =>
-                    drawTree(item.input, `${item.name}-children`)?.(ctx)
-                : undefined,
               drawArgs: item.args
                 ? item.args.map(
                     (arg, index) => (ctx: CanvasRenderingContext2D) =>
