@@ -144,11 +144,11 @@ export const draw: ItemDrawFn<ISaturationConfig> = ({
 /** Adjust image saturation */
 export const create = (
   config: ISaturationConfig = {},
-  input?: RenderTree,
+  input: RenderTree | undefined,
 ): IRenderItem<ISaturationConfig> => ({
   name: "saturation",
   config,
-  args: [input ?? []],
+  args: [input],
 });
 
 const operation = {

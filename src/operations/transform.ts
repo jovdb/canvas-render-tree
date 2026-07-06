@@ -43,11 +43,11 @@ const schema: OperationSchema<"transform"> = {
 
 export const create = (
   config: ITransformConfig,
-  input?: RenderTree,
+  input: RenderTree | undefined,
 ): IRenderItem<ITransformConfig> => ({
   name: "transform",
   config,
-  args: [input ?? []],
+  args: [input],
 });
 
 export const draw: ItemDrawFn<ITransformConfig> = ({

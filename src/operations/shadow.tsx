@@ -33,11 +33,11 @@ const schema: OperationSchema<"shadow"> = {
  */
 const create = (
   config: IShadowConfig,
-  input?: RenderTree,
+  input: RenderTree | undefined,
 ): IRenderItem<IShadowConfig> => ({
   name: "shadow",
   config,
-  args: [input ?? []],
+  args: [input],
 });
 
 export const draw: ItemDrawFn<IShadowConfig> = ({

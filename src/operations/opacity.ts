@@ -40,11 +40,11 @@ export const draw: ItemDrawFn<IOpacityConfig> = ({
 export const create = (
   opacity: number = 0.5,
   /** When passed, only the children will have opacity */
-  input?: RenderTree | undefined,
+  input: RenderTree | undefined,
 ): IRenderItem<IOpacityConfig> => ({
   name: "opacity",
   config: { opacity },
-  args: [input ?? []],
+  args: [input],
 });
 
 const operation = {

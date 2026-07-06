@@ -57,14 +57,22 @@ export function engravedWoodTree() {
             shadowColor: "#fff8",
           },
           [
-            operations.drawImage({ imageUrl: availableImages.wood }),
-            operations.fillColor({ color: "#0001" }), // Make darker inside
-            operations.blend("multiply", [
-              operations.drawImage({ imageUrl: availableImages.noise }), // Add
-            ]),
-            operations.blend("destination-in", [
-              operations.drawImage({ imageUrl: availableImages.text }),
-            ]),
+            operations.blend(
+              "destination-in",
+              [
+                operations.blend(
+                  "multiply",
+                  [
+                    operations.drawImage({ imageUrl: availableImages.wood }),
+                    operations.fillColor({ color: "#0001" }), // Make darker inside,
+                  ],
+                  [
+                    operations.drawImage({ imageUrl: availableImages.noise }), // Add
+                  ],
+                ),
+              ],
+              [operations.drawImage({ imageUrl: availableImages.text })],
+            ),
             //
 
             /*

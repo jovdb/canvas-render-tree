@@ -39,10 +39,11 @@ export const samples = {
     name: "Blend",
     type: "2d",
     tree: () => [
-      operations.drawImage({ imageUrl: availableImages.testbeeld }),
-      operations.blend("multiply", [
-        operations.drawImage({ imageUrl: availableImages.homer }),
-      ]),
+      operations.blend(
+        "multiply",
+        [operations.drawImage({ imageUrl: availableImages.testbeeld })],
+        [operations.drawImage({ imageUrl: availableImages.homer })],
+      ),
     ],
   },
   raise: {

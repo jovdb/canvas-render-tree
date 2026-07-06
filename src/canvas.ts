@@ -54,7 +54,7 @@ export interface IRenderItem<TConfig extends IConfig = IConfig> {
 
   input?: RenderTree | undefined;
 
-  args?: RenderTree[] | undefined;
+  args?: (RenderTree | undefined)[];
 }
 
 // eslint-disable-next-line @typescript-eslint/no-explicit-any

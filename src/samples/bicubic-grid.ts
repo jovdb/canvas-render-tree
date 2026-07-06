@@ -17,11 +17,13 @@ export function bicubicGridTree() {
   }
 
   const tree: IRenderItem[] = [
-    operations.drawImage({ imageUrl: availableImages.testbeeld }),
-    operations.bicubicGrid({
-      controlsPoints: deformationGrid,
-      debug: true,
-    }),
+    operations.bicubicGrid(
+      {
+        controlsPoints: deformationGrid,
+        debug: true,
+      },
+      [operations.drawImage({ imageUrl: availableImages.testbeeld })],
+    ),
   ];
   return tree;
 }

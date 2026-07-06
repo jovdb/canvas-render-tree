@@ -4,10 +4,11 @@ import { availableImages } from "../resources";
 
 export function displacementTree() {
   const tree: IRenderItem[] = [
-    operations.drawImage({ imageUrl: availableImages.testbeeld }),
-    operations.displacement({ strength: 20 }, [
-      operations.drawImage({ imageUrl: availableImages.displacementMap1 }),
-    ]),
+    operations.displacement(
+      { strength: 20 },
+      [operations.drawImage({ imageUrl: availableImages.testbeeld })],
+      [operations.drawImage({ imageUrl: availableImages.displacementMap1 })],
+    ),
   ];
 
   return tree;

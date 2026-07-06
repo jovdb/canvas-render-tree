@@ -148,7 +148,11 @@ body {
   align-items: end;
 
   gap: 0.4em;
-  width: min-content;
+  width: auto;
+
+  &:has(.render-tree > *:not(.render-tree__buttons)) {
+    width: min-content;
+  }
 }
 
 .render-item__input {

@@ -52,18 +52,21 @@ export function RenderTree2({
       case "drawImage":
         return operations.drawImage({ imageUrl: availableImages.parrot });
       case "opacity":
-        return operations.opacity(1);
+        return operations.opacity(1, []);
       case "blend":
-        return operations.blend("source-over");
+        return operations.blend("source-over", [], []);
       case "shadow":
-        return operations.shadow({
-          type: "outer",
-          shadowBlur: 10,
-          shadowOffsetX: 5,
-          shadowOffsetY: 5,
-          shadowColor: "#0008",
-          onlyShadow: false,
-        });
+        return operations.shadow(
+          {
+            type: "outer",
+            shadowBlur: 10,
+            shadowOffsetX: 5,
+            shadowOffsetY: 5,
+            shadowColor: "#0008",
+            onlyShadow: false,
+          },
+          [],
+        );
       default:
         return (
           operations as Record<string, (...args: unknown[]) => IRenderItem>

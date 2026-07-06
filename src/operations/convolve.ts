@@ -223,7 +223,7 @@ const schema: OperationSchema<"convolve"> = {
   args: [
     {
       description: "Rendering to convolve",
-      required: false,
+      required: true,
     },
   ],
 };
@@ -358,11 +358,11 @@ export const ConvolveConfig: ItemConfigFn<IConvolveConfig> = ({
 /** Apply a convolution kernel on an image */
 export const create = (
   config: IConvolveConfig,
-  input?: RenderTree,
+  input: RenderTree | undefined,
 ): IRenderItem<IConvolveConfig> => ({
   name: "convolve",
   config,
-  args: input ? [input] : undefined,
+  args: [input],
 });
 
 const operation = {

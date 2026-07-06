@@ -27,11 +27,12 @@ const schema: OperationSchema<"blend"> = {
 const create = (
   blendMode: GlobalCompositeOperation,
   /** When passed, only the children will be blended */
-  input?: RenderTree | undefined,
+  input: RenderTree | undefined,
+  toBlend: RenderTree | undefined,
 ): IRenderItem<IBlendConfig> => ({
   name: "blend",
   config: { blendMode },
-  args: input ? [input] : undefined,
+  args: [input, toBlend],
 });
 
 const draw: ItemDrawFn<IBlendConfig> = ({

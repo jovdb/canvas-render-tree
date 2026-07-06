@@ -16,9 +16,11 @@ const schema: OperationSchema<"invert"> = {
   ],
 };
 
-export const create = (input?: RenderTree): IRenderItem<IInvertConfig> => ({
+export const create = (
+  input: RenderTree | undefined,
+): IRenderItem<IInvertConfig> => ({
   name: "invert",
-  args: [input ?? []],
+  args: [input],
 });
 
 export const draw: ItemDrawFn<IInvertConfig> = ({

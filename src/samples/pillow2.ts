@@ -39,16 +39,19 @@ export function pillow2Tree() {
   deformationGrid[2][2].y -= 0.2;
 
   const tree: IRenderItem[] = [
-    operations.drawImage({ imageUrl: availableImages.pillow2 }),
-    operations.blend("multiply", [
-      operations.layer([
-        operations.drawImage({ imageUrl: availableImages.checkerboard }),
-        operations.bicubicGrid({
-          controlsPoints: deformationGrid,
-          // debug: true,
-        }),
-      ]),
-    ]),
+    operations.blend(
+      "multiply",
+      [operations.drawImage({ imageUrl: availableImages.pillow2 })],
+      [
+        operations.bicubicGrid(
+          {
+            controlsPoints: deformationGrid,
+            // debug: true,
+          },
+          [operations.drawImage({ imageUrl: availableImages.checkerboard })],
+        ),
+      ],
+    ),
   ];
   return tree;
 }

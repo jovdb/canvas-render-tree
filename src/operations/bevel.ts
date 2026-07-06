@@ -128,12 +128,12 @@ const schema: OperationSchema<"bevel"> = {
   args: [
     {
       description: "Rendering to bevel",
-      required: false,
+      required: true,
     },
   ],
 };
 
-export const draw: ItemDrawFn<IBevelConfig> = ({ ctx, drawPrev, config }) => {
+export const draw: ItemDrawFn<IBevelConfig> = ({ ctx, drawPrev, config, drawArgs }) => {
   const {
     bevelSize = 6,
     shadowColor = [0, 0, 0, 192],
@@ -153,6 +153,9 @@ export const draw: ItemDrawFn<IBevelConfig> = ({ ctx, drawPrev, config }) => {
 
   // first draw previous items
   drawPrev?.(ctx);
+
+
+  //TODO: Do based on drawArgs
 
   if (debugKernel) {
     drawKernel(ctx, highlightKernel);
@@ -220,13 +223,13 @@ export const draw: ItemDrawFn<IBevelConfig> = ({ ctx, drawPrev, config }) => {
 };
 
 /** Apply bevel effect */
-export const create = (
+const create = (
   config: IBevelConfig = {},
-  input?: RenderTree,
+  input: RenderTree | undefined,
 ): IRenderItem<IBevelConfig> => ({
   name: "bevel",
   config,
-  args: input ? [input] : undefined,
+  args: [input],
 });
 
 // Backward compatibility

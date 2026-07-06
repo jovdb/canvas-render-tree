@@ -18,34 +18,40 @@ export function engravedGlassTree() {
     //   shadowColor: "#0003",
     // }),
 
-    operations.drawImage({ imageUrl: availableImages.glass }),
-    operations.blend("multiply", [
-      operations.shadow(
-        {
-          type: "inner",
-          shadowBlur: 2,
-          shadowOffsetX: 2,
-          shadowOffsetY: 2,
-          shadowColor: "#0002",
-        },
-        [
-          operations.layer([
-            operations.drawImage({ imageUrl: availableImages.noise }),
-            operations.fillColor({ color: "#0001" }), // make a bit darker
-            operations.blend("destination-in", [
-              operations.drawText({
-                text: "Kelly",
-                x: 162,
-                y: 150,
-                fontFamilyName: "Arial",
-                fontSize: 70,
-                isBold: true,
-              }),
-            ]),
-          ]),
-        ],
-      ),
-    ]),
+    operations.blend(
+      "multiply",
+      [operations.drawImage({ imageUrl: availableImages.glass })],
+      [
+        operations.shadow(
+          {
+            type: "inner",
+            shadowBlur: 2,
+            shadowOffsetX: 2,
+            shadowOffsetY: 2,
+            shadowColor: "#0002",
+          },
+          [
+            operations.blend(
+              "destination-in",
+              [
+                operations.drawImage({ imageUrl: availableImages.noise }),
+                operations.fillColor({ color: "#0001" }), // make a bit darker
+              ],
+              [
+                operations.drawText({
+                  text: "Kelly",
+                  x: 162,
+                  y: 150,
+                  fontFamilyName: "Arial",
+                  fontSize: 70,
+                  isBold: true,
+                }),
+              ],
+            ),
+          ],
+        ),
+      ],
+    ),
   ];
   return tree;
 }

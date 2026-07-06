@@ -11,7 +11,7 @@ const schema: OperationSchema<"cyl"> = {
   args: [
     {
       description: "Rendering to composite with the cylinder",
-      required: false,
+      required: true,
     },
   ],
 };
@@ -154,10 +154,10 @@ function drawCylinder(
 /** Create a cylinder render */
 export const create = (
   /** When passed, cylinder will be rendered with children */
-  input?: RenderTree | undefined,
+  input: RenderTree | undefined,
 ): IRenderItem<ICylConfig> => ({
   name: "cyl",
-  args: input ? [input] : undefined,
+  args: [input],
 });
 
 /** Draw a 3D cylinder */

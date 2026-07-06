@@ -136,11 +136,12 @@ export const draw: ItemDrawFn<IDisplacementConfig> = ({
 /** Apply displacement map effect */
 export const create = (
   config: IDisplacementConfig,
-  displacement?: RenderTree,
+  input: RenderTree | undefined,
+  displacementMap: RenderTree | undefined,
 ): IRenderItem<IDisplacementConfig> => ({
   name: "displacement",
   config: { strength: 10, ...config },
-  args: [displacement ?? []],
+  args: [input, displacementMap],
 });
 
 const operation = {

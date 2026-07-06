@@ -26,61 +26,72 @@ export function bevel1Tree() {
 
   // Tests for kernels
   const tree: IRenderItem[] = [
-    operations.layer([
+    operations.bevel({ ...bevelProps }, [
       operations.drawText({
         ...commonTextProps,
         x,
         y,
       }),
-      operations.bevel({ ...bevelProps }),
     ]),
-    operations.layer([
+
+    operations.bevel({ ...bevelProps2 }, [
       operations.drawText({
         ...commonTextProps2,
         y,
       }),
-      operations.bevel({ ...bevelProps2 }),
     ]),
-    operations.layer([
-      operations.drawText({
-        ...commonTextProps,
-        y: y + commonTextProps.fontSize!,
-      }),
-      operations.bevel({
+
+    operations.bevel(
+      {
         ...bevelProps,
         bevelSize: 10,
-      }),
-    ]),
-    operations.layer([
-      operations.drawText({
-        ...commonTextProps2,
-        y: y + commonTextProps.fontSize!,
-      }),
-      operations.bevel({
+      },
+      [
+        operations.drawText({
+          ...commonTextProps,
+          y: y + commonTextProps.fontSize!,
+        }),
+      ],
+    ),
+
+    operations.bevel(
+      {
         ...bevelProps2,
         bevelSize: 10,
-      }),
-    ]),
-    operations.layer([
-      operations.drawText({
-        ...commonTextProps,
-        y: y + commonTextProps.fontSize! * 2,
-      }),
-      operations.bevel({
+      },
+      [
+        operations.drawText({
+          ...commonTextProps2,
+          y: y + commonTextProps.fontSize!,
+        }),
+      ],
+    ),
+
+    operations.bevel(
+      {
         ...bevelProps,
         bevelSize: 3,
-      }),
-    ]),
-    operations.layer([
-      operations.drawText({
-        ...commonTextProps2,
-        y: y + commonTextProps.fontSize! * 2,
-      }),
-      operations.bevel({
+      },
+      [
+        operations.drawText({
+          ...commonTextProps,
+          y: y + commonTextProps.fontSize! * 2,
+        }),
+      ],
+    ),
+
+    operations.bevel(
+      {
         ...bevelProps2,
         bevelSize: 3,
-      }),
-    ]),
+      },
+      [
+        operations.drawText({
+          ...commonTextProps2,
+          y: y + commonTextProps.fontSize! * 2,
+        }),
+      ],
+    ),
   ];
   return tree;
 }

@@ -26,44 +26,51 @@ export function convolutionSamplesTree() {
       operations.drawText({ ...commonTextProps, text: "Original" }),
     ]),
     operations.transform({ translateX: 260, translateY: 30 }, [
-      operations.layer([
-        operations.drawImage({
-          ...imageProps,
-        }),
-        operations.convolve({
+      operations.convolve(
+        {
           ...commonKernelProps,
           kernel: kernels.embossKernel(),
-        }),
-      ]),
+        },
+        [
+          operations.drawImage({
+            ...imageProps,
+          }),
+        ],
+      ),
       operations.drawText({
         ...commonTextProps,
         text: "Emboss",
       }),
     ]),
     operations.transform({ translateX: 30, translateY: 270 }, [
-      operations.layer([
-        operations.drawImage({
-          ...imageProps,
-        }),
-        operations.convolve({
+      operations.convolve(
+        {
           ...commonKernelProps,
           // debugKernel: true,
           kernel: kernels.gaussianBlurKernel(5, 5 / 2),
-        }),
-      ]),
+        },
+        [
+          operations.drawImage({
+            ...imageProps,
+          }),
+        ],
+      ),
+
       operations.drawText({ ...commonTextProps, text: "Gaussian Blur" }),
     ]),
     operations.transform({ translateX: 260, translateY: 270 }, [
-      operations.layer([
-        operations.drawImage({
-          ...imageProps,
-        }),
-        operations.convolve({
+      operations.convolve(
+        {
           ...commonKernelProps,
           kernel: kernels.edgeDetectKernel(),
-        }),
-        // operations.invert(),
-      ]),
+        },
+        [
+          operations.drawImage({
+            ...imageProps,
+          }),
+        ],
+      ),
+      // operations.invert(),
       operations.drawText({
         ...commonTextProps,
         text: "Edge Detection",

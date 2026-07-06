@@ -24,7 +24,7 @@ const schema: OperationSchema<"raise"> = {
   args: [
     {
       description: "Rendering to raise",
-      required: false,
+      required: true,
     },
   ],
 };
@@ -57,7 +57,9 @@ function getDistanceField(imageData: ImageData) {
         x > 0 ? distance[index - 1] + 1 : maxDistance,
         y > 0 ? distance[index - width] + 1 : maxDistance,
         x > 0 && y > 0 ? distance[index - width - 1] + 1.414 : maxDistance,
-        x < width - 1 && y > 0 ? distance[index - width + 1] + 1.414 : maxDistance,
+        x < width - 1 && y > 0
+          ? distance[index - width + 1] + 1.414
+          : maxDistance,
       );
 
       distance[index] = best;
@@ -73,8 +75,12 @@ function getDistanceField(imageData: ImageData) {
         distance[index],
         x < width - 1 ? distance[index + 1] + 1 : maxDistance,
         y < height - 1 ? distance[index + width] + 1 : maxDistance,
-        x < width - 1 && y < height - 1 ? distance[index + width + 1] + 1.414 : maxDistance,
-        x > 0 && y < height - 1 ? distance[index + width - 1] + 1.414 : maxDistance,
+        x < width - 1 && y < height - 1
+          ? distance[index + width + 1] + 1.414
+          : maxDistance,
+        x > 0 && y < height - 1
+          ? distance[index + width - 1] + 1.414
+          : maxDistance,
       );
 
       distance[index] = best;
@@ -158,7 +164,9 @@ function applyRaiseEffect(imageData: ImageData, config: IRaiseConfig) {
         2 * ndotl * normal[2] - light[2],
       );
       const spec = clamp(
-        reflected[0] * view[0] + reflected[1] * view[1] + reflected[2] * view[2],
+        reflected[0] * view[0] +
+          reflected[1] * view[1] +
+          reflected[2] * view[2],
         0,
         1,
       );
@@ -194,13 +202,21 @@ function applyRaiseEffect(imageData: ImageData, config: IRaiseConfig) {
   return output;
 }
 
-const create = (config: IRaiseConfig = {}, input?: RenderTree): IRenderItem<IRaiseConfig> => ({
+const create = (
+  config: IRaiseConfig = {},
+  input: RenderTree | undefined,
+): IRenderItem<IRaiseConfig> => ({
   name: "raise",
   config,
-  args: input ? [input] : undefined,
+  args: [input],
 });
 
-export const draw: ItemDrawFn<IRaiseConfig> = ({ ctx, drawPrev, config, drawArgs }) => {
+export const draw: ItemDrawFn<IRaiseConfig> = ({
+  ctx,
+  drawPrev,
+  config,
+  drawArgs,
+}) => {
   drawPrev?.(ctx);
 
   const drawInput = drawArgs?.[0];
@@ -309,10 +325,14 @@ export const RaiseConfig: ItemConfigFn<IRaiseConfig> = ({
           max="64"
           step="1"
           value={shininess}
-          onChange={(e) => updateNumber("shininess", parseFloat(e.target.value))}
+          onChange={(e) =>
+            updateNumber("shininess", parseFloat(e.target.value))
+          }
         />
       </label>
-      <small>Uses the alpha channel to build a distance field and shade the surface.</small>
+      <small>
+        Uses the alpha channel to build a distance field and shade the surface.
+      </small>
     </div>
   );
 };

@@ -226,11 +226,11 @@ export const beierNeely = (
     falloff = 2.0,
     minDistance = 0.01,
   }: IBeierNeelyConfig,
-  input?: RenderTree,
+  input: RenderTree | undefined,
 ): IRenderItem<IBeierNeelyConfig> => ({
   name: "beierNeely",
   config: { controlPoints, strength, falloff, minDistance },
-  args: input ? [input] : undefined,
+  args: [input],
 });
 
 // ============================================================================

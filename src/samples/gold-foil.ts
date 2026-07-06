@@ -23,10 +23,11 @@ export function goldFoilTree() {
             shadowColor: "#fff2",
           },
           [
-            operations.drawImage({ imageUrl: availableImages.gold }),
-            operations.blend("destination-in", [
-              operations.drawImage({ imageUrl: availableImages.goldFoil }),
-            ]),
+            operations.blend(
+              "destination-in",
+              [operations.drawImage({ imageUrl: availableImages.gold })],
+              [operations.drawImage({ imageUrl: availableImages.goldFoil })],
+            ),
           ],
         ),
       ],

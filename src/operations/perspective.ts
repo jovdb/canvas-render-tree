@@ -17,11 +17,11 @@ export interface IPerspectiveConfig extends IConfig {
 export const create = (
   config: IPerspectiveConfig,
   /** When passed, perspective will be applied to children */
-  input?: RenderTree | undefined,
+  input: RenderTree | undefined,
 ): IRenderItem<IPerspectiveConfig> => ({
   name: "perspective",
   config,
-  args: [input ?? []],
+  args: [input],
 });
 const schema: OperationSchema<"perspective"> = {
   name: "perspective",

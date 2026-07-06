@@ -345,7 +345,7 @@ const schema: OperationSchema<"bicubicGrid"> = {
   args: [
     {
       description: "Rendering to warp",
-      required: false,
+      required: true,
     },
   ],
 };
@@ -389,11 +389,11 @@ export const draw: ItemDrawFn<IBicubicGridConfig> = ({
 /** Apply bicubic grid warping */
 export const create = (
   config: IBicubicGridConfig,
-  input?: RenderTree,
+  input: RenderTree,
 ): IRenderItem<IBicubicGridConfig> => ({
   name: "bicubicGrid",
   config: config,
-  args: input ? [input] : undefined,
+  args: [input],
 });
 
 const operation = {

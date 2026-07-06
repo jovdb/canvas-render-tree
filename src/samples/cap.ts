@@ -15,20 +15,27 @@ export function capTree() {
   // ];
 
   const tree: RenderTree = [
-    operations.fillColor({ color: "#ff0000" }),
-    operations.blend("destination-in", [
-      operations.drawText({
-        text: "Kelly",
-        fontSize: 80,
-        x: 152,
-        y: 220,
-        isBold: true,
-      }),
-    ]),
-    operations.bevel({}),
-    operations.blend("multiply", [
-      operations.drawImage({ imageUrl: availableImages.cap }),
-    ]),
+    operations.blend(
+      "multiply",
+      [
+        operations.bevel({}, [
+          operations.blend(
+            "destination-in",
+            [operations.fillColor({ color: "#ff0000" })],
+            [
+              operations.drawText({
+                text: "Kelly",
+                fontSize: 80,
+                x: 152,
+                y: 220,
+                isBold: true,
+              }),
+            ],
+          ),
+        ]),
+      ],
+      [operations.drawImage({ imageUrl: availableImages.cap })],
+    ),
   ];
 
   return tree;

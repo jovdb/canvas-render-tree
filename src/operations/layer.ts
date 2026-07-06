@@ -36,9 +36,11 @@ export const draw: ItemDrawFn = ({ ctx, drawPrev, drawArgs }) => {
 };
 
 /** Draw children on a new render layer */
-export const create = (input?: RenderTree): IRenderItem<ILayerConfig> => ({
+export const create = (
+  input: RenderTree | undefined,
+): IRenderItem<ILayerConfig> => ({
   name: "layer",
-  args: input ? [input] : undefined,
+  args: [input],
 });
 
 const operation = {

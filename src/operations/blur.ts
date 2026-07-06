@@ -43,7 +43,7 @@ const schema: OperationSchema<"blur"> = {
   args: [
     {
       description: "Rendering to blur",
-      required: false,
+      required: true,
     },
   ],
 };
@@ -125,11 +125,11 @@ export const draw: ItemDrawFn<IBlurConfig> = ({
 /** Apply Gaussian blur effect */
 export const create = (
   config: IBlurConfig = {},
-  input?: RenderTree,
+  input: RenderTree | undefined,
 ): IRenderItem<IBlurConfig> => ({
   name: "blur",
   config,
-  args: input ? [input] : undefined,
+  args: [input],
 });
 
 const operation = {

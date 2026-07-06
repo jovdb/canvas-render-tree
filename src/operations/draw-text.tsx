@@ -1,4 +1,4 @@
-import { IRenderItem, ItemDrawFn, RenderTree } from "../canvas";
+import { IRenderItem, ItemDrawFn } from "../canvas";
 import { IConfig } from "../configs";
 import { ItemOverlayFn } from "../overlays";
 import { OperationSchema } from "../schemas";
@@ -154,7 +154,6 @@ export const draw: ItemDrawFn<IDrawTextConfig> = ({
 /** Draw text on a canvas */
 export const create = (
   config: IDrawTextConfig,
-  input?: RenderTree,
 ): IRenderItem<IDrawTextConfig> => ({
   name: "drawText",
   config: {
@@ -168,7 +167,7 @@ export const create = (
     isBold: config.isBold ?? false,
     isItalic: config.isItalic ?? false,
   },
-  args: input ? [input] : undefined,
+  args: [],
 });
 
 const operation = {

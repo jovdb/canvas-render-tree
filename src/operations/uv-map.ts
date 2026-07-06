@@ -251,14 +251,21 @@ const schema: OperationSchema<"uvMap"> = {
       description: "Rendering to map",
       required: true,
     },
+    {
+      description: "The uv map to use",
+      required: true,
+    },
   ],
 };
 
 /** Create UV mapping */
-export const create = (uv?: RenderTree): IRenderItem<IUVMapConfig> => ({
+export const create = (
+  input: RenderTree | undefined,
+  uvMap: RenderTree | undefined,
+): IRenderItem<IUVMapConfig> => ({
   name: "uvMap",
   config: {},
-  args: uv ? [uv] : undefined,
+  args: [input, uvMap],
 });
 
 export const draw: ItemDrawFn<IUVMapConfig> = ({ ctx, drawPrev, drawArgs }) => {
