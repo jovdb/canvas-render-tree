@@ -133,7 +133,7 @@ const schema: OperationSchema<"bevel"> = {
   ],
 };
 
-export const draw: ItemDrawFn<IBevelConfig> = ({ ctx, drawPrev, config, drawArgs }) => {
+export const draw: ItemDrawFn<IBevelConfig> = ({ ctx, drawPrev, config }) => {
   const {
     bevelSize = 6,
     shadowColor = [0, 0, 0, 192],
@@ -153,7 +153,6 @@ export const draw: ItemDrawFn<IBevelConfig> = ({ ctx, drawPrev, config, drawArgs
 
   // first draw previous items
   drawPrev?.(ctx);
-
 
   //TODO: Do based on drawArgs
 

@@ -23,14 +23,14 @@ import "./configs/load";
 import { getRendererOverlay } from "./overlays";
 import { useWorkTree, useWorkTreeActions } from "./stores/useWorkTreeStore";
 
-export function selectIndex(tree: IRenderItem[], index: TreeIndex) {
+export function selectIndex(tree: readonly IRenderItem[], index: TreeIndex) {
   if (index.length === 0) return undefined;
   if (index.length === 1) return tree[index[0]];
 
   const [nextIndex, ...restIndex] = index;
   const restTree = tree[nextIndex];
-  const items = restTree?.args ? restTree.args.flat() : [];
-  if (!restTree || !items) return undefined;
+  const items = restTree?.args?.flatMap((arg) => arg ?? []) ?? [];
+  if (!restTree || items.length === 0) return undefined;
   return selectIndex(items, restIndex);
 }
 
@@ -43,8 +43,8 @@ function filterTree(
 
   items?.forEach((item, index) => {
     const treeIndex = [...parentTreeIndexes, index];
-    const items = item.args ? item.args.flat() : [];
-    const children = filterTree(items, visibleIndexes, treeIndex);
+    const childItems = item.args?.flatMap((arg) => arg ?? []) ?? [];
+    const children = filterTree(childItems, visibleIndexes, treeIndex);
 
     if (
       visibleIndexes.some(
