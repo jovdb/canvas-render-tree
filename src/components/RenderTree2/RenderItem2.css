@@ -5,6 +5,7 @@ body {
 .render-tree {
   text-align: center;
   width: min-content;
+  justify-self: center;
 
   .render-item__group--collapsed > & {
     display: none;

@@ -19,7 +19,6 @@ export interface OperationSchema<TOperationName extends string> {
   getName?: (config: IConfig | undefined) => string;
 
   description?: string;
-  prevAsInput?: OperationRenderArg | undefined;
   input?: OperationRenderArg | undefined;
   args?: OperationRenderArg[];
 }
@@ -48,15 +47,6 @@ export function validateSchema(renderItem: IRenderItem, hasPrev: boolean) {
   if (!schema?.input) {
     if (Array.isArray(renderItem.input) && renderItem.input.length !== 0) {
       throw new Error(`Operation "${operationName}" does not expect input`);
-    }
-  }
-
-  // prevAsInput
-  if (schema?.prevAsInput && (schema.prevAsInput.required ?? true)) {
-    if (!hasPrev) {
-      throw new Error(
-        `Operation "${operationName}" requires previous item(s) as input`,
-      );
     }
   }
 

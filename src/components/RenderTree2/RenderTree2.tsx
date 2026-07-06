@@ -15,6 +15,7 @@ export function RenderTree2({
   selectedItems = [],
   visibleIndexes = [],
   editIndex,
+  title,
   onClick,
   onDelete,
   onVisibilityChange,
@@ -25,6 +26,7 @@ export function RenderTree2({
   selectedItems?: readonly IRenderItem[];
   visibleIndexes: readonly TreeIndex[];
   editIndex?: TreeIndex | undefined;
+  title: string | undefined;
   onClick?(item: IRenderItem, treeIndex: TreeIndex): void;
   onDelete?(item: IRenderItem, treeIndex: TreeIndex): void;
   onVisibilityChange?(item: IRenderItem, treeIndex: TreeIndex): void;
@@ -98,20 +100,11 @@ export function RenderTree2({
     );
   }
 
-  let hasPrevAsInput = false;
-
   return (
-    <div className="render-tree">
+    <div className="render-tree" title={title}>
       <div className="render-tree__buttons">{renderAddMenu("first")}</div>
       {items?.reduceRight(
         (prevComponents, item, index) => {
-          const schema = schemas[item.name as keyof typeof schemas];
-          const prevAsInput = !!schema?.prevAsInput;
-          if (hasPrevAsInput) return prevComponents; // skip rendering this item, as it is already included as input to the next item
-          if (prevAsInput) {
-            hasPrevAsInput = true;
-          }
-
           const newComponent = (
             <Fragment key={`${item.name}-${index}`}>
               <RenderItem2

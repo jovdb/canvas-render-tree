@@ -14,13 +14,14 @@ const schema: OperationSchema<"blend"> = {
   description: "Blend the rendering with the previous items",
   args: [
     {
-      description: "Rendering to apply blending to",
+      description: "Source of  blending",
+      required: true,
+    },
+    {
+      description: "Rendering to blend",
       required: true,
     },
   ],
-  prevAsInput: {
-    description: "Source for blending",
-  },
 } as const;
 
 const create = (

@@ -40,18 +40,10 @@ export function RenderItem2({
   const name = schema?.getName ? schema.getName(item.config) : item.name;
 
   const inputs: Array<readonly IRenderItem[] | undefined> = [
-    ...(schema?.prevAsInput ? [prevItems] : []),
     ...(item.args ? item.args : []),
   ];
 
-  if (inputs.length === 0) {
-    if (schema?.prevAsInput || schema?.input || schema?.args?.length) {
-      inputs.push(undefined);
-    }
-  }
-
-  const argNames = [
-    ...(schema?.prevAsInput ? [schema?.prevAsInput.description ?? ""] : []),
+    const argNames = [
     ...(schema?.args?.map((arg) => arg.description ?? "") ?? []),
   ];
 
@@ -80,6 +72,11 @@ export function RenderItem2({
                   ];
                   onTreeChange?.(newItems);
                 }}
+                title={`${
+                  schema?.args?.at(index)?.description ||
+                  (schema?.name ? `Input for '${schema.name}'` : "") ||
+                  `Input for ${item.name}`
+                } `}
               />
             </div>
             <div className="render-item__input-below">
