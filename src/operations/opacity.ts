@@ -1,6 +1,7 @@
+import React from "react";
 import { addOperation } from ".";
 import { IRenderItem, ItemDrawFn, RenderTree } from "../canvas";
-import { IConfig } from "../configs";
+import { IConfig, ItemConfigFn } from "../configs";
 import { OperationSchema } from "../schemas";
 
 export interface IOpacityConfig extends IConfig {
@@ -47,11 +48,39 @@ const create = (
   args: [input],
 });
 
+export const OpacityConfig: ItemConfigFn<IOpacityConfig> = ({
+  config,
+  mutateConfig,
+}) => {
+  const opacity = config.opacity ?? 0.5;
+
+  return React.createElement(
+    "div",
+    { style: { display: "flex", flexDirection: "column", gap: "0.25rem" } },
+    React.createElement("label", { htmlFor: "opacity-slider" }, "Opacity"),
+    React.createElement("input", {
+      id: "opacity-slider",
+      type: "range",
+      min: "0",
+      max: "1",
+      step: "0.01",
+      value: opacity,
+      onChange: (event: React.ChangeEvent<HTMLInputElement>) => {
+        mutateConfig((draftConfig) => {
+          draftConfig.opacity = parseFloat(event.target.value);
+        });
+      },
+    }),
+    React.createElement("div", null, `${Math.round(opacity * 100)}%`),
+  );
+};
+
 const operation = {
   key: "opacity",
   create,
   draw,
   schema,
+  configComponent: OpacityConfig,
 } as const;
 addOperation(operation);
 
