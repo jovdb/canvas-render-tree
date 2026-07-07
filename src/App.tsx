@@ -72,17 +72,17 @@ function App() {
 
   /** Working tree is a copy of the entire sample and can be modified */
   const workTree = useWorkTree();
-  const { setWorkTree, updateWorkTree, deleteItem } = useWorkTreeActions();
+  const { updateWorkTree, deleteItem } = useWorkTreeActions();
 
   const [sampleKey, setSampleKey] = useState<keyof typeof samples>("opacity");
 
   useEffect(() => {
     const sample = samples[sampleKey];
     const tree = sample?.tree() ?? [];
-    setWorkTree(tree);
+    updateWorkTree(() => tree);
     setEditIndex([]);
     setVisibleIndexes([]);
-  }, [setWorkTree, sampleKey]);
+  }, [updateWorkTree, sampleKey]);
 
   /** The items to render, workTree with selection filter */
   const renderTree = useMemo(() => {
@@ -226,7 +226,7 @@ function App() {
               });
             }}
             onTreeChange={(newTree) => {
-              setWorkTree(newTree);
+              updateWorkTree(() => newTree);
               console.log("New tree:", JSON.stringify(newTree, null, 2));
             }}
           />

@@ -6,7 +6,6 @@ import { TreeIndex } from "../components/RenderTree";
 type WorkTreeUpdater = (currentTree: IRenderItem[]) => IRenderItem[] | void;
 
 interface WorkTreeActions {
-  setWorkTree: (tree: IRenderItem[] | WorkTreeUpdater) => void;
   updateWorkTree: (updater: WorkTreeUpdater) => void;
   addItem: (item: IRenderItem, index?: number) => void;
   deleteItem: (targetIndex: TreeIndex) => void;
@@ -115,18 +114,6 @@ function replaceWithInput(
 export const useWorkTreeStore = create<WorkTreeState>((set) => ({
   workTree: [],
   actions: {
-    setWorkTree: (tree) =>
-      set((state) => ({
-        workTree:
-          typeof tree === "function"
-            ? produce(state.workTree, (draft) => {
-                const result = tree(draft);
-                if (Array.isArray(result)) {
-                  return result;
-                }
-              })
-            : tree,
-      })),
     updateWorkTree: (updater) =>
       set((state) => ({
         workTree: produce(state.workTree, (draft) => {
