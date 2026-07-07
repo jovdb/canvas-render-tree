@@ -72,18 +72,17 @@ function App() {
 
   /** Working tree is a copy of the entire sample and can be modified */
   const workTree = useWorkTree();
-  const { setWorkTree, updateWorkTree, resetWorkTree, deleteItem } =
-    useWorkTreeActions();
+  const { setWorkTree, updateWorkTree, deleteItem } = useWorkTreeActions();
 
   const [sampleKey, setSampleKey] = useState<keyof typeof samples>("opacity");
 
   useEffect(() => {
     const sample = samples[sampleKey];
     const tree = sample?.tree() ?? [];
-    resetWorkTree(tree);
+    setWorkTree(tree);
     setEditIndex([]);
     setVisibleIndexes([]);
-  }, [resetWorkTree, sampleKey]);
+  }, [setWorkTree, sampleKey]);
 
   /** The items to render, workTree with selection filter */
   const renderTree = useMemo(() => {

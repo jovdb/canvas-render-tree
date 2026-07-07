@@ -1,15 +1,13 @@
+import { produce } from "immer";
 import { create } from "zustand";
-import { IRenderItem } from "../canvas";
+import { IRenderItem, RenderTree } from "../canvas";
 import { TreeIndex } from "../components/RenderTree";
 
+type WorkTreeUpdater = (currentTree: IRenderItem[]) => IRenderItem[] | void;
+
 interface WorkTreeActions {
-  setWorkTree: (
-    tree: IRenderItem[] | ((currentTree: IRenderItem[]) => IRenderItem[]),
-  ) => void;
-  resetWorkTree: (tree: IRenderItem[]) => void;
-  updateWorkTree: (
-    updater: (currentTree: IRenderItem[]) => IRenderItem[],
-  ) => void;
+  setWorkTree: (tree: IRenderItem[] | WorkTreeUpdater) => void;
+  updateWorkTree: (updater: WorkTreeUpdater) => void;
   addItem: (item: IRenderItem, index?: number) => void;
   deleteItem: (targetIndex: TreeIndex) => void;
 }
@@ -32,7 +30,8 @@ function replaceWithInput(
     const itemToReplace = newItems[targetPos];
 
     if (itemToReplace) {
-      const replacementItems = itemToReplace.args?.flat() ?? [];
+      const replacementItems =
+        (itemToReplace.args?.flatMap((arg) => arg ?? []) ?? []) as IRenderItem[];
       newItems.splice(targetPos, 1, ...replacementItems);
     }
 
@@ -44,7 +43,8 @@ function replaceWithInput(
   if (!parentItem) return newItems;
 
   const [childTargetPos, ...childRestIndex] = restIndex;
-  const flatArgs = parentItem.args?.flat() ?? [];
+  const flatArgs =
+    (parentItem.args?.flatMap((arg) => arg ?? []) ?? []) as IRenderItem[];
 
   if (childTargetPos < flatArgs.length) {
     let positionInFoundArg = childTargetPos;
@@ -52,20 +52,23 @@ function replaceWithInput(
 
     for (let i = 0; i < (parentItem.args?.length ?? 0); i++) {
       const arg = parentItem.args![i];
-      if (positionInFoundArg < arg.length) {
+      if (arg && positionInFoundArg < arg.length) {
         foundArgIndex = i;
         break;
       }
-      positionInFoundArg -= arg.length;
+      if (arg) {
+        positionInFoundArg -= arg.length;
+      }
     }
 
     if (foundArgIndex >= 0 && parentItem.args) {
       const newArgs = [...parentItem.args];
-      const argArray = [...newArgs[foundArgIndex]];
+      const argArray = [...(newArgs[foundArgIndex] ?? [])] as IRenderItem[];
 
       if (childRestIndex.length === 0) {
         const itemToReplace = argArray[positionInFoundArg];
-        const replacementItems = itemToReplace?.args?.flat() ?? [];
+        const replacementItems =
+          (itemToReplace?.args?.flatMap((arg) => arg ?? []) ?? []) as IRenderItem[];
         argArray.splice(positionInFoundArg, 1, ...replacementItems);
       } else {
         const newArgArray = replaceWithInput(argArray, [
@@ -82,16 +85,17 @@ function replaceWithInput(
     }
   } else {
     const positionInInput = childTargetPos - flatArgs.length;
-    const input = parentItem.args?.flat() ?? [];
+    const input = (parentItem.args?.flatMap((arg) => arg ?? []) ?? []) as IRenderItem[];
 
     if (childRestIndex.length === 0) {
       const newInput = [...input];
       const itemToReplace = newInput[positionInInput];
-      const replacementItems = itemToReplace?.args?.flat() ?? [];
+      const replacementItems =
+        (itemToReplace?.args?.flatMap((arg) => arg ?? []) ?? []) as IRenderItem[];
       newInput.splice(positionInInput, 1, ...replacementItems);
       newItems[targetPos] = {
         ...parentItem,
-        args: newInput.length > 0 ? [newInput] : undefined,
+        args: newInput.length > 0 ? [newInput as RenderTree] : undefined,
       };
     } else {
       const newInput = replaceWithInput(input, [
@@ -100,7 +104,7 @@ function replaceWithInput(
       ]);
       newItems[targetPos] = {
         ...parentItem,
-        args: newInput.length > 0 ? [newInput] : undefined,
+        args: newInput.length > 0 ? [newInput as RenderTree] : undefined,
       };
     }
   }
@@ -113,24 +117,37 @@ export const useWorkTreeStore = create<WorkTreeState>((set) => ({
   actions: {
     setWorkTree: (tree) =>
       set((state) => ({
-        workTree: typeof tree === "function" ? tree(state.workTree) : tree,
+        workTree:
+          typeof tree === "function"
+            ? produce(state.workTree, (draft) => {
+                const result = tree(draft);
+                if (Array.isArray(result)) {
+                  return result;
+                }
+              })
+            : tree,
       })),
-    resetWorkTree: (tree) => set({ workTree: tree }),
     updateWorkTree: (updater) =>
-      set((state) => ({ workTree: updater(state.workTree) })),
+      set((state) => ({
+        workTree: produce(state.workTree, (draft) => {
+          updater(draft);
+        }),
+      })),
     addItem: (item, index) =>
-      set((state) => {
-        const nextTree = [...state.workTree];
-        if (typeof index === "number") {
-          nextTree.splice(index, 0, item);
-        } else {
-          nextTree.push(item);
-        }
-        return { workTree: nextTree };
-      }),
+      set((state) => ({
+        workTree: produce(state.workTree, (draft) => {
+          if (typeof index === "number") {
+            draft.splice(index, 0, item);
+          } else {
+            draft.push(item);
+          }
+        }),
+      })),
     deleteItem: (targetIndex) =>
       set((state) => ({
-        workTree: replaceWithInput(state.workTree, targetIndex),
+        workTree: produce(state.workTree, (draft) => {
+          return replaceWithInput(draft, targetIndex);
+        }),
       })),
   },
 }));
