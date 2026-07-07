@@ -32,8 +32,7 @@ function replaceWithInput(
     const itemToReplace = newItems[targetPos];
 
     if (itemToReplace) {
-      const replacementItems =
-        itemToReplace.args?.flatMap((arg) => arg ?? []) ?? [];
+      const replacementItems = itemToReplace.args?.flat() ?? [];
       newItems.splice(targetPos, 1, ...replacementItems);
     }
 
@@ -45,15 +44,14 @@ function replaceWithInput(
   if (!parentItem) return newItems;
 
   const [childTargetPos, ...childRestIndex] = restIndex;
-  const flatArgs = parentItem.args?.flatMap((arg) => arg ?? []) ?? [];
+  const flatArgs = parentItem.args?.flat() ?? [];
 
   if (childTargetPos < flatArgs.length) {
     let positionInFoundArg = childTargetPos;
     let foundArgIndex = -1;
 
     for (let i = 0; i < (parentItem.args?.length ?? 0); i++) {
-      const arg = parentItem.args?.[i];
-      if (!arg) continue;
+      const arg = parentItem.args![i];
       if (positionInFoundArg < arg.length) {
         foundArgIndex = i;
         break;
@@ -63,15 +61,12 @@ function replaceWithInput(
 
     if (foundArgIndex >= 0 && parentItem.args) {
       const newArgs = [...parentItem.args];
-      const argArray = [...(newArgs[foundArgIndex] ?? [])];
+      const argArray = [...newArgs[foundArgIndex]];
 
       if (childRestIndex.length === 0) {
         const itemToReplace = argArray[positionInFoundArg];
-        const replacementItems =
-          itemToReplace?.args?.flatMap((arg) => arg ?? []) ?? [];
-        if (itemToReplace) {
-          argArray.splice(positionInFoundArg, 1, ...replacementItems);
-        }
+        const replacementItems = itemToReplace?.args?.flat() ?? [];
+        argArray.splice(positionInFoundArg, 1, ...replacementItems);
       } else {
         const newArgArray = replaceWithInput(argArray, [
           positionInFoundArg,
@@ -87,16 +82,13 @@ function replaceWithInput(
     }
   } else {
     const positionInInput = childTargetPos - flatArgs.length;
-    const input = parentItem.args?.flatMap((arg) => arg ?? []) ?? [];
+    const input = parentItem.args?.flat() ?? [];
 
     if (childRestIndex.length === 0) {
       const newInput = [...input];
       const itemToReplace = newInput[positionInInput];
-      const replacementItems =
-        itemToReplace?.args?.flatMap((arg) => arg ?? []) ?? [];
-      if (itemToReplace) {
-        newInput.splice(positionInInput, 1, ...replacementItems);
-      }
+      const replacementItems = itemToReplace?.args?.flat() ?? [];
+      newInput.splice(positionInInput, 1, ...replacementItems);
       newItems[targetPos] = {
         ...parentItem,
         args: newInput.length > 0 ? [newInput] : undefined,
