@@ -242,8 +242,8 @@ function App() {
             onClick={(_item, treeIndex) => {
               setEditIndex(treeIndex);
             }}
-            onDelete={(_item, treeIndex) => {
-              deleteItem(treeIndex);
+            onDelete={(item, treeIndex) => {
+              deleteItem(item);
             }}
             onVisibilityChange={(_item, treeIndex) => {
               setVisibleIndexes((prev) => {

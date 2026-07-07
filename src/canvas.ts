@@ -46,6 +46,7 @@ export interface IRenderItem<TConfig extends IConfig = IConfig> {
   config?: TConfig;
 
   // Temporary: remove
+  /** @deprecated */
   children?: RenderTree | undefined;
 
   input?: RenderTree | undefined;

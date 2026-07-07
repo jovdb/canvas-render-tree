@@ -5,6 +5,7 @@ import { availableImages } from "../../resources";
 import { getSchema } from "../../schemas";
 import { RenderItem2 } from "./RenderItem2";
 import { AddOperationPopover } from "./AddOperationPopover";
+import { useWorkTreeActions } from "../../stores/useWorkTreeStore";
 
 /** Indexes in tree */
 export type TreeIndex = number[];
@@ -21,7 +22,7 @@ export function RenderTree2({
   onVisibilityChange,
   onTreeChange,
 }: {
-  items: readonly IRenderItem[] | undefined;
+  items: readonly IRenderItem[];
   parentIndexes?: TreeIndex;
   selectedItems?: readonly IRenderItem[];
   visibleIndexes: readonly TreeIndex[];
@@ -35,6 +36,8 @@ export function RenderTree2({
   const [addMenu, setAddMenu] = useState<
     { mode: "first" | "after"; index?: number } | undefined
   >();
+
+  const { addItem } = useWorkTreeActions();
 
   const operationOptions = useMemo(
     () =>
@@ -51,10 +54,6 @@ export function RenderTree2({
     switch (operationName) {
       case "drawImage":
         return operations.drawImage({ imageUrl: availableImages.parrot });
-      case "opacity":
-        return operations.opacity(1, []);
-      case "blend":
-        return operations.blend("source-over", [], []);
       case "shadow":
         return operations.shadow(
           {
@@ -74,21 +73,13 @@ export function RenderTree2({
     }
   }
 
-  function addItem(operationName: string, index?: number) {
+  function onAddItem(operationName: string, index: number) {
     const newItem = createDefaultItem(operationName);
-    const newItems = [...(items ?? [])];
-
-    if (typeof index === "number") {
-      newItems.splice(index + 1, 0, newItem);
-    } else {
-      newItems.unshift(newItem);
-    }
-
-    onTreeChange?.(newItems);
-    setAddMenu(undefined);
+    addItem(items, newItem, index);
+    setAddMenu(undefined); // Close menu
   }
 
-  function renderAddMenu(mode: "first" | "after", index?: number) {
+  function renderAddMenu(mode: "first" | "after", index: number) {
     const isOpen = addMenu?.mode === mode && addMenu.index === index;
 
     return (
@@ -98,7 +89,7 @@ export function RenderTree2({
           setAddMenu(open ? { mode, index } : undefined);
         }}
         operations={operationOptions}
-        onSelect={(operationName) => addItem(operationName, index)}
+        onSelect={(operationName) => onAddItem(operationName, index)}
       />
     );
   }
