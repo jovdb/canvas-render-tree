@@ -62,7 +62,7 @@ function drawTree(items: RenderTree | undefined, _name = "") {
   return items?.reduce(
     (prev, item) => {
       return (ctx) => {
-        //if (name) console.group(name, items?.length ?? 0);
+        //if (name) con sole.group(name, items?.length ?? 0);
         try {
           // eslint-disable-next-line @typescript-eslint/no-explicit-any
           const renderer = (renderers as any)[item.name] as IItemRenderer;
@@ -86,6 +86,7 @@ function drawTree(items: RenderTree | undefined, _name = "") {
             //if (item.children) {
             //  drawTree(item.children, `${item.name}-children`)?.(ctx);
             //}
+            console.error(`item '${item.name}' has no draw function`);
           }
         } finally {
           //console.groupEnd();

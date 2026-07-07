@@ -161,15 +161,18 @@ export const samples = {
     type: "2d",
     tree: () => [operations.drawText({ text: "Hello", x: 24, y: 48 })],
   },
-  layer: {
-    name: "Layer",
+  mask: {
+    name: "Mask",
     type: "2d",
     tree: () => [
-      operations.layer([
-        operations.drawImage({ imageUrl: availableImages.homer }),
-      ]),
+      operations.mask(
+        {},
+        [operations.drawImage({ imageUrl: availableImages.parrot })],
+        [operations.drawImage({ imageUrl: availableImages.mask })],
+      ),
     ],
   },
+
   blur: {
     name: "Blur",
     type: "2d",

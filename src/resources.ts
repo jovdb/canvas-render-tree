@@ -57,6 +57,7 @@ export const availableImages = {
   displacementMap2: "displacement-map2.png",
   homer: "homer.png",
   mona: "mona.jpg",
+  mask: "mask.png",
   checkerboard: "checkerboard.png",
   pillow: "pillow.webp",
   pillow2: "pillow-2.jpg",

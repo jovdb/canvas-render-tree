@@ -95,10 +95,11 @@ body {
 }
 
 .render-item {
+  color: #224;
   position: relative;
   padding: 2px 5px;
   margin: 4px 0;
-  border-radius: 3px;
+  border-radius: 6px;
   border: 2px solid var(--border-color);
   background-color: #eee;
 }
@@ -110,7 +111,8 @@ body {
 
 .render-item--selectable:hover {
   cursor: pointer;
-  background-color: #eee;
+  background-color: #eeeef8;
+  border-color: #ccd;
 }
 
 .render-item--selected {

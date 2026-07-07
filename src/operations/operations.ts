@@ -8,7 +8,7 @@ import "./fill-color";
 import "./bevel";
 import "./draw-text";
 import "./layer";
-// import "./mask";
+import "./mask";
 import "./blur";
 import "./saturation";
 import "./convolve";

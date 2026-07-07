@@ -159,8 +159,8 @@ const create = (
   config: {
     ...config,
     text: config.text ?? "Text",
-    x: config.x ?? 0,
-    y: config.y ?? 0,
+    x: config.x ?? 100,
+    y: config.y ?? 100,
     foregroundColor: config.foregroundColor ?? "#000",
     fontSize: config.fontSize ?? 16,
     fontFamilyName: config.fontFamilyName ?? "Arial",

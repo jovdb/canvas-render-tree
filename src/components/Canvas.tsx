@@ -17,10 +17,11 @@ export function Canvas({ items }: { items: IRenderItem[] }) {
       return null;
     },
   });
+
   return (
     <>
       <canvas ref={canvasRef} width="500" height="500" className="canvas" />
-      {false && isFetching && <div>Loading...</div>}
+      {isFetching && <div>Loading...</div>}
       {error && (
         <div style={{ color: "red" }}>Error: {(error as Error).message}</div>
       )}
