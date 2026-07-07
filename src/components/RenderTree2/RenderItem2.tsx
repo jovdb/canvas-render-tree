@@ -13,7 +13,6 @@ export function RenderItem2({
   onClick,
   onDelete,
   onVisibilityChange,
-  onTreeChange,
 }: {
   item: IRenderItem;
   selectedItems?: readonly IRenderItem[];
@@ -25,7 +24,6 @@ export function RenderItem2({
   onClick?(item: IRenderItem, treeIndex: TreeIndex): void;
   onDelete?(item: IRenderItem, treeIndex: TreeIndex): void;
   onVisibilityChange?(item: IRenderItem, treeIndex: TreeIndex): void;
-  onTreeChange?(newTree: IRenderItem[]): void;
 }) {
   // const isSelected = selectedItems.includes(item);
   const isSelected = treeIndex.join() === editIndex?.join();
@@ -54,7 +52,7 @@ export function RenderItem2({
               className={`render-item__group ${collapseInput ? "render-item__group--collapsed" : ""}`}
             >
               <RenderTree2
-                items={arg}
+                items={arg ?? []}
                 selectedItems={selectedItems}
                 visibleIndexes={visibleIndexes}
                 parentIndexes={treeIndex}
@@ -62,14 +60,6 @@ export function RenderItem2({
                 onClick={onClick}
                 onDelete={onDelete}
                 onVisibilityChange={onVisibilityChange}
-                onTreeChange={(newTree) => {
-                  const newItems = [
-                    ...(arg ?? []).slice(0, index),
-                    ...(Array.isArray(newTree) ? newTree : [newTree]),
-                    ...(arg ?? []).slice(index + 1),
-                  ];
-                  onTreeChange?.(newItems);
-                }}
                 title={`${
                   schema?.args?.at(index)?.description ||
                   (schema?.name ? `Input for '${schema.name}'` : "") ||

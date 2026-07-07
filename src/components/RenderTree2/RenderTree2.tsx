@@ -20,7 +20,6 @@ export function RenderTree2({
   onClick,
   onDelete,
   onVisibilityChange,
-  onTreeChange,
 }: {
   items: readonly IRenderItem[];
   parentIndexes?: TreeIndex;
@@ -31,7 +30,6 @@ export function RenderTree2({
   onClick?(item: IRenderItem, treeIndex: TreeIndex): void;
   onDelete?(item: IRenderItem, treeIndex: TreeIndex): void;
   onVisibilityChange?(item: IRenderItem, treeIndex: TreeIndex): void;
-  onTreeChange?(newTree: IRenderItem[]): void;
 }) {
   const [addMenu, setAddMenu] = useState<
     { mode: "first" | "after"; index?: number } | undefined
@@ -96,7 +94,7 @@ export function RenderTree2({
 
   return (
     <div className="render-tree" title={title}>
-      <div className="render-tree__buttons">{renderAddMenu("first")}</div>
+      <div className="render-tree__buttons">{renderAddMenu("first", -1)}</div>
       {items?.reduceRight(
         (prevComponents, item, index) => {
           const newComponent = (
@@ -110,16 +108,6 @@ export function RenderTree2({
                 onClick={onClick}
                 onDelete={onDelete}
                 onVisibilityChange={onVisibilityChange}
-                onTreeChange={(newItem) => {
-                  const newItems = [...(items ?? [])];
-                  newItems[index] = {
-                    ...newItems[index],
-                    args: Array.isArray(newItem)
-                      ? [newItem]
-                      : [newItem ? [newItem] : []],
-                  };
-                  onTreeChange?.(newItems);
-                }}
               />
               <div className="render-tree__buttons">
                 {renderAddMenu("after", index)}

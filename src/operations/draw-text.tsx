@@ -152,9 +152,7 @@ export const draw: ItemDrawFn<IDrawTextConfig> = ({
 };
 
 /** Draw text on a canvas */
-const create = (
-  config: IDrawTextConfig,
-): IRenderItem<IDrawTextConfig> => ({
+const create = (config: IDrawTextConfig): IRenderItem<IDrawTextConfig> => ({
   name: "drawText",
   config: {
     ...config,

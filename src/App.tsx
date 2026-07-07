@@ -242,7 +242,7 @@ function App() {
             onClick={(_item, treeIndex) => {
               setEditIndex(treeIndex);
             }}
-            onDelete={(item, treeIndex) => {
+            onDelete={(item) => {
               deleteItem(item);
             }}
             onVisibilityChange={(_item, treeIndex) => {
@@ -259,10 +259,6 @@ function App() {
                   return [...prev, treeIndex];
                 }
               });
-            }}
-            onTreeChange={(newTree) => {
-              updateWorkTree(() => newTree);
-              console.log("New tree:", JSON.stringify(newTree, null, 2));
             }}
           />
         </div>

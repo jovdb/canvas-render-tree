@@ -1,5 +1,5 @@
 import { create } from "zustand";
-import { IRenderItem, RenderTree } from "../canvas";
+import { IRenderItem } from "../canvas";
 import { createMutationCommand } from "./command/createMutationCommand";
 import { useCommandManagerStore } from "./command/useCommandManagerStore";
 import { original } from "immer";
