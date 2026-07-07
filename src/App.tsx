@@ -21,6 +21,11 @@ import { getRendererConfig, IConfig, JsonConfig } from "./configs";
 import { RenderItemName } from "./operations";
 import "./configs/load";
 import { getRendererOverlay } from "./overlays";
+import {
+  useCanRedo,
+  useCanUndo,
+  useCommandManagerActions,
+} from "./stores/command/useCommandManagerStore";
 import { useWorkTree, useWorkTreeActions } from "./stores/useWorkTreeStore";
 
 export function selectIndex(tree: readonly IRenderItem[], index: TreeIndex) {
@@ -73,6 +78,9 @@ function App() {
   /** Working tree is a copy of the entire sample and can be modified */
   const workTree = useWorkTree();
   const { updateWorkTree, deleteItem } = useWorkTreeActions();
+  const canUndo = useCanUndo();
+  const canRedo = useCanRedo();
+  const { undo, redo } = useCommandManagerActions();
 
   const [sampleKey, setSampleKey] = useState<keyof typeof samples>("opacity");
 
@@ -143,6 +151,27 @@ function App() {
     };
   }, [isResizing]);
 
+  useEffect(() => {
+    const onKeyDown = (event: KeyboardEvent) => {
+      if (!(event.ctrlKey || event.metaKey)) return;
+      const key = event.key.toLowerCase();
+
+      if (key === "z" && event.shiftKey) {
+        event.preventDefault();
+        redo();
+      } else if (key === "z") {
+        event.preventDefault();
+        undo();
+      } else if (key === "y") {
+        event.preventDefault();
+        redo();
+      }
+    };
+
+    window.addEventListener("keydown", onKeyDown);
+    return () => window.removeEventListener("keydown", onKeyDown);
+  }, [undo, redo]);
+
   return (
     <div className="app">
       <div className="app__preview">
@@ -174,7 +203,13 @@ function App() {
                 })}
             </optgroup>
           ))}
-        </select>
+        </select>{" "}
+        <button type="button" onClick={undo} disabled={!canUndo}>
+          Undo
+        </button>{" "}
+        <button type="button" onClick={redo} disabled={!canRedo}>
+          Redo
+        </button>
         <br />
         <div className="app__canvas">
           <Canvas items={deferredRenderTree ?? []} />
