@@ -16,6 +16,25 @@ body {
   position: relative;
 }
 
+.render-tree__buttons--drop-target-active {
+  outline: 2px dashed #44f;
+  outline-offset: 1px;
+  border-radius: 4px;
+  background-color: #ddf;
+}
+
+.render-tree__buttons--drop-target-active::before {
+  content: "";
+  position: absolute;
+  left: -10px;
+  right: -10px;
+  top: 50%;
+  height: 3px;
+  background-color: #44f;
+  border-radius: 2px;
+  pointer-events: none;
+}
+
 .render-tree__add {
   border-radius: 50%;
   border-width: 0px;
@@ -141,6 +160,10 @@ body {
 .render-item--selectable.render-item--selected:hover {
   border: 2px solid #44f;
   background: #ccf;
+}
+
+.render-item--dragging {
+  opacity: 0.4;
 }
 
 .render-item__visibility {

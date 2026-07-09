@@ -6,6 +6,7 @@ import { getSchema } from "../../schemas";
 import { RenderItem2 } from "./RenderItem2";
 import { AddOperationPopover } from "./AddOperationPopover";
 import { useWorkTreeActions } from "../../stores/useWorkTreeStore";
+import { getDraggedItem } from "./dragState";
 
 /** Indexes in tree */
 export type TreeIndex = number[];
@@ -20,6 +21,7 @@ export function RenderTree2({
   onClick,
   onDelete,
   onVisibilityChange,
+  onMove,
 }: {
   items: readonly IRenderItem[];
   parentIndexes?: TreeIndex;
@@ -30,12 +32,15 @@ export function RenderTree2({
   onClick?(item: IRenderItem, treeIndex: TreeIndex): void;
   onDelete?(item: IRenderItem, treeIndex: TreeIndex): void;
   onVisibilityChange?(item: IRenderItem, treeIndex: TreeIndex): void;
+  onMove?(item: IRenderItem, targetTree: readonly IRenderItem[], atIndex: number): void;
 }) {
   const [addMenu, setAddMenu] = useState<
     { mode: "first" | "after"; index?: number } | undefined
   >();
+  const [dragOverIndex, setDragOverIndex] = useState<number | undefined>();
 
   const { addItem } = useWorkTreeActions();
+
 
   const operationOptions = useMemo(
     () =>
@@ -92,9 +97,40 @@ export function RenderTree2({
     );
   }
 
+  /** Renders the zone between/around items: the "add" popover plus a drop target for drag/move. */
+  function renderZone(mode: "first" | "after", index: number, dropAtIndex: number) {
+    const isDragOver = dragOverIndex === dropAtIndex;
+
+    return (
+      <div
+        className={`render-tree__buttons ${
+          isDragOver ? "render-tree__buttons--drop-target-active" : ""
+        }`}
+        onDragOver={(e) => {
+          if (!getDraggedItem()) return;
+          e.preventDefault();
+          e.dataTransfer.dropEffect = "move";
+          setDragOverIndex(dropAtIndex);
+        }}
+        onDragLeave={() => {
+          setDragOverIndex((prev) => (prev === dropAtIndex ? undefined : prev));
+        }}
+        onDrop={(e) => {
+          e.preventDefault();
+          const dragged = getDraggedItem();
+          setDragOverIndex(undefined);
+          if (!dragged) return;
+          onMove?.(dragged, items, dropAtIndex);
+        }}
+      >
+        {renderAddMenu(mode, index)}
+      </div>
+    );
+  }
+
   return (
     <div className="render-tree" title={title}>
-      <div className="render-tree__buttons">{renderAddMenu("first", -1)}</div>
+      {renderZone("first", -1, 0)}
       {items?.reduceRight(
         (prevComponents, item, index) => {
           const newComponent = (
@@ -108,10 +144,9 @@ export function RenderTree2({
                 onClick={onClick}
                 onDelete={onDelete}
                 onVisibilityChange={onVisibilityChange}
+                onMove={onMove}
               />
-              <div className="render-tree__buttons">
-                {renderAddMenu("after", index)}
-              </div>
+              {renderZone("after", index, index + 1)}
             </Fragment>
           );
           prevComponents.unshift(newComponent);

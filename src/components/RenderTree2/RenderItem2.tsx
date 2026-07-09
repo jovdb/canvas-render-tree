@@ -3,6 +3,7 @@ import { TreeIndex, RenderTree2 } from "./RenderTree2";
 import "./RenderItem2.css";
 import { getSchema } from "../../schemas";
 import { useState } from "react";
+import { setDraggedItem } from "./dragState";
 
 export function RenderItem2({
   item,
@@ -13,6 +14,7 @@ export function RenderItem2({
   onClick,
   onDelete,
   onVisibilityChange,
+  onMove,
 }: {
   item: IRenderItem;
   selectedItems?: readonly IRenderItem[];
@@ -24,6 +26,7 @@ export function RenderItem2({
   onClick?(item: IRenderItem, treeIndex: TreeIndex): void;
   onDelete?(item: IRenderItem, treeIndex: TreeIndex): void;
   onVisibilityChange?(item: IRenderItem, treeIndex: TreeIndex): void;
+  onMove?(item: IRenderItem, targetTree: readonly IRenderItem[], atIndex: number): void;
 }) {
   // const isSelected = selectedItems.includes(item);
   const isSelected = treeIndex.join() === editIndex?.join();
@@ -33,7 +36,9 @@ export function RenderItem2({
   }
 
   const [collapseInput, setCollapseInput] = useState(false);
+  const [isDragging, setIsDragging] = useState(false);
   const name = schema?.getName ? schema.getName(item.config) : item.name;
+
 
   const inputs: Array<readonly IRenderItem[] | undefined> = [
     ...(item.args ? item.args : []),
@@ -60,6 +65,7 @@ export function RenderItem2({
                 onClick={onClick}
                 onDelete={onDelete}
                 onVisibilityChange={onVisibilityChange}
+                onMove={onMove}
                 title={`${
                   schema?.args?.at(index)?.description ||
                   (schema?.name ? `Input for '${schema.name}'` : "") ||
@@ -89,10 +95,21 @@ export function RenderItem2({
         <div
           className={`render-item ${onClick ? "render-item--selectable" : ""} ${
             isSelected ? "render-item--selected" : ""
-          }`}
+          } ${isDragging ? "render-item--dragging" : ""}`}
           role="button"
           tabIndex={0}
           title={schema?.description}
+          draggable={!!onMove}
+          onDragStart={(e) => {
+            setDraggedItem(item);
+            setIsDragging(true);
+            e.dataTransfer.effectAllowed = "move";
+            e.dataTransfer.setData("text/plain", item.name);
+          }}
+          onDragEnd={() => {
+            setDraggedItem(undefined);
+            setIsDragging(false);
+          }}
         >
           <span
             className="render-item__visibility"

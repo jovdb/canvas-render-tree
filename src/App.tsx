@@ -77,7 +77,7 @@ function App() {
 
   /** Working tree is a copy of the entire sample and can be modified */
   const workTree = useWorkTree();
-  const { updateWorkTree, deleteItem } = useWorkTreeActions();
+  const { updateWorkTree, deleteItem, moveItem } = useWorkTreeActions();
   const canUndo = useCanUndo();
   const canRedo = useCanRedo();
   const { undo, redo } = useCommandManagerActions();
@@ -244,6 +244,9 @@ function App() {
             }}
             onDelete={(item) => {
               deleteItem(item);
+            }}
+            onMove={(item, targetTree, atIndex) => {
+              moveItem(item, targetTree, atIndex);
             }}
             onVisibilityChange={(_item, treeIndex) => {
               setVisibleIndexes((prev) => {

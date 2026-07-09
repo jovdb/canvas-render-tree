@@ -15,6 +15,29 @@ interface WorkTreeActions {
     atIndex: number,
   ) => void;
   deleteItem: (item: IRenderItem) => void;
+  /**
+   * Move an existing item (and its whole subtree) to a different location,
+   * possibly in a different render-tree level.
+   */
+  moveItem: (
+    item: IRenderItem,
+    targetTree: readonly IRenderItem[],
+    atIndex: number,
+  ) => void;
+}
+
+/** Does `node`'s subtree contain (or equal) the given tree array? */
+function treeContainsTree(
+  node: IRenderItem,
+  tree: readonly IRenderItem[],
+): boolean {
+  if (!Array.isArray(node.args)) return false;
+  for (const argTree of node.args) {
+    if (!Array.isArray(argTree)) continue;
+    if (argTree === tree) return true;
+    if (argTree.some((child) => treeContainsTree(child, tree))) return true;
+  }
+  return false;
 }
 
 export const useWorkTreeStore = create<IRenderItem[]>(() => []);
@@ -104,6 +127,70 @@ const actions: WorkTreeActions = {
         deleteItemInner(draft);
       },
     ),
+  moveItem: (item, targetTree, atIndex) => {
+    // Prevent dropping an item into its own subtree (would create a cycle)
+    if (treeContainsTree(item, targetTree)) return;
+
+    runMutation(
+      () => `Move ${item.name}`,
+      (draft) => {
+        let removedItem: IRenderItem | undefined;
+        let removedFromTree: IRenderItem[] | undefined;
+        let removedIndex = -1;
+
+        function removeItemInner(items: IRenderItem[] | undefined): boolean {
+          if (!Array.isArray(items)) return false;
+
+          const index = items.findIndex((i) => original(i) === item);
+          if (index !== -1) {
+            removedFromTree = items;
+            removedIndex = index;
+            [removedItem] = items.splice(index, 1);
+            return true;
+          }
+
+          for (const child of items) {
+            if (Array.isArray(child.args)) {
+              for (const args of child.args) {
+                if (removeItemInner(args)) return true;
+              }
+            }
+          }
+          return false;
+        }
+
+        removeItemInner(draft);
+        if (!removedItem) return;
+
+        function insertItemInner(items: IRenderItem[] | undefined): boolean {
+          if (!Array.isArray(items)) return false;
+
+          if (original(items) === targetTree) {
+            let insertIndex = atIndex;
+            // Compensate for the shift caused by removing the item earlier
+            // from the same array.
+            if (removedFromTree === items && removedIndex < atIndex) {
+              insertIndex -= 1;
+            }
+            insertIndex = Math.max(0, Math.min(insertIndex, items.length));
+            items.splice(insertIndex, 0, removedItem!);
+            return true;
+          }
+
+          for (const child of items) {
+            if (Array.isArray(child.args)) {
+              for (const args of child.args) {
+                if (insertItemInner(args)) return true;
+              }
+            }
+          }
+          return false;
+        }
+
+        insertItemInner(draft);
+      },
+    );
+  },
 };
 
 export function useWorkTree() {
