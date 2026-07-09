@@ -99,18 +99,15 @@ export function RenderTree2({
 
   /** Renders the zone between/around items: the "add" popover plus a drop target for drag/move. */
   function renderZone(mode: "first" | "after", index: number, dropAtIndex: number) {
-    const dragged = getDraggedItem();
-    const draggedIndex = dragged ? items.findIndex((item) => item === dragged) : -1;
-    const isNoopDrop = draggedIndex !== -1 && (dropAtIndex === draggedIndex || dropAtIndex === draggedIndex + 1);
     const isDragOver = dragOverIndex === dropAtIndex;
 
     return (
       <div
         className={`render-tree__buttons ${
-          isDragOver && !isNoopDrop ? "render-tree__buttons--drop-target-active" : ""
+          isDragOver ? "render-tree__buttons--drop-target-active" : ""
         }`}
         onDragOver={(e) => {
-          if (!dragged || isNoopDrop) return;
+          if (!getDraggedItem()) return;
           e.preventDefault();
           e.dataTransfer.dropEffect = "move";
           setDragOverIndex(dropAtIndex);
@@ -120,8 +117,9 @@ export function RenderTree2({
         }}
         onDrop={(e) => {
           e.preventDefault();
+          const dragged = getDraggedItem();
           setDragOverIndex(undefined);
-          if (!dragged || isNoopDrop) return;
+          if (!dragged) return;
           onMove?.(dragged, items, dropAtIndex);
         }}
       >
