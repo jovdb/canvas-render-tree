@@ -31,8 +31,7 @@ export interface FreeControlPointsOverlayProps<
   /** Line color */
   lineColor?: string;
   /** Custom point component props */
-  sourcePointProps?: Partial<ControlPointProps>;
-  targetPointProps?: Partial<ControlPointProps>;
+  pointProps?: Partial<ControlPointProps>;
 }
 
 /**
@@ -48,8 +47,7 @@ export function FreeControlPointsOverlay<
   targetColor = "green",
   showLines = true,
   lineColor = "rgba(255, 255, 0, 0.5)",
-  sourcePointProps = {},
-  targetPointProps = {},
+  pointProps = {},
 }: FreeControlPointsOverlayProps<TConfig>) {
   const { controlPoints = [] } = config || {};
 
@@ -138,30 +136,24 @@ export function FreeControlPointsOverlay<
     const targetX = cp.x + cp.dx;
     const targetY = cp.y + cp.dy;
 
-    // Source point (blue) - the anchor position
+    // Combined control point:
+    // - draggable main point (filled) at the target/displaced position
+    // - outer ring at the source/anchor position, also independently draggable
     points.push(
       <ControlPoint
-        key={`src-${i}`}
-        left={sourceX}
-        top={sourceY}
-        color={sourceColor}
-        draggable={true}
-        onMouseDown={handleMouseDown(i, "position")}
-        {...sourcePointProps}
-      />,
-    );
-
-    // Target point (green) - where it should move to
-    points.push(
-      <ControlPoint
-        key={`tgt-${i}`}
+        key={`cp-${i}`}
         left={targetX}
         top={targetY}
         color={targetColor}
-        outer={false}
+        outer
+        outerLeft={sourceX}
+        outerTop={sourceY}
+        outerColor={sourceColor}
         draggable={true}
         onMouseDown={handleMouseDown(i, "target")}
-        {...targetPointProps}
+        outerDraggable={true}
+        onOuterMouseDown={handleMouseDown(i, "position")}
+        {...pointProps}
       />,
     );
 

@@ -368,17 +368,8 @@ export const CatmullRomOverlay: ItemOverlayFn<ICatmullRomConfig> = ({
       const baseTop = r / (rows - 1);
       const cp = controlPointMap[`${r}-${c}`];
 
-      // Blue grid point (outer circle)
-      dots.push(
-        <ControlPoint
-          key={`dot-${r}-${c}`}
-          left={baseLeft}
-          top={baseTop}
-          color="blue"
-        />,
-      );
-
-      // Green control point (filled circle) - either at base position or offset
+      // Combined control point: draggable current position (filled),
+      // with an outer ring showing the original grid position
       const cpLeft = cp ? baseLeft + cp.dx : baseLeft;
       const cpTop = cp ? baseTop + cp.dy : baseTop;
       dots.push(
@@ -386,8 +377,9 @@ export const CatmullRomOverlay: ItemOverlayFn<ICatmullRomConfig> = ({
           key={`cp-${r}-${c}`}
           left={cpLeft}
           top={cpTop}
-          color="green"
-          outer={false}
+          outer
+          outerLeft={baseLeft}
+          outerTop={baseTop}
           draggable={true}
           onMouseDown={handleMouseDown(r, c)}
         />,

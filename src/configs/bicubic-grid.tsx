@@ -10,7 +10,7 @@ import React, { useState } from "react";
 export const BicubicGridConfig: ItemConfigFn<IBicubicGridConfig> = () => {
   return (
     <div style={{ fontSize: "12px", color: "#666" }}>
-      <p>Drag the green control points in the canvas to warp the grid.</p>
+      <p>Drag the control points in the canvas to warp the grid.</p>
     </div>
   );
 };
@@ -64,46 +64,16 @@ export const BicubicGridOverlay: ItemOverlayFn<IBicubicGridConfig> = ({
       const original = originalGrid[j][i];
       const current = controlsPoints[j][i];
 
-      // Line from the original grid position to the current (dragged) position
-      elements.push(
-        <div
-          key={`line-${j}-${i}`}
-          style={{
-            position: "absolute",
-            left: `${original.x * 100}%`,
-            top: `${original.y * 100}%`,
-            width: `${Math.abs(current.x - original.x) * 100}%`,
-            height: `${Math.abs(current.y - original.y) * 100}%`,
-            border: "1px solid rgba(255, 255, 0, 0.5)",
-            transform: `translate(${current.x > original.x ? 0 : -100}%, ${
-              current.y > original.y ? 0 : -100
-            }%) rotate(${Math.atan2(
-              current.y - original.y,
-              current.x - original.x,
-            )}rad)`,
-            pointerEvents: "none",
-          }}
-        />,
-      );
-
-      // Original grid position (not draggable)
+      // Combined control point: draggable current position (filled),
+      // with an outer ring showing the original grid position
       elements.push(
         <ControlPoint
-          key={`orig-${j}-${i}`}
-          left={original.x}
-          top={original.y}
-          color="red"
-        />,
-      );
-
-      // Current (draggable) position
-      elements.push(
-        <ControlPoint
-          key={`cur-${j}-${i}`}
+          key={`cp-${j}-${i}`}
           left={current.x}
           top={current.y}
-          color="green"
-          outer={false}
+          outer
+          outerLeft={original.x}
+          outerTop={original.y}
           draggable
           onMouseDown={handleMouseDown(j, i)}
         />,

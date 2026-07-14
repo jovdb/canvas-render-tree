@@ -385,7 +385,9 @@ export const PerspectiveOverlay: ItemOverlayFn<IPerspectiveConfig> = ({
           key={`${index}-${point.x}-${point.y}`}
           left={point.x}
           top={point.y}
-          color={"blue"}
+          outer
+          outerLeft={index === 0 ? 0 : index === 1 ? 1 : index === 2 ? 1 : 0}
+          outerTop={index === 0 ? 0 : index === 1 ? 0 : index === 2 ? 1 : 1}
           draggable={true}
           onMouseDown={() => setDraggedIndex(index)}
         />
