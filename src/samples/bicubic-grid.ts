@@ -20,7 +20,6 @@ export function bicubicGridTree() {
     operations.bicubicGrid(
       {
         controlsPoints: deformationGrid,
-        debug: true,
       },
       [operations.drawImage({ imageUrl: availableImages.testbeeld })],
     ),

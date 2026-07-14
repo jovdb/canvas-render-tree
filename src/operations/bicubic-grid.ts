@@ -4,7 +4,7 @@ import { OperationSchema } from "../schemas";
 import { addOperation } from ".";
 import { onChildCtx } from "./layer";
 
-interface Point {
+export interface Point {
   x: number;
   y: number;
 }
@@ -280,58 +280,9 @@ function setPixel(
   imageData.data.set(pixel, i);
 }
 
-function drawControlPointDisplacement(
-  ctx: CanvasRenderingContext2D,
-  point1: Point,
-  point2: Point,
-  radius = 5,
-) {
-  ctx.save(); // Save current canvas state
-
-  // Draw grid lines
-  ctx.save();
-  ctx.globalCompositeOperation = "difference";
-  ctx.strokeStyle = "#bbbb";
-  ctx.lineWidth = 2;
-  ctx.beginPath();
-  ctx.moveTo(point1.x * ctx.canvas.width, point1.y * ctx.canvas.height);
-  ctx.lineTo(point2.x * ctx.canvas.width, point2.y * ctx.canvas.height);
-  ctx.stroke();
-  ctx.restore();
-
-  ctx.fillStyle = "red";
-  ctx.strokeStyle = "#000a";
-  ctx.beginPath();
-  ctx.arc(
-    point1.x * ctx.canvas.width,
-    point1.y * ctx.canvas.height,
-    radius,
-    0,
-    Math.PI * 2,
-  ); // Draw circle at control point
-  ctx.fill();
-  ctx.stroke();
-
-  ctx.fillStyle = "green";
-  ctx.strokeStyle = "#000a";
-  ctx.beginPath();
-  ctx.arc(
-    point2.x * ctx.canvas.width,
-    point2.y * ctx.canvas.height,
-    radius,
-    0,
-    Math.PI * 2,
-  ); // Draw circle at control point
-  ctx.fill();
-  ctx.stroke();
-  ctx.stroke();
-
-  ctx.restore(); // Restore original canvas state
-}
 export interface IBicubicGridConfig extends IConfig {
   /** Normalized controlPoints */
   controlsPoints: Point[][];
-  debug?: boolean;
 }
 
 const schema: OperationSchema<"bicubicGrid"> = {
@@ -371,22 +322,6 @@ export const draw: ItemDrawFn<IBicubicGridConfig> = ({
     );
     const newImageData = deformImage(imageData, config.controlsPoints);
     drawCtx.putImageData(newImageData, 0, 0);
-
-    if (config?.debug) {
-      const rows = config.controlsPoints.length;
-      const cols = config.controlsPoints[0].length;
-      const originalGrid = createOriginalGrid(rows, cols);
-
-      for (let j = 0; j < rows; j++) {
-        for (let i = 0; i < cols; i++) {
-          drawControlPointDisplacement(
-            drawCtx,
-            originalGrid[j][i],
-            config.controlsPoints[j][i],
-          );
-        }
-      }
-    }
   });
 };
 
