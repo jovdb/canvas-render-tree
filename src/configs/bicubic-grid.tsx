@@ -50,7 +50,6 @@ export const BicubicGridOverlay: ItemOverlayFn<IBicubicGridConfig> = ({
           outer
           outerLeft={original.x}
           outerTop={original.y}
-          draggable
           onDragInner={(x, y) => {
             mutateConfig((newConfig) => {
               newConfig.controlsPoints[j][i] = {

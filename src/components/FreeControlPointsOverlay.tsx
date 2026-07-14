@@ -84,7 +84,6 @@ export function FreeControlPointsOverlay<
         outer
         outerLeft={sourceX}
         outerTop={sourceY}
-        draggable={true}
         onDragInner={(x, y) => {
           mutateConfig((newConfig: TConfig) => {
             const newControlPoints = [...(newConfig.controlPoints || [])];
@@ -97,7 +96,6 @@ export function FreeControlPointsOverlay<
             newConfig.controlPoints = newControlPoints;
           });
         }}
-        outerDraggable={true}
         onDragOuter={(x, y) => {
           mutateConfig((newConfig: TConfig) => {
             const newControlPoints = [...(newConfig.controlPoints || [])];

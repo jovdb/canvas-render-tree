@@ -15,7 +15,6 @@ export interface OperationSchema<TOperationName extends string> {
   name: TOperationName;
 
   /** Short name to show in the block */
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   getName?: (config: IConfig | undefined) => string;
 
   description?: string;

@@ -3,7 +3,6 @@ import { IConfig } from "../configs";
 import { OperationSchema } from "../schemas";
 import { addOperation } from ".";
 import { ItemOverlayFn } from "../overlays";
-import React from "react";
 import { ControlPoint } from "../components/ControlPoint";
 
 export interface IPerspectiveConfig extends IConfig {
@@ -379,7 +378,6 @@ export const PerspectiveOverlay: ItemOverlayFn<IPerspectiveConfig> = ({
           outer
           outerLeft={defaultPoints[index].x}
           outerTop={defaultPoints[index].y}
-          draggable={true}
           onDragInner={(x, y) => onDragInner(index, x, y)}
         />
       ))}

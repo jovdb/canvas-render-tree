@@ -2,7 +2,7 @@ import { addOperation, IOperation } from ".";
 import { IRenderItem, ItemDrawFn, RenderTree } from "../canvas";
 import { ItemConfigFn } from "../configs";
 import { OperationSchema } from "../schemas";
-import { createOffscreenCanvasCtx, onChildCtx } from "./layer";
+import { onChildCtx } from "./layer";
 
 export interface IBlendConfig {
   blendMode: GlobalCompositeOperation;

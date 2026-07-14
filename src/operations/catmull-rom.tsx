@@ -1,7 +1,6 @@
 import { IRenderItem, ItemDrawFn, RenderTree } from "../canvas";
 import { ItemOverlayFn } from "../overlays";
 import { ItemConfigFn } from "../configs";
-import React from "react";
 import { ControlPoint } from "../components/ControlPoint";
 import { addOperation, IOperation } from ".";
 
@@ -320,7 +319,6 @@ export const CatmullRomOverlay: ItemOverlayFn<ICatmullRomConfig> = ({
           outer
           outerLeft={baseLeft}
           outerTop={baseTop}
-          draggable={true}
           onDragInner={(x, y) => {
             mutateConfig((newConfig: ICatmullRomConfig) => {
               const newControlPoints = [...(newConfig.controlPoints || [])];

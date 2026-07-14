@@ -132,6 +132,5 @@ export function pipe<TIn, TOut>(start: TIn, fn1: OneArgFn<TIn, TOut>): TOut;
 export function pipe<TIn>(start: TIn): TIn;
 export function pipe<TIn>(start: TIn, ...fns: Function[]) {
   // For better type inference, I included the start value as argument
-  // eslint-disable-next-line @typescript-eslint/no-unsafe-return
   return fns.reduce((y, f) => f(y), start);
 }
