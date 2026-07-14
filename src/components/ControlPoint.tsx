@@ -11,11 +11,6 @@ export interface ControlPointProps {
   outerTop?: number;
   /** Whether to also render an outer ring, e.g. showing the original/anchor position */
   outer?: boolean;
-  onMouseDown?: (e: React.MouseEvent) => void;
-  draggable?: boolean;
-  /** Whether the outer ring itself is draggable (e.g. to move the anchor/source position independently) */
-  outerDraggable?: boolean;
-  onOuterMouseDown?: (e: React.MouseEvent) => void;
   onDragInner?: (x: number, y: number) => void;
   onDragOuter?: (x: number, y: number) => void;
 }
@@ -32,9 +27,6 @@ export const ControlPoint: React.FC<ControlPointProps> = ({
   outerLeft = left,
   outerTop = top,
   outer = false,
-  draggable = false,
-  outerDraggable = false,
-  onOuterMouseDown,
   onDragInner,
   onDragOuter,
 }) => {
@@ -117,14 +109,6 @@ export const ControlPoint: React.FC<ControlPointProps> = ({
       {outer && (
         <div
           ref={outerRef}
-          onMouseDown={(e) => {
-            onOuterMouseDown?.(e);
-            if (outerDraggable) {
-              e.preventDefault();
-              e.stopPropagation();
-              setIsDraggingOuter(true);
-            }
-          }}
           onMouseEnter={() => setIsHoveringOuter(true)}
           onMouseLeave={() => setIsHoveringOuter(false)}
           onClick={() => {
@@ -141,7 +125,7 @@ export const ControlPoint: React.FC<ControlPointProps> = ({
             outline: `${borderWidth}px solid ${isHoveringInner ? outerHighlightColor : outerColor2}`,
             boxSizing: "border-box",
             transform: "translate(-50%, -50%)",
-            cursor: outerDraggable ? "move" : "pointer",
+            cursor: onDragOuter ? "move" : "pointer",
             userSelect: "none",
           }}
         />
@@ -151,7 +135,7 @@ export const ControlPoint: React.FC<ControlPointProps> = ({
         onMouseEnter={() => setIsHoveringInner(true)}
         onMouseLeave={() => setIsHoveringInner(false)}
         onMouseDown={(e) => {
-          if (draggable) {
+          if (onDragInner) {
             e.preventDefault();
             e.stopPropagation();
             setIsDraggingInner(true);
@@ -167,7 +151,7 @@ export const ControlPoint: React.FC<ControlPointProps> = ({
           backgroundColor: isHoveringOuter ? innerHighlightColor : innerColor,
           boxSizing: "border-box",
           transform: "translate(-50%, -50%)",
-          cursor: draggable ? "move" : undefined,
+          cursor: onDragInner ? "move" : undefined,
           userSelect: "none",
           outline: `2px solid white`,
         }}

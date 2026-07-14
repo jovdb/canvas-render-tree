@@ -45,7 +45,11 @@ export function RenderTree2({
   onDelete?(item: IRenderItem, treeIndex: TreeIndex): void;
   onVisibilityChange?(item: IRenderItem, treeIndex: TreeIndex): void;
   onSoloChange?(item: IRenderItem, treeIndex: TreeIndex): void;
-  onMove?(item: IRenderItem, targetTree: readonly IRenderItem[], atIndex: number): void;
+  onMove?(
+    item: IRenderItem,
+    targetTree: readonly IRenderItem[],
+    atIndex: number,
+  ): void;
 }) {
   const [addMenu, setAddMenu] = useState<
     { mode: "first" | "after"; index?: number } | undefined
@@ -53,7 +57,6 @@ export function RenderTree2({
   const [dragOverIndex, setDragOverIndex] = useState<number | undefined>();
 
   const { addItem } = useWorkTreeActions();
-
 
   const operationOptions = useMemo(
     () =>
@@ -111,7 +114,11 @@ export function RenderTree2({
   }
 
   /** Renders the zone between/around items: the "add" popover plus a drop target for drag/move. */
-  function renderZone(mode: "first" | "after", index: number, dropAtIndex: number) {
+  function renderZone(
+    mode: "first" | "after",
+    index: number,
+    dropAtIndex: number,
+  ) {
     const isDragOver = dragOverIndex === dropAtIndex;
 
     return (

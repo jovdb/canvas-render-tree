@@ -10,7 +10,11 @@ interface RenderTreePanelProps {
   onDelete?(item: IRenderItem, treeIndex: TreeIndex): void;
   onVisibilityChange?(item: IRenderItem, treeIndex: TreeIndex): void;
   onSoloChange?(item: IRenderItem, treeIndex: TreeIndex): void;
-  onMove?(item: IRenderItem, targetTree: readonly IRenderItem[], atIndex: number): void;
+  onMove?(
+    item: IRenderItem,
+    targetTree: readonly IRenderItem[],
+    atIndex: number,
+  ): void;
 }
 
 export function RenderTreePanel({
