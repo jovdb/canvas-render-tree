@@ -11,16 +11,26 @@ import { getDraggedItem } from "./dragState";
 /** Indexes in tree */
 export type TreeIndex = number[];
 
+/** Returns true when `index` is `ancestor` itself or a descendant of it. */
+export function isWithinTree(index: TreeIndex, ancestor: TreeIndex): boolean {
+  return (
+    index.length >= ancestor.length &&
+    ancestor.every((value, i) => index[i] === value)
+  );
+}
+
 export function RenderTree2({
   items,
   parentIndexes = [],
   selectedItems = [],
   visibleIndexes = [],
   editIndex,
+  soloIndex,
   title,
   onClick,
   onDelete,
   onVisibilityChange,
+  onSoloChange,
   onMove,
 }: {
   items: readonly IRenderItem[];
@@ -28,10 +38,13 @@ export function RenderTree2({
   selectedItems?: readonly IRenderItem[];
   visibleIndexes: readonly TreeIndex[];
   editIndex?: TreeIndex | undefined;
+  /** Tree index of the item that is currently "solo'd" (only it + its inputs are rendered) */
+  soloIndex?: TreeIndex | undefined;
   title: string | undefined;
   onClick?(item: IRenderItem, treeIndex: TreeIndex): void;
   onDelete?(item: IRenderItem, treeIndex: TreeIndex): void;
   onVisibilityChange?(item: IRenderItem, treeIndex: TreeIndex): void;
+  onSoloChange?(item: IRenderItem, treeIndex: TreeIndex): void;
   onMove?(item: IRenderItem, targetTree: readonly IRenderItem[], atIndex: number): void;
 }) {
   const [addMenu, setAddMenu] = useState<
@@ -139,11 +152,13 @@ export function RenderTree2({
                 item={item}
                 treeIndex={[...parentIndexes, index]}
                 editIndex={editIndex}
+                soloIndex={soloIndex}
                 selectedItems={selectedItems}
                 visibleIndexes={visibleIndexes}
                 onClick={onClick}
                 onDelete={onDelete}
                 onVisibilityChange={onVisibilityChange}
+                onSoloChange={onSoloChange}
                 onMove={onMove}
               />
               {renderZone("after", index, index + 1)}

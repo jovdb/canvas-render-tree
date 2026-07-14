@@ -72,6 +72,7 @@ function filterTree(
 function App() {
   const [editIndex, setEditIndex] = useState<TreeIndex | undefined>();
   const [visibleIndexes, setVisibleIndexes] = useState<TreeIndex[]>([]);
+  const [soloIndex, setSoloIndex] = useState<TreeIndex | undefined>();
   const [editPanelWidth, setEditPanelWidth] = useState(280);
   const [isResizing, setIsResizing] = useState(false);
 
@@ -90,14 +91,22 @@ function App() {
     updateWorkTree(() => tree);
     setEditIndex([]);
     setVisibleIndexes([]);
+    setSoloIndex(undefined);
   }, [updateWorkTree, sampleKey]);
 
-  /** The items to render, workTree with selection filter */
+  /** Item that is currently "solo'd": only it and its inputs are rendered */
+  const soloItem = useMemo(
+    () => (soloIndex ? selectIndex(workTree, soloIndex) : undefined),
+    [workTree, soloIndex],
+  );
+
+  /** The items to render, workTree with selection filter (or solo'd to a single item + its inputs) */
   const renderTree = useMemo(() => {
+    if (soloItem) return [soloItem];
     return workTree && visibleIndexes.length
       ? filterTree(workTree, visibleIndexes)
       : (workTree ?? []);
-  }, [workTree, visibleIndexes]);
+  }, [workTree, visibleIndexes, soloItem]);
   const deferredRenderTree = useDeferredValue(renderTree);
   // console.log(JSON.stringify(renderTree, null, 2));
 
@@ -239,6 +248,7 @@ function App() {
             items={workTree}
             editIndex={editIndex}
             visibleIndexes={visibleIndexes}
+            soloIndex={soloIndex}
             onClick={(_item, treeIndex) => {
               setEditIndex(treeIndex);
             }}
@@ -262,6 +272,13 @@ function App() {
                   return [...prev, treeIndex];
                 }
               });
+            }}
+            onSoloChange={(_item, treeIndex) => {
+              setSoloIndex((prev) =>
+                prev && JSON.stringify(prev) === JSON.stringify(treeIndex)
+                  ? undefined
+                  : treeIndex,
+              );
             }}
           />
         </div>

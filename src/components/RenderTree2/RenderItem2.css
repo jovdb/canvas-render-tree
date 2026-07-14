@@ -166,8 +166,57 @@ body {
   opacity: 0.4;
 }
 
+.render-item--disabled {
+  opacity: 0.35;
+  filter: grayscale(1);
+}
+
+.render-item--disabled.render-item--selectable:hover {
+  background-color: #eee;
+  border-color: var(--border-color);
+}
+
 .render-item__visibility {
   position: absolute;
+}
+
+.render-item__solo {
+  position: absolute;
+  top: 50%;
+  left: 2px;
+  transform: translateY(-50%);
+
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+
+  border: none;
+  padding: 1px;
+  margin: 0;
+  width: 24px;
+  height: 24px;
+
+  color: #99a;
+  background-color: transparent;
+  cursor: pointer;
+  visibility: hidden;
+}
+
+.render-item:hover .render-item__solo {
+  visibility: visible;
+}
+
+.render-item__solo:hover {
+  color: #66f;
+}
+
+.render-item__solo--active {
+  visibility: visible;
+  color: #44f;
+}
+
+.render-item__solo--active:hover {
+  color: #00f;
 }
 
 .render-item__name {

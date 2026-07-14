@@ -5,9 +5,11 @@ interface RenderTreePanelProps {
   items: readonly IRenderItem[];
   editIndex: TreeIndex | undefined;
   visibleIndexes: readonly TreeIndex[];
+  soloIndex?: TreeIndex | undefined;
   onClick?(item: IRenderItem, treeIndex: TreeIndex): void;
   onDelete?(item: IRenderItem, treeIndex: TreeIndex): void;
   onVisibilityChange?(item: IRenderItem, treeIndex: TreeIndex): void;
+  onSoloChange?(item: IRenderItem, treeIndex: TreeIndex): void;
   onMove?(item: IRenderItem, targetTree: readonly IRenderItem[], atIndex: number): void;
 }
 
@@ -15,9 +17,11 @@ export function RenderTreePanel({
   items,
   editIndex,
   visibleIndexes = [],
+  soloIndex,
   onClick,
   onDelete,
   onVisibilityChange,
+  onSoloChange,
   onMove,
 }: RenderTreePanelProps) {
   function onSave() {
@@ -60,6 +64,7 @@ export function RenderTreePanel({
           parentIndexes={[]}
           editIndex={editIndex}
           visibleIndexes={visibleIndexes}
+          soloIndex={soloIndex}
           selectedItems={items.filter((item) =>
             visibleIndexes.some(
               (visibleIndex) =>
@@ -69,6 +74,7 @@ export function RenderTreePanel({
           onClick={onClick}
           onDelete={onDelete}
           onVisibilityChange={onVisibilityChange}
+          onSoloChange={onSoloChange}
           onMove={onMove}
         />
       </div>

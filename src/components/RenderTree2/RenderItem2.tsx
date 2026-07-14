@@ -1,9 +1,10 @@
 import { IRenderItem } from "../../canvas";
-import { TreeIndex, RenderTree2 } from "./RenderTree2";
+import { TreeIndex, RenderTree2, isWithinTree } from "./RenderTree2";
 import "./RenderItem2.css";
 import { getSchema } from "../../schemas";
 import { useState } from "react";
 import { setDraggedItem } from "./dragState";
+import { TargetIcon } from "../../icons/target";
 
 export function RenderItem2({
   item,
@@ -11,9 +12,11 @@ export function RenderItem2({
   visibleIndexes = [],
   treeIndex,
   editIndex,
+  soloIndex,
   onClick,
   onDelete,
   onVisibilityChange,
+  onSoloChange,
   onMove,
 }: {
   item: IRenderItem;
@@ -23,13 +26,23 @@ export function RenderItem2({
   treeIndex: TreeIndex;
   /** Tree index of the item selected for editing */
   editIndex: TreeIndex | undefined;
+  /** Tree index of the item that is currently "solo'd" (only it + its inputs are rendered) */
+  soloIndex?: TreeIndex | undefined;
   onClick?(item: IRenderItem, treeIndex: TreeIndex): void;
   onDelete?(item: IRenderItem, treeIndex: TreeIndex): void;
   onVisibilityChange?(item: IRenderItem, treeIndex: TreeIndex): void;
-  onMove?(item: IRenderItem, targetTree: readonly IRenderItem[], atIndex: number): void;
+  onSoloChange?(item: IRenderItem, treeIndex: TreeIndex): void;
+  onMove?(
+    item: IRenderItem,
+    targetTree: readonly IRenderItem[],
+    atIndex: number,
+  ): void;
 }) {
   // const isSelected = selectedItems.includes(item);
   const isSelected = treeIndex.join() === editIndex?.join();
+  const isSolo = treeIndex.join() === soloIndex?.join();
+  const isDisabled =
+    soloIndex !== undefined && !isWithinTree(treeIndex, soloIndex);
   const schema = getSchema(item.name);
   if (!schema) {
     console.warn(`No schema found for item name: ${item.name}`);
@@ -38,7 +51,6 @@ export function RenderItem2({
   const [collapseInput, setCollapseInput] = useState(false);
   const [isDragging, setIsDragging] = useState(false);
   const name = schema?.getName ? schema.getName(item.config) : item.name;
-
 
   const inputs: Array<readonly IRenderItem[] | undefined> = [
     ...(item.args ? item.args : []),
@@ -62,9 +74,11 @@ export function RenderItem2({
                 visibleIndexes={visibleIndexes}
                 parentIndexes={treeIndex}
                 editIndex={editIndex}
+                soloIndex={soloIndex}
                 onClick={onClick}
                 onDelete={onDelete}
                 onVisibilityChange={onVisibilityChange}
+                onSoloChange={onSoloChange}
                 onMove={onMove}
                 title={`${
                   schema?.args?.at(index)?.description ||
@@ -95,7 +109,9 @@ export function RenderItem2({
         <div
           className={`render-item ${onClick ? "render-item--selectable" : ""} ${
             isSelected ? "render-item--selected" : ""
-          } ${isDragging ? "render-item--dragging" : ""}`}
+          } ${isDragging ? "render-item--dragging" : ""} ${
+            isDisabled ? "render-item--disabled" : ""
+          }`}
           role="button"
           tabIndex={0}
           title={schema?.description}
@@ -111,6 +127,22 @@ export function RenderItem2({
             setIsDragging(false);
           }}
         >
+          <button
+            type="button"
+            className={`render-item__solo ${isSolo ? "render-item__solo--active" : ""}`}
+            title={
+              isSolo
+                ? "Show full render tree"
+                : "Solo: only render this item and its inputs"
+            }
+            aria-pressed={isSolo}
+            onClick={(e) => {
+              e.stopPropagation();
+              onSoloChange?.(item, treeIndex);
+            }}
+          >
+            <TargetIcon size={14} />
+          </button>
           <span
             className="render-item__visibility"
             onClick={() => {
@@ -123,6 +155,7 @@ export function RenderItem2({
           >
             {/*isVisible ? <EyeIcon size={16} /> : <EyeClosedIcon size={16} />*/}
           </span>
+
           <div
             onClick={(e) => {
               e.stopPropagation();
