@@ -30,13 +30,15 @@ import { useWorkTree, useWorkTreeActions } from "./stores/useWorkTreeStore";
 
 export function selectIndex(tree: readonly IRenderItem[], index: TreeIndex) {
   if (index.length === 0) return undefined;
-  if (index.length === 1) return tree[index[0]];
 
-  const [nextIndex, ...restIndex] = index;
-  const restTree = tree[nextIndex];
-  const items = restTree?.args?.flatMap((arg) => arg ?? []) ?? [];
-  if (!restTree || items.length === 0) return undefined;
-  return selectIndex(items, restIndex);
+  const [itemIndex, argIndex, ...restIndex] = index;
+  const item = tree[itemIndex];
+  if (!item) return undefined;
+  if (index.length === 1) return item;
+
+  const argItems = item.args?.[argIndex] ?? [];
+  if (argItems.length === 0) return undefined;
+  return selectIndex(argItems, restIndex);
 }
 
 function filterTree(
@@ -48,8 +50,9 @@ function filterTree(
 
   items?.forEach((item, index) => {
     const treeIndex = [...parentTreeIndexes, index];
-    const childItems = item.args?.flatMap((arg) => arg ?? []) ?? [];
-    const children = filterTree(childItems, visibleIndexes, treeIndex);
+    const children = (item.args ?? []).flatMap((argItems, argIndex) =>
+      filterTree(argItems ?? [], visibleIndexes, [...treeIndex, argIndex]),
+    );
 
     if (
       visibleIndexes.some(

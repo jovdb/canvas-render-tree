@@ -72,7 +72,7 @@ export function RenderItem2({
                 items={arg ?? []}
                 selectedItems={selectedItems}
                 visibleIndexes={visibleIndexes}
-                parentIndexes={treeIndex}
+                parentIndexes={[...treeIndex, index]}
                 editIndex={editIndex}
                 soloIndex={soloIndex}
                 onClick={onClick}
