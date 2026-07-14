@@ -9,21 +9,15 @@ export interface ControlPointProps {
   outerLeft?: number;
   /** Normalized y position (0-1) of the outer ring, defaults to `top` */
   outerTop?: number;
-  /** Radius in pixels */
-  radius?: number;
-  /** Border width in pixels */
-  borderWidth?: number;
-  /** Color of the control point (and outer ring, unless overridden) */
-  color?: string;
   /** Whether to also render an outer ring, e.g. showing the original/anchor position */
   outer?: boolean;
-  /** Color of the outer ring, defaults to `color` */
-  outerColor?: string;
   onMouseDown?: (e: React.MouseEvent) => void;
   draggable?: boolean;
   /** Whether the outer ring itself is draggable (e.g. to move the anchor/source position independently) */
   outerDraggable?: boolean;
   onOuterMouseDown?: (e: React.MouseEvent) => void;
+  onDragInner?: (x: number, y: number) => void;
+  onDragOuter?: (x: number, y: number) => void;
 }
 
 /**
@@ -37,15 +31,24 @@ export const ControlPoint: React.FC<ControlPointProps> = ({
   top,
   outerLeft = left,
   outerTop = top,
-  radius = 4,
-  borderWidth = 2,
   outer = false,
-  onMouseDown,
   draggable = false,
   outerDraggable = false,
   onOuterMouseDown,
+  onDragInner,
+  onDragOuter,
 }) => {
+  const radius = 4;
+  const borderWidth = 2;
   const diameter = radius * 2;
+  const innerRef = React.useRef<HTMLDivElement>(null);
+  const outerRef = React.useRef<HTMLDivElement>(null);
+
+  const onDragInnerRef = React.useRef(onDragInner);
+  onDragInnerRef.current = onDragInner;
+
+  const onDragOuterRef = React.useRef(onDragOuter);
+  onDragOuterRef.current = onDragOuter;
 
   const outerHighlightColor = "#00f"; // Highlight color for outer ring when hovering inner point
   const outerColor2 = "#88f"; // Highlight color for outer ring when hovering inner point
@@ -53,15 +56,80 @@ export const ControlPoint: React.FC<ControlPointProps> = ({
   const innerColor = outerColor2;
 
   const [isHoveringInner, setIsHoveringInner] = React.useState(false);
+  const [isDraggingInner, setIsDraggingInner] = React.useState(false);
+  const [isDraggingOuter, setIsDraggingOuter] = React.useState(false);
   const [isHoveringOuter, setIsHoveringOuter] = React.useState(false);
+
+  React.useEffect(() => {
+    if (!isDraggingInner || !innerRef.current) return;
+
+    const offsetParent = innerRef.current.offsetParent as HTMLElement;
+    if (!offsetParent) return;
+
+    const handleMouseMove = (e: MouseEvent) => {
+      const offsetRect = offsetParent.getBoundingClientRect();
+      const x = (e.clientX - offsetRect.left) / offsetRect.width;
+      const y = (e.clientY - offsetRect.top) / offsetRect.height;
+      onDragInnerRef.current?.(x, y);
+    };
+
+    const handleMouseUp = () => {
+      setIsDraggingInner(false);
+    };
+
+    window.addEventListener("mousemove", handleMouseMove);
+    window.addEventListener("mouseup", handleMouseUp);
+
+    return () => {
+      window.removeEventListener("mousemove", handleMouseMove);
+      window.removeEventListener("mouseup", handleMouseUp);
+    };
+  }, [isDraggingInner]);
+
+  React.useEffect(() => {
+    if (!isDraggingOuter || !outerRef.current) return;
+
+    const offsetParent = outerRef.current.offsetParent as HTMLElement;
+    if (!offsetParent) return;
+
+    const handleMouseMove = (e: MouseEvent) => {
+      const offsetRect = offsetParent.getBoundingClientRect();
+      const x = (e.clientX - offsetRect.left) / offsetRect.width;
+      const y = (e.clientY - offsetRect.top) / offsetRect.height;
+      onDragOuterRef.current?.(x, y);
+    };
+
+    const handleMouseUp = () => {
+      setIsDraggingOuter(false);
+    };
+
+    window.addEventListener("mousemove", handleMouseMove);
+    window.addEventListener("mouseup", handleMouseUp);
+
+    return () => {
+      window.removeEventListener("mousemove", handleMouseMove);
+      window.removeEventListener("mouseup", handleMouseUp);
+    };
+  }, [isDraggingOuter]);
 
   return (
     <>
       {outer && (
         <div
-          onMouseDown={onOuterMouseDown}
+          ref={outerRef}
+          onMouseDown={(e) => {
+            onOuterMouseDown?.(e);
+            if (outerDraggable) {
+              e.preventDefault();
+              e.stopPropagation();
+              setIsDraggingOuter(true);
+            }
+          }}
           onMouseEnter={() => setIsHoveringOuter(true)}
           onMouseLeave={() => setIsHoveringOuter(false)}
+          onClick={() => {
+            onDragInner?.(outerLeft, outerTop);
+          }}
           style={{
             position: "absolute",
             left: `${outerLeft * 100}%`,
@@ -73,15 +141,22 @@ export const ControlPoint: React.FC<ControlPointProps> = ({
             outline: `${borderWidth}px solid ${isHoveringInner ? outerHighlightColor : outerColor2}`,
             boxSizing: "border-box",
             transform: "translate(-50%, -50%)",
-            cursor: outerDraggable ? "move" : undefined,
+            cursor: outerDraggable ? "move" : "pointer",
             userSelect: "none",
           }}
         />
       )}
       <div
-        onMouseDown={onMouseDown}
+        ref={innerRef}
         onMouseEnter={() => setIsHoveringInner(true)}
         onMouseLeave={() => setIsHoveringInner(false)}
+        onMouseDown={(e) => {
+          if (draggable) {
+            e.preventDefault();
+            e.stopPropagation();
+            setIsDraggingInner(true);
+          }
+        }}
         style={{
           position: "absolute",
           left: `${left * 100}%`,

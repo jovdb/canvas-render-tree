@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React from "react";
 import { ControlPoint, ControlPointProps } from "./ControlPoint";
 
 export interface FreeControlPoint {
@@ -22,10 +22,6 @@ export interface FreeControlPointsOverlayProps<
 > {
   config: Readonly<TConfig>;
   mutateConfig: (mutate: (config: TConfig) => void) => void;
-  /** Color for source/anchor points */
-  sourceColor?: string;
-  /** Color for target/displaced points */
-  targetColor?: string;
   /** Whether to show connecting lines */
   showLines?: boolean;
   /** Line color */
@@ -43,70 +39,11 @@ export function FreeControlPointsOverlay<
 >({
   config,
   mutateConfig,
-  sourceColor = "blue",
-  targetColor = "green",
   showLines = true,
   lineColor = "rgba(255, 255, 0, 0.5)",
   pointProps = {},
 }: FreeControlPointsOverlayProps<TConfig>) {
   const { controlPoints = [] } = config || {};
-
-  const [draggedIndex, setDraggedIndex] = useState<number | null>(null);
-  const [dragMode, setDragMode] = useState<"position" | "target">("target");
-
-  const handleMouseDown =
-    (index: number, mode: "position" | "target") => (e: React.MouseEvent) => {
-      e.preventDefault();
-      setDraggedIndex(index);
-      setDragMode(mode);
-    };
-
-  const handleMouseMove = (e: React.MouseEvent<HTMLDivElement>) => {
-    if (draggedIndex === null) return;
-
-    const rect = e.currentTarget.getBoundingClientRect();
-    const x = e.clientX - rect.left;
-    const y = e.clientY - rect.top;
-
-    const normalizedX = x / rect.width;
-    const normalizedY = y / rect.height;
-
-    mutateConfig((newConfig: TConfig) => {
-      const newControlPoints = [...(newConfig.controlPoints || [])];
-
-      if (draggedIndex >= newControlPoints.length) {
-        // Add new point at the dragged position
-        newControlPoints.push({ x: normalizedX, y: normalizedY, dx: 0, dy: 0 });
-      }
-
-      if (dragMode === "position") {
-        // Move the source position
-        newControlPoints[draggedIndex] = {
-          ...newControlPoints[draggedIndex],
-          x: normalizedX,
-          y: normalizedY,
-        };
-      } else {
-        // Move the target position (by adjusting dx/dy)
-        const cp = newControlPoints[draggedIndex];
-        newControlPoints[draggedIndex] = {
-          ...cp,
-          dx: normalizedX - cp.x,
-          dy: normalizedY - cp.y,
-        };
-      }
-
-      newConfig.controlPoints = newControlPoints;
-    });
-  };
-
-  const handleMouseUp = () => {
-    setDraggedIndex(null);
-  };
-
-  const handleMouseLeave = () => {
-    setDraggedIndex(null);
-  };
 
   const addPoint = () => {
     mutateConfig((newConfig: TConfig) => {
@@ -144,15 +81,35 @@ export function FreeControlPointsOverlay<
         key={`cp-${i}`}
         left={targetX}
         top={targetY}
-        color={targetColor}
         outer
         outerLeft={sourceX}
         outerTop={sourceY}
-        outerColor={sourceColor}
         draggable={true}
-        onMouseDown={handleMouseDown(i, "target")}
+        onDragInner={(x, y) => {
+          mutateConfig((newConfig: TConfig) => {
+            const newControlPoints = [...(newConfig.controlPoints || [])];
+            const cp = newControlPoints[i];
+            newControlPoints[i] = {
+              ...cp,
+              dx: x - cp.x,
+              dy: y - cp.y,
+            };
+            newConfig.controlPoints = newControlPoints;
+          });
+        }}
         outerDraggable={true}
-        onOuterMouseDown={handleMouseDown(i, "position")}
+        onDragOuter={(x, y) => {
+          mutateConfig((newConfig: TConfig) => {
+            const newControlPoints = [...(newConfig.controlPoints || [])];
+            const cp = newControlPoints[i];
+            newControlPoints[i] = {
+              ...cp,
+              x,
+              y,
+            };
+            newConfig.controlPoints = newControlPoints;
+          });
+        }}
         {...pointProps}
       />,
     );
@@ -214,9 +171,6 @@ export function FreeControlPointsOverlay<
         height: "100%",
         backgroundColor: "rgba(255,255,255,0.4)",
       }}
-      onMouseMove={handleMouseMove}
-      onMouseUp={handleMouseUp}
-      onMouseLeave={handleMouseLeave}
     >
       {points}
       <button

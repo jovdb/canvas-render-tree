@@ -337,36 +337,30 @@ export const draw: ItemDrawFn<IPerspectiveConfig> = ({
   ctx.drawImage(offscreenCanvas, 0, 0);
 };
 
+const defaultPoints = [
+  { x: 0, y: 0 },
+  { x: 1, y: 0 },
+  { x: 1, y: 1 },
+  { x: 0, y: 1 },
+];
+
 export const PerspectiveOverlay: ItemOverlayFn<IPerspectiveConfig> = ({
   config,
   mutateConfig,
 }) => {
-  const [draggedIndex, setDraggedIndex] = React.useState<number | null>(null);
+  const points = config?.controlPoints ?? defaultPoints;
 
-  const handleMouseMove = (event: React.MouseEvent<HTMLDivElement>) => {
-    if (draggedIndex === null) return;
-
-    const rect = event.currentTarget.getBoundingClientRect();
-    const x = clamp((event.clientX - rect.left) / rect.width, 0, 1);
-    const y = clamp((event.clientY - rect.top) / rect.height, 0, 1);
-
+  const onDragInner = (index: number, x: number, y: number) => {
     mutateConfig((draftConfig) => {
       const nextPoints = [...(draftConfig.controlPoints ?? [])];
-      nextPoints[draggedIndex] = { x, y };
+      nextPoints[index] = {
+        x,
+        y,
+      };
       draftConfig.controlPoints =
         nextPoints as IPerspectiveConfig["controlPoints"];
     });
   };
-
-  const handleMouseUp = () => setDraggedIndex(null);
-  const handleMouseLeave = () => setDraggedIndex(null);
-
-  const points = config?.controlPoints ?? [
-    { x: 0, y: 0 },
-    { x: 1, y: 0 },
-    { x: 1, y: 1 },
-    { x: 0, y: 1 },
-  ];
 
   return (
     <div
@@ -376,23 +370,19 @@ export const PerspectiveOverlay: ItemOverlayFn<IPerspectiveConfig> = ({
         height: "100%",
         backgroundColor: "rgba(255,255,255,0.3)",
       }}
-      onMouseMove={handleMouseMove}
-      onMouseUp={handleMouseUp}
-      onMouseLeave={handleMouseLeave}
     >
-      {...points.map((point, index) => (
+      {points.map((point, index) => (
         <ControlPoint
-          key={`${index}-${point.x}-${point.y}`}
+          key={`perspective-cp-${index}`}
           left={point.x}
           top={point.y}
           outer
-          outerLeft={index === 0 ? 0 : index === 1 ? 1 : index === 2 ? 1 : 0}
-          outerTop={index === 0 ? 0 : index === 1 ? 0 : index === 2 ? 1 : 1}
+          outerLeft={defaultPoints[index].x}
+          outerTop={defaultPoints[index].y}
           draggable={true}
-          onMouseDown={() => setDraggedIndex(index)}
+          onDragInner={(x, y) => onDragInner(index, x, y)}
         />
       ))}
-      ,
     </div>
   );
 };

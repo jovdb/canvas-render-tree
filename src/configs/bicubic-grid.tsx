@@ -5,7 +5,7 @@ import {
   createOriginalGrid,
   IBicubicGridConfig,
 } from "../operations/bicubic-grid";
-import React, { useState } from "react";
+import React from "react";
 
 export const BicubicGridConfig: ItemConfigFn<IBicubicGridConfig> = () => {
   return (
@@ -26,36 +26,12 @@ export const BicubicGridOverlay: ItemOverlayFn<IBicubicGridConfig> = ({
   mutateConfig,
 }) => {
   const { controlsPoints } = config || {};
-  const [dragged, setDragged] = useState<{
-    row: number;
-    col: number;
-  } | null>(null);
 
   if (!controlsPoints || !controlsPoints.length) return null;
 
   const rows = controlsPoints.length;
   const cols = controlsPoints[0].length;
   const originalGrid = createOriginalGrid(rows, cols);
-
-  const handleMouseDown =
-    (row: number, col: number) => (e: React.MouseEvent) => {
-      e.preventDefault();
-      setDragged({ row, col });
-    };
-
-  const handleMouseMove = (e: React.MouseEvent<HTMLDivElement>) => {
-    if (!dragged) return;
-
-    const rect = e.currentTarget.getBoundingClientRect();
-    const x = (e.clientX - rect.left) / rect.width;
-    const y = (e.clientY - rect.top) / rect.height;
-
-    mutateConfig((newConfig) => {
-      newConfig.controlsPoints[dragged.row][dragged.col] = { x, y };
-    });
-  };
-
-  const handleMouseUp = () => setDragged(null);
 
   const elements: React.ReactNode[] = [];
 
@@ -75,19 +51,21 @@ export const BicubicGridOverlay: ItemOverlayFn<IBicubicGridConfig> = ({
           outerLeft={original.x}
           outerTop={original.y}
           draggable
-          onMouseDown={handleMouseDown(j, i)}
+          onDragInner={(x, y) => {
+            mutateConfig((newConfig) => {
+              newConfig.controlsPoints[j][i] = {
+                x: Math.max(0, Math.min(1, x)),
+                y: Math.max(0, Math.min(1, y)),
+              };
+            });
+          }}
         />,
       );
     }
   }
 
   return (
-    <div
-      style={{ position: "relative", width: "100%", height: "100%" }}
-      onMouseMove={handleMouseMove}
-      onMouseUp={handleMouseUp}
-      onMouseLeave={handleMouseUp}
-    >
+    <div style={{ position: "relative", width: "100%", height: "100%" }}>
       {elements}
     </div>
   );

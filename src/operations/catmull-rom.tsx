@@ -290,66 +290,6 @@ export const CatmullRomOverlay: ItemOverlayFn<ICatmullRomConfig> = ({
 }) => {
   const rows = config?.gridRows || 4;
   const cols = config?.gridCols || 4;
-  const [draggedPoint, setDraggedPoint] = React.useState<{
-    row: number;
-    col: number;
-  } | null>(null);
-
-  const handleMouseDown =
-    (row: number, col: number) => (e: React.MouseEvent) => {
-      e.preventDefault();
-      setDraggedPoint({ row, col });
-    };
-
-  const handleMouseMove = (e: React.MouseEvent<HTMLDivElement>) => {
-    if (draggedPoint === null) return;
-
-    const rect = e.currentTarget.getBoundingClientRect();
-    const x = e.clientX - rect.left;
-    const y = e.clientY - rect.top;
-
-    const normalizedX = x / rect.width;
-    const normalizedY = y / rect.height;
-
-    const baseLeft = draggedPoint.col / (cols - 1);
-    const baseTop = draggedPoint.row / (rows - 1);
-
-    const newDx = normalizedX - baseLeft;
-    const newDy = normalizedY - baseTop;
-
-    mutateConfig((newConfig: ICatmullRomConfig) => {
-      const newControlPoints = [...(newConfig.controlPoints || [])];
-      const existingIndex = newControlPoints.findIndex(
-        (cp) => cp.row === draggedPoint.row && cp.col === draggedPoint.col,
-      );
-
-      if (existingIndex >= 0) {
-        // Update existing control point
-        newControlPoints[existingIndex] = {
-          ...newControlPoints[existingIndex],
-          dx: newDx,
-          dy: newDy,
-        };
-      } else {
-        // Create new control point
-        newControlPoints.push({
-          row: draggedPoint.row,
-          col: draggedPoint.col,
-          dx: newDx,
-          dy: newDy,
-        });
-      }
-      newConfig.controlPoints = newControlPoints;
-    });
-  };
-
-  const handleMouseUp = () => {
-    setDraggedPoint(null);
-  };
-
-  const handleMouseLeave = () => {
-    setDraggedPoint(null);
-  };
 
   const dots = [];
 
@@ -381,7 +321,35 @@ export const CatmullRomOverlay: ItemOverlayFn<ICatmullRomConfig> = ({
           outerLeft={baseLeft}
           outerTop={baseTop}
           draggable={true}
-          onMouseDown={handleMouseDown(r, c)}
+          onDragInner={(x, y) => {
+            mutateConfig((newConfig: ICatmullRomConfig) => {
+              const newControlPoints = [...(newConfig.controlPoints || [])];
+              const existingIndex = newControlPoints.findIndex(
+                (cp) => cp.row === r && cp.col === c,
+              );
+
+              const dx = x - baseLeft;
+              const dy = y - baseTop;
+
+              if (existingIndex >= 0) {
+                // Update existing control point
+                newControlPoints[existingIndex] = {
+                  ...newControlPoints[existingIndex],
+                  dx,
+                  dy,
+                };
+              } else {
+                // Create new control point
+                newControlPoints.push({
+                  row: r,
+                  col: c,
+                  dx,
+                  dy,
+                });
+              }
+              newConfig.controlPoints = newControlPoints;
+            });
+          }}
         />,
       );
     }
@@ -395,9 +363,6 @@ export const CatmullRomOverlay: ItemOverlayFn<ICatmullRomConfig> = ({
         height: "100%",
         backgroundColor: "rgba(255,255,255,0.4)",
       }}
-      onMouseMove={handleMouseMove}
-      onMouseUp={handleMouseUp}
-      onMouseLeave={handleMouseLeave}
     >
       {dots}
     </div>
