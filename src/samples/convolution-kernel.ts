@@ -4,10 +4,12 @@ import { kernels } from "../kernels";
 import { availableImages } from "../resources";
 
 export function convolutionSamplesTree() {
-  const commonTextProps = {
+  const commonTextProps: Partial<Parameters<typeof operations.drawText>[0]> = {
     fontSize: 20,
     fontFamilyName: "Arial",
     foregroundColor: "#2222DD",
+    x: 45,
+    y: 5,
   };
   const imageProps = {
     imageUrl: availableImages.glass,

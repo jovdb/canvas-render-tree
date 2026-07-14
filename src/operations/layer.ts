@@ -22,6 +22,7 @@ export function onChildCtx(
   draw: (childCtx: CanvasRenderingContext2D) => void,
 ) {
   if (useChild) {
+    sourceCtx.save();
     const childCtx = createOffscreenCanvasCtx(sourceCtx);
     draw(childCtx);
     sourceCtx.drawImage(
@@ -31,6 +32,7 @@ export function onChildCtx(
       sourceCtx.canvas.width,
       sourceCtx.canvas.height,
     );
+    sourceCtx.restore();
   } else {
     sourceCtx.save();
     draw(sourceCtx);

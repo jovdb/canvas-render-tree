@@ -2,7 +2,7 @@ import { addOperation, IOperation } from ".";
 import { IRenderItem, ItemDrawFn, RenderTree } from "../canvas";
 import { ItemConfigFn } from "../configs";
 import { OperationSchema } from "../schemas";
-import { onChildCtx } from "./layer";
+import { createOffscreenCanvasCtx, onChildCtx } from "./layer";
 
 export interface IBlendConfig {
   blendMode: GlobalCompositeOperation;
@@ -49,7 +49,9 @@ const draw: ItemDrawFn<IBlendConfig> = ({
     drawArgs?.[0]?.(drawCtx);
     drawCtx.save();
     drawCtx.globalCompositeOperation = config.blendMode;
-    drawArgs?.[1]?.(drawCtx);
+    onChildCtx(drawCtx, !!drawArgs?.[1], (drawCtx2) => {
+      drawArgs?.[1]?.(drawCtx2);
+    });
     drawCtx.restore();
   });
 };
