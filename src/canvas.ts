@@ -131,7 +131,8 @@ export function loadTree(items: RenderTree | undefined) {
 
 export function getContext2d(canvas: HTMLCanvasElement, contextName: string) {
   const ctx = canvas.getContext("2d");
-  if (!ctx) throw new Error(`Error creating canvas 2D context '${contextName}'`);
+  if (!ctx)
+    throw new Error(`Error creating canvas 2D context '${contextName}'`);
 
   return ctx;
   /*

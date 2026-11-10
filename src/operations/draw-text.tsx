@@ -118,11 +118,7 @@ const schema: OperationSchema<"drawText"> = {
       : "drawText",
 };
 
-const draw: ItemDrawFn<IDrawTextConfig> = ({
-  ctx,
-  drawPrev,
-  config,
-}) => {
+const draw: ItemDrawFn<IDrawTextConfig> = ({ ctx, drawPrev, config }) => {
   // first draw previous items
   drawPrev?.(ctx);
 

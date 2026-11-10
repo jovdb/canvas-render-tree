@@ -136,8 +136,7 @@ export function pipe<TIn>(start: TIn): TIn;
 export function pipe(start: unknown, ...fns: unknown[]): unknown {
   // For better type inference, I included the start value as argument
   return fns.reduce(
-    (value, fn) =>
-      (fn as (currentValue: unknown) => unknown)(value),
+    (value, fn) => (fn as (currentValue: unknown) => unknown)(value),
     start,
   );
 }

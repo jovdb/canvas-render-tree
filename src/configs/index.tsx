@@ -31,4 +31,3 @@ export function getRendererConfig(
   const configComponent = configs[name as RenderItemName];
   return configComponent;
 }
-
