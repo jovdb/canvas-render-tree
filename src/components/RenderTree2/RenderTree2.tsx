@@ -7,17 +7,7 @@ import { RenderItem2 } from "./RenderItem2";
 import { AddOperationPopover } from "./AddOperationPopover";
 import { useWorkTreeActions } from "../../stores/useWorkTreeStore";
 import { getDraggedItem } from "./dragState";
-
-/** Indexes in tree */
-export type TreeIndex = number[];
-
-/** Returns true when `index` is `ancestor` itself or a descendant of it. */
-export function isWithinTree(index: TreeIndex, ancestor: TreeIndex): boolean {
-  return (
-    index.length >= ancestor.length &&
-    ancestor.every((value, i) => index[i] === value)
-  );
-}
+import type { TreeIndex } from "./treeIndex";
 
 export function RenderTree2({
   items,

@@ -17,7 +17,7 @@ export interface IDrawTextConfig extends IConfig {
 }
 
 // Overlay component for drawText position - just a draggable blue dot
-const DrawTextOverlay: ItemOverlayFn<IDrawTextConfig> = ({
+export const DrawTextOverlay: ItemOverlayFn<IDrawTextConfig> = ({
   config,
   mutateConfig,
 }) => {
@@ -36,31 +36,6 @@ const DrawTextOverlay: ItemOverlayFn<IDrawTextConfig> = ({
     setStartConfig({ x: x || 0, y: y || 0 });
   };
 
-  const handleMouseMove = (e: MouseEvent) => {
-    if (!isDragging || !overlayRef.current) return;
-
-    // Calculate the delta in pixels
-    const dx = e.clientX - startPos.x;
-    const dy = e.clientY - startPos.y;
-
-    // Calculate new pixel coordinates (no clamping - allow negative or > container size)
-    const newX = startConfig.x + dx;
-    const newY = startConfig.y + dy;
-
-    mutateConfig((newConfig: IDrawTextConfig) => {
-      newConfig.x = newX;
-      newConfig.y = newY;
-    });
-
-    // Update start position for next move event
-    setStartPos({ x: e.clientX, y: e.clientY });
-    setStartConfig({ x: newX, y: newY });
-  };
-
-  const handleMouseUp = () => {
-    setIsDragging(false);
-  };
-
   // x and y are pixel coordinates - convert to normalized for display
   // Get container size from parent
   const container = overlayRef.current?.parentElement;
@@ -73,6 +48,24 @@ const DrawTextOverlay: ItemOverlayFn<IDrawTextConfig> = ({
   // Add document event listeners for dragging
   useEffect(() => {
     if (isDragging) {
+      const handleMouseMove = (e: MouseEvent) => {
+        if (!overlayRef.current) return;
+
+        const dx = e.clientX - startPos.x;
+        const dy = e.clientY - startPos.y;
+        const newX = startConfig.x + dx;
+        const newY = startConfig.y + dy;
+
+        mutateConfig((newConfig: IDrawTextConfig) => {
+          newConfig.x = newX;
+          newConfig.y = newY;
+        });
+
+        setStartPos({ x: e.clientX, y: e.clientY });
+        setStartConfig({ x: newX, y: newY });
+      };
+      const handleMouseUp = () => setIsDragging(false);
+
       document.addEventListener("mousemove", handleMouseMove);
       document.addEventListener("mouseup", handleMouseUp);
       return () => {
@@ -80,7 +73,7 @@ const DrawTextOverlay: ItemOverlayFn<IDrawTextConfig> = ({
         document.removeEventListener("mouseup", handleMouseUp);
       };
     }
-  }, [isDragging, startPos, startConfig]);
+  }, [isDragging, startPos, startConfig, mutateConfig]);
 
   return (
     <div
@@ -125,7 +118,7 @@ const schema: OperationSchema<"drawText"> = {
       : "drawText",
 };
 
-export const draw: ItemDrawFn<IDrawTextConfig> = ({
+const draw: ItemDrawFn<IDrawTextConfig> = ({
   ctx,
   drawPrev,
   config,

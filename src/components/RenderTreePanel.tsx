@@ -1,5 +1,6 @@
 import { IRenderItem } from "../canvas";
-import { RenderTree2, TreeIndex } from "./RenderTree2/RenderTree2";
+import { RenderTree2 } from "./RenderTree2/RenderTree2";
+import type { TreeIndex } from "./RenderTree2/treeIndex";
 
 interface RenderTreePanelProps {
   items: readonly IRenderItem[];

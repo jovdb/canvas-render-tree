@@ -40,7 +40,7 @@ const create = (
   args: [input],
 });
 
-export const draw: ItemDrawFn<IShadowConfig> = ({
+const draw: ItemDrawFn<IShadowConfig> = ({
   ctx,
   drawPrev,
   config,

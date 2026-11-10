@@ -270,7 +270,7 @@ function applyTransform(x: number, y: number, matrix: number[]): Point {
   };
 }
 
-export const draw: ItemDrawFn<IPerspectiveConfig> = ({
+const draw: ItemDrawFn<IPerspectiveConfig> = ({
   ctx,
   drawPrev,
   config,

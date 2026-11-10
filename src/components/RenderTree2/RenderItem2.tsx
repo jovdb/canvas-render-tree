@@ -1,5 +1,7 @@
 import { IRenderItem } from "../../canvas";
-import { TreeIndex, RenderTree2, isWithinTree } from "./RenderTree2";
+import { RenderTree2 } from "./RenderTree2";
+import { isWithinTree } from "./treeIndex";
+import type { TreeIndex } from "./treeIndex";
 import "./RenderItem2.css";
 import { getSchema } from "../../schemas";
 import { useState } from "react";

@@ -352,7 +352,7 @@ class ThinPlateSplinesWarper {
 // Factory function
 // ============================================================================
 
-export const thinPlateSplines = ({
+const thinPlateSplines = ({
   controlPoints = [],
   strength = 1.0,
   regularization = 0.001,
@@ -365,7 +365,7 @@ export const thinPlateSplines = ({
 // Draw Function
 // ============================================================================
 
-export const draw: ItemDrawFn<IThinPlatesSplinesConfig> = ({
+const draw: ItemDrawFn<IThinPlatesSplinesConfig> = ({
   ctx,
   drawPrev,
   config,

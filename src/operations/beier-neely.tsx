@@ -216,7 +216,7 @@ class BeierNeelyWarper {
 // Factory function
 // ============================================================================
 
-export const beierNeely = (
+const beierNeely = (
   {
     controlPoints = [],
     strength = 1.0,
@@ -234,7 +234,7 @@ export const beierNeely = (
 // Draw Function
 // ============================================================================
 
-export const draw: ItemDrawFn<IBeierNeelyConfig> = ({
+const draw: ItemDrawFn<IBeierNeelyConfig> = ({
   ctx,
   drawPrev,
   config,

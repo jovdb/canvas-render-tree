@@ -17,7 +17,8 @@ import { samples } from "./samples";
 import { produce } from "immer";
 import { RenderTreePanel } from "./components/RenderTreePanel";
 import { TreeIndex } from "./components/RenderTree";
-import { getRendererConfig, IConfig, JsonConfig } from "./configs";
+import { getRendererConfig, IConfig } from "./configs";
+import { JsonConfig } from "./configs/JsonConfig";
 import { RenderItemName } from "./operations";
 import "./configs/load";
 import { getRendererOverlay } from "./overlays";
@@ -28,7 +29,7 @@ import {
 } from "./stores/command/useCommandManagerStore";
 import { useWorkTree, useWorkTreeActions } from "./stores/useWorkTreeStore";
 
-export function selectIndex(tree: readonly IRenderItem[], index: TreeIndex) {
+function selectIndex(tree: readonly IRenderItem[], index: TreeIndex) {
   if (index.length === 0) return undefined;
 
   const [itemIndex, argIndex, ...restIndex] = index;

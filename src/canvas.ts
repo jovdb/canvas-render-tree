@@ -54,7 +54,6 @@ export interface IRenderItem<TConfig extends IConfig = IConfig> {
   args?: (RenderTree | undefined)[];
 }
 
-// eslint-disable-next-line @typescript-eslint/no-explicit-any
 export type RenderTree = IRenderItem<IConfig>[];
 
 export type Drawable = HTMLImageElement | HTMLCanvasElement;

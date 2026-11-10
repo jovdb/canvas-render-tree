@@ -212,7 +212,7 @@ const create = (
   args: [input],
 });
 
-export const draw: ItemDrawFn<IRaiseConfig> = ({
+const draw: ItemDrawFn<IRaiseConfig> = ({
   ctx,
   drawPrev,
   config,

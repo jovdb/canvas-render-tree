@@ -215,7 +215,7 @@ class CatmullRomGridWarper {
 // Draw Function
 // ============================================================================
 
-export const draw: ItemDrawFn<ICatmullRomConfig> = ({
+const draw: ItemDrawFn<ICatmullRomConfig> = ({
   ctx,
   drawPrev,
   config,
