@@ -3,7 +3,7 @@ import { IConfig } from "../configs";
 import { OperationSchema } from "../schemas";
 import { addOperation } from ".";
 
-export interface ICylConfig extends IConfig {}
+export type ICylConfig = IConfig;
 
 const schema: OperationSchema<"cyl"> = {
   name: "cyl",

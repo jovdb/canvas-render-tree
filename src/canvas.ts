@@ -59,7 +59,7 @@ export type RenderTree = IRenderItem<IConfig>[];
 
 export type Drawable = HTMLImageElement | HTMLCanvasElement;
 
-function drawTree(items: RenderTree | undefined, _name = "") {
+function drawTree(items: RenderTree | undefined) {
   return items?.reduce(
     (prev, item) => {
       return (ctx) => {
@@ -74,8 +74,8 @@ function drawTree(items: RenderTree | undefined, _name = "") {
               config: item.config,
               drawArgs: item.args
                 ? item.args.map(
-                    (arg, index) => (ctx: CanvasRenderingContext2D) =>
-                      drawTree(arg, `${item.name}-arg-${index}`)?.(ctx),
+                    (arg) => (ctx: CanvasRenderingContext2D) =>
+                      drawTree(arg)?.(ctx),
                   )
                 : undefined,
             });
@@ -130,9 +130,9 @@ export function loadTree(items: RenderTree | undefined) {
   return promises.length === 0 ? undefined : Promise.all(promises);
 }
 
-export function getContext2d(canvas: HTMLCanvasElement, _name: string) {
+export function getContext2d(canvas: HTMLCanvasElement, contextName: string) {
   const ctx = canvas.getContext("2d");
-  if (!ctx) throw new Error("Error creating canvas 2D context");
+  if (!ctx) throw new Error(`Error creating canvas 2D context '${contextName}'`);
 
   return ctx;
   /*
@@ -160,5 +160,5 @@ export function redrawTree(canvasEl: HTMLCanvasElement, items: IRenderItem[]) {
   const ctx = getContext2d(canvasEl, "rootCtx");
   ctx.reset(); // clear and reset unclosed operations: globalAlpha, ...
   ctx.globalCompositeOperation = "source-over";
-  drawTree(items, "root")?.(ctx);
+  drawTree(items)?.(ctx);
 }

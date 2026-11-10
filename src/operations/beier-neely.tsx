@@ -119,15 +119,11 @@ class BeierNeelyWarper {
 
     const weights = this.calculateNormalizedWeights(x, y);
 
-    let sumWx = 0;
-    let sumWy = 0;
     let sumWeightedDx = 0;
     let sumWeightedDy = 0;
 
     for (let i = 0; i < n; i++) {
       const w = weights[i];
-      sumWx += w * this.sourcePoints[i].x;
-      sumWy += w * this.sourcePoints[i].y;
       sumWeightedDx += w * (this.targetPoints[i].x - this.sourcePoints[i].x);
       sumWeightedDy += w * (this.targetPoints[i].y - this.sourcePoints[i].y);
     }

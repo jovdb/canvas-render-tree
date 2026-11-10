@@ -40,7 +40,7 @@ export function onChildCtx(
   }
 }
 
-export interface ILayerConfig extends IConfig {}
+export type ILayerConfig = IConfig;
 
 const schema: OperationSchema<"layer"> = {
   name: "layer",

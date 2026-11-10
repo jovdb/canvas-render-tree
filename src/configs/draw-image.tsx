@@ -9,7 +9,7 @@ export const DrawImageConfig: ItemConfigFn<IDrawImageConfig> = ({
   const { imageUrl } = config;
 
   const [resourceName] = availableImages
-    ? (Object.entries(availableImages).find(([_resourceName, imageUrl2]) => {
+    ? (Object.entries(availableImages).find(([, imageUrl2]) => {
         return imageUrl === imageUrl2;
       }) ?? [undefined, undefined])
     : [undefined, undefined];

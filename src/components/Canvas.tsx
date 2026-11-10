@@ -6,7 +6,7 @@ import { validateSchemas } from "../schemas";
 export function Canvas({ items }: { items: IRenderItem[] }) {
   const canvasRef = useRef<HTMLCanvasElement>(null);
 
-  const { isFetching, error } = useQuery({
+  useQuery({
     queryKey: ["canvas", items],
     queryFn: async () => {
       if (!canvasRef.current) return null;

@@ -3,7 +3,7 @@ import { IConfig } from "../configs";
 import { OperationSchema } from "../schemas";
 import { addOperation } from ".";
 
-export interface IInvertConfig extends IConfig {}
+export type IInvertConfig = IConfig;
 
 const schema: OperationSchema<"invert"> = {
   name: "invert",

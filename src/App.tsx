@@ -120,7 +120,7 @@ function App() {
 
   const RendererOverlay = getRendererOverlay(renderItemName);
 
-  const [_isPending, startTransition] = useTransition();
+  const [, startTransition] = useTransition();
   const onConfigChange = (mutate: (config: IConfig) => void) => {
     const newTree = produce(workTree, (draftTree) => {
       const item = selectIndex(draftTree, editIndex ?? []);
