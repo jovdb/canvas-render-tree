@@ -1,6 +1,8 @@
 import { IRenderItem, ItemDrawFn } from "../canvas";
 import { ItemConfigFn } from "../configs";
 import { addOperation, IOperation } from ".";
+import { FreeControlPointsConfig } from "../components/FreeControlPointsOverlay";
+
 type Point = { x: number; y: number };
 type Vector = { dx: number; dy: number };
 
@@ -93,7 +95,7 @@ const math = {
   },
 };
 
-export interface IBSplinePointsConfig {
+export interface IBSplinePointsConfig extends FreeControlPointsConfig {
   strength?: number;
 }
 
@@ -383,18 +385,23 @@ export const draw: ItemDrawFn<IBSplinePointsConfig> = ({
     20,
   );
 
+  const { strength: lambda = 1, controlPoints = [] } = config || {};
+
   // Define correspondences
-  const pointsA: Point[] = [
-    { x: 120, y: 100 },
-    { x: 480, y: 320 },
-  ]; // Source points
+  const pointsA: Point[] = controlPoints.map((cp) => ({
+    x: cp.x * ctx.canvas.width,
+    y: cp.y * ctx.canvas.height,
+  }));
 
-  const pointsB: Point[] = [
-    { x: 120, y: 300 },
-    { x: 450, y: 340 },
-  ]; // Source points
+  const pointsB: Point[] = controlPoints.map((cp) => ({
+    x: (cp.x + cp.dx) * ctx.canvas.width,
+    y: (cp.y + cp.dy) * ctx.canvas.height,
+  }));
 
-  const { strength: lambda = 1 } = config || {};
+  if (pointsA.length === 0) {
+    if (drawInput) ctx.restore();
+    return;
+  }
 
   // Solve deformation
   warper.solveCorrespondences(pointsA, pointsB, lambda);

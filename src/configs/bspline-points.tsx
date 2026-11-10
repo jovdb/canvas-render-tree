@@ -1,5 +1,7 @@
 import { addRendererConfig, ItemConfigFn } from ".";
 import { IBSplinePointsConfig } from "../operations/bspline-points";
+import { FreeControlPointsOverlay } from "../components/FreeControlPointsOverlay";
+import { addRendererOverlay } from "../overlays";
 
 export const BSplinePointsConfig: ItemConfigFn<IBSplinePointsConfig> = ({
   config,
@@ -30,3 +32,4 @@ export const BSplinePointsConfig: ItemConfigFn<IBSplinePointsConfig> = ({
 };
 
 addRendererConfig("bSplinePoints", BSplinePointsConfig);
+addRendererOverlay("bSplinePoints", FreeControlPointsOverlay);
