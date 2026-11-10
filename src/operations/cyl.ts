@@ -1,13 +1,37 @@
+import React from "react";
 import { IRenderItem, ItemDrawFn, RenderTree } from "../canvas";
 import { IConfig } from "../configs";
+import { ControlPoint } from "../components/ControlPoint";
+import { ItemOverlayFn } from "../overlays";
 import { OperationSchema } from "../schemas";
 import { addOperation } from ".";
+import { renderCylinderTexture } from "./cyl-renderer";
 
-export type ICylConfig = IConfig;
+interface NormalizedPoint {
+  x: number;
+  y: number;
+}
+
+export interface ICylConfig extends IConfig {
+  controlPoints?: NormalizedPoint[];
+  diameterTop?: number;
+  diameterBottom?: number;
+  height?: number;
+  side?: 1 | -1;
+}
+
+const defaultControlPoints: NormalizedPoint[] = [
+  { x: 0.38, y: 0.28 },
+  { x: 0.5, y: 0.22 },
+  { x: 0.62, y: 0.28 },
+  { x: 0.29, y: 0.73 },
+  { x: 0.5, y: 0.82 },
+  { x: 0.71, y: 0.73 },
+];
 
 const schema: OperationSchema<"cyl"> = {
   name: "cyl",
-  description: "Render a 3D cylinder",
+  description: "Render a textured cone using six draggable perspective points",
   args: [
     {
       description: "Rendering to composite with the cylinder",
@@ -16,172 +40,118 @@ const schema: OperationSchema<"cyl"> = {
   ],
 };
 
-interface Point3D {
-  x: number;
-  y: number;
-  z: number;
-}
-
-interface ControlPoints {
-  topCenter: Point3D;
-  topRadius: number; // Use a single radius for a circular cylinder
-  bottomCenter: Point3D;
-  bottomRadius: number;
-  // No need for separate rx, ry since it's a cylinder.
-}
-
-function drawCylinder(
-  imageData: ImageData,
-  controlPoints: ControlPoints,
-  color: [number, number, number, number] = [0, 0, 255, 255],
-): void {
-  const width = imageData.width;
-  const height = imageData.height;
-
-  // Unpack control points for easier access
-  const { topCenter, topRadius, bottomCenter, bottomRadius } = controlPoints;
-
-  // Perspective projection parameters (can be adjusted)
-  const focalLength = 500;
-  const cameraZ = -1000; // Camera position
-
-  // Simple lighting:  Ambient + directional from top-right
-  const ambientLight = 0.3;
-  const directionalLight = 0.7;
-  const lightDirection = { x: 1, y: -1, z: -1 }; // Normalized direction
-
-  function project(point: Point3D): { x: number; y: number } | null {
-    const x = point.x;
-    const y = point.y;
-    const z = point.z;
-    // Perspective projection
-    const perspective = focalLength / (focalLength + z + cameraZ);
-    const projectedX = x * perspective + width / 2; // Center on screen
-    const projectedY = y * perspective + height / 2;
-    return { x: projectedX, y: projectedY };
-  }
-
-  function setPixel(
-    x: number,
-    y: number,
-    color: [number, number, number, number],
-  ) {
-    if (x < 0 || x >= width || y < 0 || y >= height) {
-      return; // Out of bounds
-    }
-    const index = (Math.floor(y) * width + Math.floor(x)) * 4;
-    imageData.data[index] = color[0]; // R
-    imageData.data[index + 1] = color[1]; // G
-    imageData.data[index + 2] = color[2]; // B
-    imageData.data[index + 3] = color[3]; // A
-  }
-  function normalizeVector(v: Point3D): Point3D {
-    const magnitude = Math.sqrt(v.x * v.x + v.y * v.y + v.z * v.z);
-    return {
-      x: v.x / magnitude,
-      y: v.y / magnitude,
-      z: v.z / magnitude,
-    };
-  }
-
-  function dotProduct(v1: Point3D, v2: Point3D): number {
-    return v1.x * v2.x + v1.y * v2.y + v1.z * v2.z;
-  }
-
-  // Iterate over a grid of points in 3D space that define the cylinder's surface
-  const numStepsTheta = 60; // Resolution around the circumference
-  const numStepsHeight = 60; // Resolution along the height
-  const heightDiff = {
-    x: bottomCenter.x - topCenter.x,
-    y: bottomCenter.y - topCenter.y,
-    z: bottomCenter.z - topCenter.z,
-  };
-
-  for (let i = 0; i <= numStepsTheta; i++) {
-    const theta = (i / numStepsTheta) * 2 * Math.PI;
-
-    for (let j = 0; j <= numStepsHeight; j++) {
-      const t = j / numStepsHeight; // Parameter along cylinder height (0 to 1)
-
-      // Calculate the radius and center at the current height
-      const currentRadius = topRadius * (1 - t) + bottomRadius * t;
-      const currentCenter = {
-        x: topCenter.x + heightDiff.x * t,
-        y: topCenter.y + heightDiff.y * t,
-        z: topCenter.z + heightDiff.z * t,
-      };
-
-      // Calculate the 3D point on the cylinder's surface
-      const x = currentCenter.x + currentRadius * Math.cos(theta);
-      const y = currentCenter.y + currentRadius * Math.sin(theta);
-      const z = currentCenter.z;
-      const point3D: Point3D = { x, y, z };
-
-      // Project the 3D point to 2D
-      const point2D = project(point3D);
-      if (!point2D) continue; // Skip points behind the camera
-
-      // --- Calculate Lighting ---
-      // Calculate surface normal (simplified for a cylinder)
-      const normal: Point3D = normalizeVector({
-        x: x - currentCenter.x,
-        y: y - currentCenter.y,
-        z: 0, // For a cylinder, Z component of normal is 0 along the sides
-      });
-
-      // Calculate diffuse light intensity
-      const normalizedLight = normalizeVector(lightDirection);
-      let diffuseIntensity = dotProduct(normal, normalizedLight);
-      diffuseIntensity = Math.max(0, diffuseIntensity); // Clamp to avoid negative light
-
-      // Combine ambient and diffuse light
-      const lightIntensity = ambientLight + directionalLight * diffuseIntensity;
-
-      // Apply lighting to the color
-      const litColor: [number, number, number, number] = [
-        color[0] * lightIntensity,
-        color[1] * lightIntensity,
-        color[2] * lightIntensity,
-        color[3],
-      ];
-      // Draw the pixel
-
-      setPixel(point2D.x, point2D.y, litColor);
-    }
-  }
-}
-
 /** Create a cylinder render */
-const create = (
-  /** When passed, cylinder will be rendered with children */
-  input: RenderTree | undefined,
-): IRenderItem<ICylConfig> => ({
-  name: "cyl",
-  args: [input],
-});
+function create(input: RenderTree | undefined): IRenderItem<ICylConfig>;
+function create(
+  config?: Partial<ICylConfig>,
+  input?: RenderTree,
+): IRenderItem<ICylConfig>;
+function create(
+  configOrInput: Partial<ICylConfig> | RenderTree | undefined = {},
+  input?: RenderTree,
+): IRenderItem<ICylConfig> {
+  const isLegacyInput = Array.isArray(configOrInput);
+  const config =
+    isLegacyInput || configOrInput === undefined ? {} : configOrInput;
+  const children = isLegacyInput ? configOrInput : input;
+
+  return {
+    name: "cyl",
+    config: {
+      controlPoints:
+        config.controlPoints?.map((point) => ({ ...point })) ??
+        defaultControlPoints.map((point) => ({ ...point })),
+      diameterTop: config.diameterTop ?? 1,
+      diameterBottom: config.diameterBottom ?? 2,
+      height: config.height ?? 1.6,
+      side: config.side ?? 1,
+    },
+    args: [Array.isArray(children) ? children : undefined],
+  };
+}
+
+const CylinderControlPointsOverlay: ItemOverlayFn<ICylConfig> = ({
+  config,
+  mutateConfig,
+}) => {
+  const controlPoints =
+    config.controlPoints?.length === 6
+      ? config.controlPoints
+      : defaultControlPoints;
+
+  return React.createElement(
+    "div",
+    {
+      style: {
+        position: "relative",
+        width: "100%",
+        height: "100%",
+        backgroundColor: "rgba(255,255,255,0.2)",
+      },
+    },
+    ...controlPoints.map((point, index) =>
+      React.createElement(ControlPoint, {
+        key: index,
+        left: point.x,
+        top: point.y,
+        onDragInner: (x, y) => {
+          mutateConfig((draftConfig) => {
+            const nextPoints =
+              draftConfig.controlPoints?.length === 6
+                ? [...draftConfig.controlPoints]
+                : defaultControlPoints.map((defaultPoint) => ({
+                    ...defaultPoint,
+                  }));
+            nextPoints[index] = {
+              x: Math.max(0, Math.min(1, x)),
+              y: Math.max(0, Math.min(1, y)),
+            };
+            draftConfig.controlPoints = nextPoints;
+          });
+        },
+      }),
+    ),
+  );
+};
 
 /** Draw a 3D cylinder */
-export const draw: ItemDrawFn<ICylConfig> = ({ ctx, drawPrev, drawArgs }) => {
-  // first draw previous items
+export const draw: ItemDrawFn<ICylConfig> = ({
+  ctx,
+  drawPrev,
+  config,
+  drawArgs,
+}) => {
   drawPrev?.(ctx);
 
   const drawInput = drawArgs?.[0];
-  if (drawInput) ctx.save();
+  const width = ctx.canvas.width;
+  const height = ctx.canvas.height;
+  const sourceCanvas = document.createElement("canvas");
+  sourceCanvas.width = width;
+  sourceCanvas.height = height;
+  const sourceContext = sourceCanvas.getContext("2d");
+  if (!sourceContext) throw new Error("Failed to create cylinder texture context");
 
-  const controlPoints: ControlPoints = {
-    topCenter: { x: 0, y: -50, z: 0 },
-    topRadius: 30,
-    bottomCenter: { x: 50, y: 50, z: 100 },
-    bottomRadius: 60,
-  };
+  if (drawInput) {
+    drawInput(sourceContext);
+  } else {
+    sourceContext.fillStyle = "#3264c8";
+    sourceContext.fillRect(0, 0, width, height);
+  }
 
-  const imageData = new ImageData(ctx.canvas.width, ctx.canvas.height);
-  drawCylinder(imageData, controlPoints, [50, 100, 200, 255]); // Blueish cylinder
+  const cylinderConfig = config ?? {};
+  renderCylinderTexture(
+    ctx,
+    sourceContext.getImageData(0, 0, width, height),
+    {
+      controlPoints: cylinderConfig.controlPoints ?? defaultControlPoints,
+      diameterTop: cylinderConfig.diameterTop ?? 1,
+      diameterBottom: cylinderConfig.diameterBottom ?? 2,
+      height: cylinderConfig.height ?? 1.6,
+      side: cylinderConfig.side ?? 1,
+    },
+  );
 
-  ctx.putImageData(imageData, 0, 0);
-
-  drawInput?.(ctx);
-  if (drawInput) ctx.restore();
 };
 
 const operation = {
@@ -189,6 +159,7 @@ const operation = {
   create,
   draw,
   schema,
+  overlayComponent: CylinderControlPointsOverlay,
 } as const;
 addOperation(operation);
 

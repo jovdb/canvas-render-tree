@@ -70,4 +70,6 @@ export const availableImages = {
   uvMap6: "uv-map6.png",
   uvMap7: "uv-map7.png",
   curvy: "curvy-shirt.jpg",
+  mug: "mug.png",
+  "mug-overlay": "mug-overlay.png",
 };

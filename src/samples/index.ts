@@ -166,7 +166,9 @@ export const samples = {
     type: "2d",
     tree: () => [
       operations.mask(
-        {},
+        {
+          maskSource: "green",
+        },
         [operations.drawImage({ imageUrl: availableImages.parrot })],
         [operations.drawImage({ imageUrl: availableImages.mask })],
       ),
@@ -218,7 +220,49 @@ export const samples = {
   },
   cyl: {
     name: "Cylinder",
-    type: "3d",
-    tree: () => [operations.cyl([operations.fillColor({ color: "#ffcc00" })])],
+    type: "lifestyle",
+    tree: () => [
+      operations.drawImage({
+        imageUrl: "mug.png",
+      }),
+      operations.cyl(
+        {
+          controlPoints: [
+            {
+              x: 0.17,
+              y: 0.2753333282470703,
+            },
+            {
+              x: 0.332,
+              y: 0.3953333282470703,
+            },
+            {
+              x: 0.538,
+              y: 0.2793333282470703,
+            },
+            {
+              x: 0.186,
+              y: 0.5513333282470703,
+            },
+            {
+              x: 0.374,
+              y: 0.6673333282470704,
+            },
+            {
+              x: 0.51,
+              y: 0.5433333282470703,
+            },
+          ],
+          diameterTop: 1,
+          diameterBottom: 1,
+          height: 1.6,
+          side: 1,
+        },
+        [operations.drawImage({ imageUrl: availableImages.mona })],
+      ),
+      operations.drawImage({
+        imageUrl: "mug-overlay.png",
+      }),
+    ],
   },
 } as const;
