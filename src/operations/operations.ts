@@ -3,6 +3,9 @@ import "./opacity";
 import "./blend";
 import "./shadow";
 import "./raise";
+import "./raise-distance";
+import "./raise-kernel";
+import "./raise-morphology";
 import "./fill-color";
 
 import "./bevel";

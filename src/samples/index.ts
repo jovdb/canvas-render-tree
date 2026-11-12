@@ -51,9 +51,35 @@ export const samples = {
     name: "Raise",
     type: "2d",
     tree: () => [
-      operations.drawImage({ imageUrl: availableImages.testbeeld }),
       operations.raise({ strength: 1 }, [
-        operations.drawImage({ imageUrl: availableImages.homer }),
+        operations.drawImage({ imageUrl: availableImages.text }),
+      ]),
+    ],
+  },
+  raiseDistance: {
+    name: "Raise (distance field)",
+    type: "2d",
+    tree: () => [
+      operations["raise-distance"]({}, [
+        operations.drawImage({ imageUrl: availableImages.text }),
+      ]),
+    ],
+  },
+  raiseKernel: {
+    name: "Raise (directional kernel)",
+    type: "2d",
+    tree: () => [
+      operations["raise-kernel"]({}, [
+        operations.drawImage({ imageUrl: availableImages.text }),
+      ]),
+    ],
+  },
+  raiseMorphology: {
+    name: "Raise (morphology)",
+    type: "2d",
+    tree: () => [
+      operations["raise-morphology"]({}, [
+        operations.drawImage({ imageUrl: availableImages.text }),
       ]),
     ],
   },
